@@ -1,3 +1,28 @@
 # Pareto
 
-Pareto 是一个以流式渲染为核心的 SSR（服务器端渲染）框架。我认为，如果 React 服务器组件代表着对 React 应用的100%性能优化，那么流式渲染就相当于对 React 应用进行80%的优化。然而，相比于服务器组件需要你付出100%的努力，流式渲染只需要你20%的投入就足够了。Pareto 的名字来源于Pareto 原则，也被称为80/20原则，这个原则表明大部分效果（80%）通常由少部分因素（20%）产生。
+Pareto 是一个以流式渲染为核心的 SSR（服务器端渲染）框架。 它的目标不是一个类似 `next.js` 或者 `remix` 的全栈框架，而是旨在对常规的 SSR应用进行增强。
+
+你可以直接用 `pareto` 来新建应用，也可以参考这个[模板](./examples/base/)来为你自己的 SSR 应用支持流式渲染功能。
+
+## Why
+
+在SSR应用中接入流式渲染是一个复杂的过程，并且遗憾的是，没有一些好的实践来告诉我们怎么接入流式渲染。像next.js 干脆将 `server component` 和流式渲染强行绑定了，而 remix 也需要使用它自定义的 `defer` 和 `loader` 逻辑。
+
+### 为什么是流式渲染
+
+关于流式渲染的文章，可以参考 <https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming#what-is-streaming> <https://github.com/reactwg/react-18/discussions/22>
+
+简单来说，流式渲染可以在常规 SSR 的基础上提升你的 FCP,TTFB 时间。并且它是一个非常大的提升，因为现在我们不需要在服务器上等待所有的的并行接口，我们可以把接口返回时间最长的那个给“流式掉“
+
+## Features
+
+- [ x ] 最小可行版本
+- [ x ] 关键性 CSS 提取
+- [ x ] `react-helmet-async` 支持
+- [ ] 路由的懒编译，`rspack` 暂时还不支持
+- [ x ] spa 模式
+- [ x ] mobx 例子
+- [ x ] zustand 例子
+- [ x ] 自定义 rspack 配置
+- [ ] tailwind 支持， rspack+tailwind的 hmr有点问题
+- [ ] cli

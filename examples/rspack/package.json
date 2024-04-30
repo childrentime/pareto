@@ -1,0 +1,41 @@
+{
+  "name": "website",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "pareto dev",
+    "build": "pareto build",
+    "start": "node .pareto/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@pareto/core": "workspace:*"
+  },
+  "dependencies": {
+    "@rspack/core": "^0.6.2",
+    "@types/express": "^4.17.21",
+    "@types/fs-extra": "^11.0.4",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@types/serialize-javascript": "^5.0.4",
+    "express": "^4.19.2",
+    "fs-extra": "^11.2.0",
+    "http-proxy-middleware": "^2.0.6",
+    "mobx": "^6.12.3",
+    "mobx-react": "^9.1.1",
+    "react": "19.0.0-beta-94eed63c49-20240425",
+    "react-dom": "19.0.0-beta-94eed63c49-20240425",
+    "serialize-javascript": "^6.0.2",
+    "webpack": "^5.91.0"
+  },
+  "browserslist": [
+    "chrome >= 87",
+    "edge >= 88",
+    "firefox >= 78",
+    "safari >= 14"
+  ]
+}

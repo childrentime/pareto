@@ -1,5 +1,4 @@
 const babelConfig = (isWebTarget) => {
-  console.log('isWebTarget',isWebTarget)
   return {
     presets: [
       [
@@ -22,7 +21,7 @@ const babelConfig = (isWebTarget) => {
       "@babel/preset-typescript",
     ],
     plugins: [
-      // process.env.NODE_ENV !== "production" &&
+      process.env.NODE_ENV !== "production" &&
         isWebTarget &&
         require.resolve("react-refresh/babel"),
     ].filter(Boolean),

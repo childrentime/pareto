@@ -1,7 +1,10 @@
-let config: any = null;
+import { ParetoRuntimeConfig } from "../types";
 
-export const getConfig = () => config;
 
-export const setConfig = (value: any) => {
+let config: ParetoRuntimeConfig = { pages: {},assets: {} };
+
+export const getRuntimeConfig = (): ParetoRuntimeConfig => config;
+
+export const setRuntimeConfig = (value: ParetoRuntimeConfig) => {
   config = value;
 };

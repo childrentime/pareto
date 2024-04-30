@@ -1,13 +1,22 @@
-const inserted = {};
+/**
+ * Isomorphic CSS style loader for Webpack
+ *
+ * Copyright © 2015-present Kriasoft, LLC. All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE.txt file in the root directory of this source tree.
+ */
+
+const inserted = {}
 
 // Base64 encoding and decoding - The "Unicode Problem"
 // https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding#The_Unicode_Problem
 function b64EncodeUnicode(str) {
   return btoa(
     encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) =>
-      String.fromCharCode(`0x${p1}`)
-    )
-  );
+      String.fromCharCode(`0x${p1}`),
+    ),
+  )
 }
 
 /**
@@ -17,12 +26,12 @@ function b64EncodeUnicode(str) {
 function removeCss(ids) {
   ids.forEach((id) => {
     if (--inserted[id] <= 0) {
-      const elem = document.getElementById(id);
+      const elem = document.getElementById(id)
       if (elem) {
-        elem.parentNode.removeChild(elem);
+        elem.parentNode.removeChild(elem)
       }
     }
-  });
+  })
 }
 
 /**
@@ -33,67 +42,63 @@ function removeCss(ids) {
  *   // Remove it from the DOM
  *   removeCss();
  */
-function insertCss(
-  hash,
-  styles,
-  { replace = false, prepend = false, prefix = "s" } = {}
-) {
-  const ids = [];
+function insertCss(styles, { replace = false, prepend = false } = {}) {
+  const ids = []
   for (let i = 0; i < styles.length; i++) {
-    const [_, css, media, sourceMap] = styles[i];
-    const id = hash;
+    const [moduleId, css, media, sourceMap] = styles[i]
+    const id = moduleId;
 
-    ids.push(id);
+    ids.push(id)
 
     if (inserted[id]) {
       if (!replace) {
-        inserted[id]++;
-        continue;
+        inserted[id]++
+        continue
       }
     }
 
-    inserted[id] = 1;
+    inserted[id] = 1
 
-    let elem = document.getElementById(id);
-    let create = false;
+    let elem = document.getElementById(id)
+    let create = false
 
     if (!elem) {
-      create = true;
+      create = true
 
-      elem = document.createElement("style");
-      elem.setAttribute("type", "text/css");
-      elem.id = id;
+      elem = document.createElement('style')
+      elem.setAttribute('type', 'text/css')
+      elem.id = id
 
       if (media) {
-        elem.setAttribute("media", media);
+        elem.setAttribute('media', media)
       }
     }
 
-    let cssText = css;
-    if (sourceMap && typeof btoa === "function") {
+    let cssText = css
+    if (sourceMap && typeof btoa === 'function') {
       // skip IE9 and below, see http://caniuse.com/atob-btoa
       cssText += `\n/*# sourceMappingURL=data:application/json;base64,${b64EncodeUnicode(
-        JSON.stringify(sourceMap)
-      )}*/`;
-      cssText += `\n/*# sourceURL=${sourceMap.file}?${id}*/`;
+        JSON.stringify(sourceMap),
+      )}*/`
+      cssText += `\n/*# sourceURL=${sourceMap.file}?${id}*/`
     }
 
-    if ("textContent" in elem) {
-      elem.textContent = cssText;
+    if ('textContent' in elem) {
+      elem.textContent = cssText
     } else {
-      elem.styleSheet.cssText = cssText;
+      elem.styleSheet.cssText = cssText
     }
 
     if (create) {
       if (prepend) {
-        document.head.insertBefore(elem, document.head.childNodes[0]);
+        document.head.insertBefore(elem, document.head.childNodes[0])
       } else {
-        document.head.appendChild(elem);
+        document.head.appendChild(elem)
       }
     }
   }
 
-  return removeCss.bind(null, ids);
+  return removeCss.bind(null, ids)
 }
 
-module.exports = insertCss;
+module.exports = insertCss

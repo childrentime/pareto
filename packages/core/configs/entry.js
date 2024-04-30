@@ -1,12 +1,16 @@
 const fs = require("fs-extra");
 const path = require("path");
+const pageConfig = require("./page.config");
 
 const cwd = process.cwd();
-const PAGE_DIR = path.resolve(cwd, "app");
-const TEMP = path.resolve(cwd, "./.mpa-ssr");
-const entryPath = path.resolve(TEMP, "./server.ts");
-const CLIENT_DIR = path.resolve(TEMP, "client");
-const CLIENT_WRAPPER = path.resolve(cwd, "./client-entry.tsx");
+const PAGE_DIR = path.resolve(cwd, pageConfig.pageDir);
+
+const {
+  ENTRY,
+  SERVER_ENTRY_PATH,
+  CLIENT_ENTRY_PATH,
+  CLIENT_WRAPPER,
+} = require("../constant");
 
 /**
  * @type {record<string,string>}
@@ -31,13 +35,10 @@ const getServerEntry = () => {
   };
 
   const getRuntimeStr = () => {
-    const assetsStr = `const assets = __non_webpack_require__('../webpack-assets.json');\n\n`;
+    const assetsStr = `const assets = __non_webpack_require__('../client/webpack-assets.json');\n\n`;
     return {
-      importStr: `const { setConfig } = require('${path.resolve(
-        __dirname,
-        "./runtime.config.ts"
-      )}');\n\n`,
-      runStr: assetsStr + "setConfig({ pages, assets });\n",
+      importStr: `import { setRuntimeConfig } from "@pareto/core/node";\n\n`,
+      runStr: assetsStr + "setRuntimeConfig({ pages, assets });\n",
     };
   };
 
@@ -49,30 +50,33 @@ const getServerEntry = () => {
     runtimeStr.importStr +
     pageStr.exportStr +
     runtimeStr.runStr;
+  
+  fs.mkdirSync(ENTRY, { recursive: true });
 
-  fs.mkdirSync(TEMP, { recursive: true });
+  fs.writeFileSync(SERVER_ENTRY_PATH, entryStr);
 
-  fs.writeFileSync(entryPath, entryStr);
-
-  return entryPath;
+  return SERVER_ENTRY_PATH;
 };
 
 const getClientEntries = () => {
-  fs.removeSync(CLIENT_DIR);
-  fs.mkdirSync(CLIENT_DIR, { recursive: true });
+  fs.ensureDirSync(ENTRY);
+  fs.ensureDirSync(CLIENT_ENTRY_PATH);
+
   return Object.entries(pageEntries).reduce(
     (clientEntries, [pageName, modulePath]) => {
       const ext = modulePath.slice(
         modulePath.lastIndexOf("."),
         modulePath.length
       );
-      const pageEntry = path.resolve(CLIENT_DIR, pageName + ext);
+      const pageEntry = path.resolve(CLIENT_ENTRY_PATH, pageName + ext);
       const entryStr =
         `import page from '${modulePath}';\nimport { startApp } from '${CLIENT_WRAPPER}';\n` +
         `startApp(page)`;
 
       fs.writeFileSync(pageEntry, entryStr);
-      clientEntries[pageName] = [path.resolve(CLIENT_DIR, `${pageName}${ext}`)];
+      clientEntries[pageName] = [
+        path.resolve(CLIENT_ENTRY_PATH, `${pageName}${ext}`),
+      ];
 
       return clientEntries;
     },

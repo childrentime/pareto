@@ -31,6 +31,8 @@ const StyleContext = createContext<{
 // @ts-ignore
 const isBrowser = (() => this && typeof this.window === "object")();
 
+const __DEV__ = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
+
 function useStyles(...styles: any[]) {
   const { insertCss } = useContext(StyleContext);
   if (!insertCss)

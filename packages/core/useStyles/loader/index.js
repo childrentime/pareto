@@ -1,4 +1,10 @@
-"use strict";
+const crypto = require('crypto');
+
+function createHash(source) {
+  const hash = crypto.createHash('md5');
+  hash.update(source);
+  return hash.digest('hex');
+}
 
 function stringifyRequest(loaderContext, request) {
   return JSON.stringify(
@@ -6,28 +12,27 @@ function stringifyRequest(loaderContext, request) {
   );
 }
 
-const { getHashDigest } = require("loader-utils");
-
-module.exports = function loader() {};
+module.exports = function loader() {}
 module.exports.pitch = function pitch(request) {
   if (this.cacheable) {
-    this.cacheable();
+    this.cacheable()
   }
 
-  const insertCss = require.resolve("./insertCss.js");
+  const insertCss = require.resolve('./insertCss.js');
   const filePath = this.resourcePath;
-  const hash = getHashDigest(filePath, "md5", "hex", 8);
+  const hash = createHash(filePath); 
 
   return `
+    var refs = 0;
     var css = require(${stringifyRequest(this, `!!${request}`)});
     var insertCss = require(${stringifyRequest(this, `!${insertCss}`)});
-    var content = typeof css === 'string' ? [[module.id, css, '']] : css;
+    var content = typeof css === 'string' ? [['${hash}', css, '']] : [['${hash}',...css[0].slice(1)]];
 
     exports = module.exports = css.locals || {};
-    exports._getContent = function() { return content; };
-    exports._getHash = function() { return '${hash}' };
+    exports._getContent = function() { return content[0][1]; };
     exports._getCss = function() { return '' + css; };
-    exports._insertCss = function(options) { return insertCss('${hash}',content, options) };
+    exports._getHash = function() { return '${hash}'; };
+    exports._insertCss = function(options) { return insertCss(content, options) };
 
     // Hot Module Replacement
     // https://webpack.github.io/docs/hot-module-replacement
@@ -36,10 +41,10 @@ module.exports.pitch = function pitch(request) {
       var removeCss = function() {};
       module.hot.accept(${stringifyRequest(this, `!!${request}`)}, function() {
         css = require(${stringifyRequest(this, `!!${request}`)});
-        content = typeof css === 'string' ? [[module.id, css, '']] : css;
+        content = typeof css === 'string' ? [['${hash}', css, '']] : [['${hash}',...css[0].slice(1)]];
         removeCss = insertCss(content, { replace: true });
       });
       module.hot.dispose(function() { removeCss(); });
     }
-  `;
-};
+  `
+}

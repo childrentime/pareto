@@ -5,6 +5,7 @@ import { renderToPipeableStream, renderToStaticMarkup } from "react-dom/server";
 import { Scripts } from "../stream-helpers";
 import superjson from "superjson";
 import { ParetoPage } from "../types";
+import { Transform } from "stream";
 
 // magically speed up ios rendering
 const PADDING_EL = '<div style="height: 0">' + "\u200b".repeat(300) + "</div>";
@@ -68,7 +69,9 @@ export const paretoRequestHandler =
     res.flushHeaders();
 
     const Page = __csr ? () => null : pages[path];
-    const initialData = !__csr ? await (Page as ParetoPage).getServerSideProps?.(req, res): {};
+    const initialData = !__csr
+      ? await (Page as ParetoPage).getServerSideProps?.(req, res)
+      : {};
 
     props.pageWrapper =
       props?.pageWrapper ||
@@ -83,7 +86,7 @@ export const paretoRequestHandler =
       page: WrapperPage,
       helmetContext = {},
       criticalCssMap = new Map<string, string>(),
-      // @ts-ignore 
+      // @ts-ignore
     } = props.pageWrapper(Page, initialData);
 
     const { pipe, abort } = renderToPipeableStream(
@@ -92,7 +95,7 @@ export const paretoRequestHandler =
         <script
           dangerouslySetInnerHTML={{
             __html: `window.__INITIAL_DATA__ = '${superjson.stringify(
-              initialData?.getState() || initialData
+              initialData?.getState?.() || initialData
             )}';`,
           }}
         />
@@ -122,7 +125,17 @@ export const paretoRequestHandler =
 
           res.write(`${helmetContent}${styles}${HEAD_CLOSE_HTML}`);
 
-          pipe(res);
+          let transform = new Transform({
+            transform(chunk, encoding, callback) {
+              this.push(chunk);
+              callback();
+            },
+            flush(callback) {
+              this.push('</body></html>');
+              callback();
+            }
+          });
+          pipe(transform).pipe(res);
         },
       }
     );

@@ -2,14 +2,12 @@ import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { ParetoPage } from "@pareto/core";
 import { Provider } from "mobx-react";
+import superjson from 'superjson'
 
 const startApp = (Page: ParetoPage) => {
   const root = document.getElementById("main") as HTMLElement;
-  const __INITIAL_DATA__ = window.__INITIAL_DATA__;
-  Page.setUpClientPromise?.();
-
-  const store = new Page.Store();
-  store.hydrate(__INITIAL_DATA__)
+  const __INITIAL_DATA__ =  superjson.parse(window.__INITIAL_DATA__) as Record<string, any>;
+  const store = Page.setUpClient?.(__INITIAL_DATA__);
 
   hydrateRoot(
     root,

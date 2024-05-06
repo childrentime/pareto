@@ -20,42 +20,24 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
-      '@types/fs-extra':
-        specifier: ^11.0.4
-        version: 11.0.4
       '@types/react':
         specifier: ^18.3.0
         version: 18.3.0
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.0
-      '@types/serialize-javascript':
-        specifier: ^5.0.4
-        version: 5.0.4
       express:
         specifier: ^4.19.2
         version: 4.19.2
-      fs-extra:
-        specifier: ^11.2.0
-        version: 11.2.0
-      http-proxy-middleware:
-        specifier: ^2.0.6
-        version: 2.0.6(@types/express@4.17.21)
-      mobx:
-        specifier: ^6.12.3
-        version: 6.12.3
-      mobx-react:
-        specifier: ^9.1.1
-        version: 9.1.1(mobx@6.12.3)(react-dom@19.0.0-beta-94eed63c49-20240425)(react@19.0.0-beta-94eed63c49-20240425)
       react:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425
       react-dom:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425(react@19.0.0-beta-94eed63c49-20240425)
-      serialize-javascript:
-        specifier: ^6.0.2
-        version: 6.0.2
+      superjson:
+        specifier: ^1.13.3
+        version: 1.13.3
     devDependencies:
       '@pareto/core':
         specifier: workspace:*
@@ -66,42 +48,24 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
-      '@types/fs-extra':
-        specifier: ^11.0.4
-        version: 11.0.4
       '@types/react':
         specifier: ^18.3.0
         version: 18.3.0
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.0
-      '@types/serialize-javascript':
-        specifier: ^5.0.4
-        version: 5.0.4
       express:
         specifier: ^4.19.2
         version: 4.19.2
-      fs-extra:
-        specifier: ^11.2.0
-        version: 11.2.0
-      http-proxy-middleware:
-        specifier: ^2.0.6
-        version: 2.0.6(@types/express@4.17.21)
-      mobx:
-        specifier: ^6.12.3
-        version: 6.12.3
-      mobx-react:
-        specifier: ^9.1.1
-        version: 9.1.1(mobx@6.12.3)(react-dom@19.0.0-beta-94eed63c49-20240425)(react@19.0.0-beta-94eed63c49-20240425)
       react:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425
       react-dom:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425(react@19.0.0-beta-94eed63c49-20240425)
-      serialize-javascript:
-        specifier: ^6.0.2
-        version: 6.0.2
+      superjson:
+        specifier: 1.13.3
+        version: 1.13.3
     devDependencies:
       '@pareto/core':
         specifier: workspace:*
@@ -112,42 +76,24 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
-      '@types/fs-extra':
-        specifier: ^11.0.4
-        version: 11.0.4
       '@types/react':
         specifier: ^18.3.0
         version: 18.3.0
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.0
-      '@types/serialize-javascript':
-        specifier: ^5.0.4
-        version: 5.0.4
       express:
         specifier: ^4.19.2
         version: 4.19.2
-      fs-extra:
-        specifier: ^11.2.0
-        version: 11.2.0
-      http-proxy-middleware:
-        specifier: ^2.0.6
-        version: 2.0.6(@types/express@4.17.21)
-      mobx:
-        specifier: ^6.12.3
-        version: 6.12.3
-      mobx-react:
-        specifier: ^9.1.1
-        version: 9.1.1(mobx@6.12.3)(react-dom@19.0.0-beta-94eed63c49-20240425)(react@19.0.0-beta-94eed63c49-20240425)
       react:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425
       react-dom:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425(react@19.0.0-beta-94eed63c49-20240425)
-      serialize-javascript:
-        specifier: ^6.0.2
-        version: 6.0.2
+      superjson:
+        specifier: ^1.13.3
+        version: 1.13.3
     devDependencies:
       '@pareto/core':
         specifier: workspace:*
@@ -158,42 +104,24 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
-      '@types/fs-extra':
-        specifier: ^11.0.4
-        version: 11.0.4
       '@types/react':
         specifier: ^18.3.0
         version: 18.3.0
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.0
-      '@types/serialize-javascript':
-        specifier: ^5.0.4
-        version: 5.0.4
       express:
         specifier: ^4.19.2
         version: 4.19.2
-      fs-extra:
-        specifier: ^11.2.0
-        version: 11.2.0
-      http-proxy-middleware:
-        specifier: ^2.0.6
-        version: 2.0.6(@types/express@4.17.21)
-      mobx:
-        specifier: ^6.12.3
-        version: 6.12.3
-      mobx-react:
-        specifier: ^9.1.1
-        version: 9.1.1(mobx@6.12.3)(react-dom@19.0.0-beta-94eed63c49-20240425)(react@19.0.0-beta-94eed63c49-20240425)
       react:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425
       react-dom:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425(react@19.0.0-beta-94eed63c49-20240425)
-      serialize-javascript:
-        specifier: ^6.0.2
-        version: 6.0.2
+      superjson:
+        specifier: ^1.13.3
+        version: 1.13.3
     devDependencies:
       '@pareto/core':
         specifier: workspace:*
@@ -201,33 +129,18 @@ importers:
 
   examples/mobx:
     dependencies:
-      '@babel/plugin-proposal-decorators':
-        specifier: ^7.24.1
-        version: 7.24.1(@babel/core@7.24.4)
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
-      '@types/fs-extra':
-        specifier: ^11.0.4
-        version: 11.0.4
       '@types/react':
         specifier: ^18.3.0
         version: 18.3.0
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.0
-      '@types/serialize-javascript':
-        specifier: ^5.0.4
-        version: 5.0.4
       express:
         specifier: ^4.19.2
         version: 4.19.2
-      fs-extra:
-        specifier: ^11.2.0
-        version: 11.2.0
-      http-proxy-middleware:
-        specifier: ^2.0.6
-        version: 2.0.6(@types/express@4.17.21)
       mobx:
         specifier: ^6.12.3
         version: 6.12.3
@@ -240,12 +153,9 @@ importers:
       react-dom:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425(react@19.0.0-beta-94eed63c49-20240425)
-      serialize-javascript:
-        specifier: ^6.0.2
-        version: 6.0.2
-      typescript:
-        specifier: 4.1.6
-        version: 4.1.6
+      superjson:
+        specifier: ^1.13.3
+        version: 1.13.3
     devDependencies:
       '@pareto/core':
         specifier: workspace:*
@@ -259,45 +169,24 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
-      '@types/fs-extra':
-        specifier: ^11.0.4
-        version: 11.0.4
       '@types/react':
         specifier: ^18.3.0
         version: 18.3.0
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.0
-      '@types/serialize-javascript':
-        specifier: ^5.0.4
-        version: 5.0.4
       express:
         specifier: ^4.19.2
         version: 4.19.2
-      fs-extra:
-        specifier: ^11.2.0
-        version: 11.2.0
-      http-proxy-middleware:
-        specifier: ^2.0.6
-        version: 2.0.6(@types/express@4.17.21)
-      mobx:
-        specifier: ^6.12.3
-        version: 6.12.3
-      mobx-react:
-        specifier: ^9.1.1
-        version: 9.1.1(mobx@6.12.3)(react-dom@19.0.0-beta-94eed63c49-20240425)(react@19.0.0-beta-94eed63c49-20240425)
       react:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425
       react-dom:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425(react@19.0.0-beta-94eed63c49-20240425)
-      serialize-javascript:
-        specifier: ^6.0.2
-        version: 6.0.2
-      webpack:
-        specifier: ^5.91.0
-        version: 5.91.0(esbuild@0.19.12)
+      superjson:
+        specifier: ^1.13.3
+        version: 1.13.3
     devDependencies:
       '@pareto/core':
         specifier: workspace:*
@@ -308,42 +197,24 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
-      '@types/fs-extra':
-        specifier: ^11.0.4
-        version: 11.0.4
       '@types/react':
         specifier: ^18.3.0
         version: 18.3.0
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.0
-      '@types/serialize-javascript':
-        specifier: ^5.0.4
-        version: 5.0.4
       express:
         specifier: ^4.19.2
         version: 4.19.2
-      fs-extra:
-        specifier: ^11.2.0
-        version: 11.2.0
-      http-proxy-middleware:
-        specifier: ^2.0.6
-        version: 2.0.6(@types/express@4.17.21)
-      mobx:
-        specifier: ^6.12.3
-        version: 6.12.3
-      mobx-react:
-        specifier: ^9.1.1
-        version: 9.1.1(mobx@6.12.3)(react-dom@19.0.0-beta-94eed63c49-20240425)(react@19.0.0-beta-94eed63c49-20240425)
       react:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425
       react-dom:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425(react@19.0.0-beta-94eed63c49-20240425)
-      serialize-javascript:
-        specifier: ^6.0.2
-        version: 6.0.2
+      superjson:
+        specifier: ^1.13.3
+        version: 1.13.3
     devDependencies:
       '@pareto/core':
         specifier: workspace:*
@@ -354,42 +225,24 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
-      '@types/fs-extra':
-        specifier: ^11.0.4
-        version: 11.0.4
       '@types/react':
         specifier: ^18.3.0
         version: 18.3.0
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.0
-      '@types/serialize-javascript':
-        specifier: ^5.0.4
-        version: 5.0.4
       express:
         specifier: ^4.19.2
         version: 4.19.2
-      fs-extra:
-        specifier: ^11.2.0
-        version: 11.2.0
-      http-proxy-middleware:
-        specifier: ^2.0.6
-        version: 2.0.6(@types/express@4.17.21)
-      mobx:
-        specifier: ^6.12.3
-        version: 6.12.3
-      mobx-react:
-        specifier: ^9.1.1
-        version: 9.1.1(mobx@6.12.3)(react-dom@19.0.0-beta-94eed63c49-20240425)(react@19.0.0-beta-94eed63c49-20240425)
       react:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425
       react-dom:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425(react@19.0.0-beta-94eed63c49-20240425)
-      serialize-javascript:
-        specifier: ^6.0.2
-        version: 6.0.2
+      superjson:
+        specifier: ^1.13.3
+        version: 1.13.3
       tailwindcss:
         specifier: ^3.4.3
         version: 3.4.3
@@ -403,36 +256,24 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
-      '@types/fs-extra':
-        specifier: ^11.0.4
-        version: 11.0.4
       '@types/react':
         specifier: ^18.3.0
         version: 18.3.0
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.0
-      '@types/serialize-javascript':
-        specifier: ^5.0.4
-        version: 5.0.4
       express:
         specifier: ^4.19.2
         version: 4.19.2
-      fs-extra:
-        specifier: ^11.2.0
-        version: 11.2.0
-      http-proxy-middleware:
-        specifier: ^2.0.6
-        version: 2.0.6(@types/express@4.17.21)
       react:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425
       react-dom:
         specifier: 19.0.0-beta-94eed63c49-20240425
         version: 19.0.0-beta-94eed63c49-20240425(react@19.0.0-beta-94eed63c49-20240425)
-      serialize-javascript:
-        specifier: ^6.0.2
-        version: 6.0.2
+      superjson:
+        specifier: ^1.13.3
+        version: 1.13.3
       zustand:
         specifier: ^4.5.2
         version: 4.5.2(@types/react@18.3.0)(react@19.0.0-beta-94eed63c49-20240425)
@@ -527,6 +368,9 @@ importers:
       serialize-javascript:
         specifier: ^6.0.2
         version: 6.0.2
+      superjson:
+        specifier: ^1.13.3
+        version: 1.13.3
       webpack:
         specifier: ^5.91.0
         version: 5.91.0(esbuild@0.19.12)
@@ -892,18 +736,6 @@ packages:
       '@babel/helper-plugin-utils': 7.24.0
     dev: false
 
-  /@babel/plugin-proposal-decorators@7.24.1(@babel/core@7.24.4):
-    resolution: {integrity: sha512-zPEvzFijn+hRvJuX2Vu3KbEBN39LN3f7tW3MQO2LsIs57B26KU+kUc82BdAktS1VCM6libzh45eKGI65lg0cpA==}
-    engines: {node: '>=6.9.0'}
-    peerDependencies:
-      '@babel/core': ^7.0.0-0
-    dependencies:
-      '@babel/core': 7.24.4
-      '@babel/helper-create-class-features-plugin': 7.24.4(@babel/core@7.24.4)
-      '@babel/helper-plugin-utils': 7.24.0
-      '@babel/plugin-syntax-decorators': 7.24.1(@babel/core@7.24.4)
-    dev: false
-
   /@babel/plugin-proposal-private-property-in-object@7.21.0-placeholder-for-preset-env.2(@babel/core@7.24.4):
     resolution: {integrity: sha512-SOSkfJDddaM7mak6cPEpswyTRnuRltl429hMraQEglW+OkovnCzsiszTmsrlY//qLFjCpQDFRvjdm2wA5pPm9w==}
     engines: {node: '>=6.9.0'}
@@ -933,16 +765,6 @@ packages:
 
   /@babel/plugin-syntax-class-static-block@7.14.5(@babel/core@7.24.4):
     resolution: {integrity: sha512-b+YyPmr6ldyNnM6sqYeMWE+bgJcJpO6yS4QD7ymxgH34GBPNDM/THBh8iunyvKIZztiwLH4CJZ0RxTk9emgpjw==}
-    engines: {node: '>=6.9.0'}
-    peerDependencies:
-      '@babel/core': ^7.0.0-0
-    dependencies:
-      '@babel/core': 7.24.4
-      '@babel/helper-plugin-utils': 7.24.0
-    dev: false
-
-  /@babel/plugin-syntax-decorators@7.24.1(@babel/core@7.24.4):
-    resolution: {integrity: sha512-05RJdO/cCrtVWuAaSn1tS3bH8jbsJa/Y1uD186u6J4C/1mnHFxseeuWpsqr9anvo7TUulev7tm7GDwRV+VuhDw==}
     engines: {node: '>=6.9.0'}
     peerDependencies:
       '@babel/core': ^7.0.0-0
@@ -2503,12 +2325,6 @@ packages:
     resolution: {integrity: sha512-D0CFMMtydbJAegzOyHjtiKPLlvnm3iTZyZRSZoLq2mRhDdmLfIWOCYPfQJ4cu2erKghU++QvjcUjp/5h7hESpA==}
     dev: false
 
-  /@types/http-proxy@1.17.14:
-    resolution: {integrity: sha512-SSrD0c1OQzlFX7pGu1eXxSEjemej64aaNPRhhVYUGqXh0BtldAAx37MG8btcumvpgKyZp1F5Gn3JkktdxiFv6w==}
-    dependencies:
-      '@types/node': 20.12.7
-    dev: false
-
   /@types/json-schema@7.0.15:
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
     dev: false
@@ -3123,6 +2939,13 @@ packages:
     engines: {node: '>= 0.6'}
     dev: false
 
+  /copy-anything@3.0.5:
+    resolution: {integrity: sha512-yCEafptTtb4bk7GLEQoM8KVJpxAfdBJYaXyzQEgQQQgYrZiDp8SJmGKlYza6CYjEDNstAdNdKA3UuoULlEbS6w==}
+    engines: {node: '>=12.13'}
+    dependencies:
+      is-what: 4.1.16
+    dev: false
+
   /core-js-compat@3.37.0:
     resolution: {integrity: sha512-vYq4L+T8aS5UuFg4UwDhc7YNRWVeVZwltad9C/jV3R2LgVOpS9BDr7l/WL6BN0dbV3k1XejPTHqqEzJgsa0frA==}
     dependencies:
@@ -3415,10 +3238,6 @@ packages:
     engines: {node: '>= 0.6'}
     dev: false
 
-  /eventemitter3@4.0.7:
-    resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
-    dev: false
-
   /events@3.3.0:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
     engines: {node: '>=0.8.x'}
@@ -3549,16 +3368,6 @@ packages:
   /flat@5.0.2:
     resolution: {integrity: sha512-b6suED+5/3rTpUBdG1gupIl8MPFCAMA0QXwmljLhvCUKcUvdE4gWky9zpuGCcXHOsz4J9wPGNWq6OKpmIzz3hQ==}
     hasBin: true
-    dev: false
-
-  /follow-redirects@1.15.6:
-    resolution: {integrity: sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==}
-    engines: {node: '>=4.0'}
-    peerDependencies:
-      debug: '*'
-    peerDependenciesMeta:
-      debug:
-        optional: true
     dev: false
 
   /foreground-child@3.1.1:
@@ -3734,36 +3543,6 @@ packages:
       toidentifier: 1.0.1
     dev: false
 
-  /http-proxy-middleware@2.0.6(@types/express@4.17.21):
-    resolution: {integrity: sha512-ya/UeJ6HVBYxrgYotAZo1KvPWlgB48kUJLDePFeneHsVujFaW5WNj2NgWCAE//B1Dl02BIfYlpNgBy8Kf8Rjmw==}
-    engines: {node: '>=12.0.0'}
-    peerDependencies:
-      '@types/express': ^4.17.13
-    peerDependenciesMeta:
-      '@types/express':
-        optional: true
-    dependencies:
-      '@types/express': 4.17.21
-      '@types/http-proxy': 1.17.14
-      http-proxy: 1.18.1
-      is-glob: 4.0.3
-      is-plain-obj: 3.0.0
-      micromatch: 4.0.5
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
-  /http-proxy@1.18.1:
-    resolution: {integrity: sha512-7mz/721AbnJwIVbnaSv1Cz3Am0ZLT/UBwkC92VlxhXv/k/BBQfM2fXElQNC27BVGr0uwUpplYPQM9LnaBMR5NQ==}
-    engines: {node: '>=8.0.0'}
-    dependencies:
-      eventemitter3: 4.0.7
-      follow-redirects: 1.15.6
-      requires-port: 1.0.0
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
   /human-signals@2.1.0:
     resolution: {integrity: sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==}
     engines: {node: '>=10.17.0'}
@@ -3851,11 +3630,6 @@ packages:
     resolution: {integrity: sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==}
     engines: {node: '>=0.12.0'}
 
-  /is-plain-obj@3.0.0:
-    resolution: {integrity: sha512-gwsOE28k+23GP1B6vFl1oVh/WOzmawBrKwo5Ev6wMKzPkaXaCDIQKzLnvsA42DRlbVTWorkgTKIviAKCWkfUwA==}
-    engines: {node: '>=10'}
-    dev: false
-
   /is-plain-object@2.0.4:
     resolution: {integrity: sha512-h5PpgXkWitc38BBMYawTYMWJHFZJVnBquFE57xFpjB8pJFiF6gZ+bU+WyI/yqXiFR5mdLsgYNaPe8uao6Uv9Og==}
     engines: {node: '>=0.10.0'}
@@ -3867,6 +3641,11 @@ packages:
     resolution: {integrity: sha512-hFoiJiTl63nn+kstHGBtewWSKnQLpyb155KHheA1l39uvtO9nWIop1p3udqPcUd/xbF1VLMO4n7OI6p7RbngDg==}
     engines: {node: '>=8'}
     dev: true
+
+  /is-what@4.1.16:
+    resolution: {integrity: sha512-ZhMwEosbFJkA0YhFnNDgTM4ZxDRsS6HqTo7qsZM08fehyRYIYa0yHu5R6mgo1n/8MgaPBXiPimPD77baVFYg+A==}
+    engines: {node: '>=12.13'}
+    dev: false
 
   /isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
@@ -4616,10 +4395,6 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: false
 
-  /requires-port@1.0.0:
-    resolution: {integrity: sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==}
-    dev: false
-
   /resolve-from@4.0.0:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}
     engines: {node: '>=4'}
@@ -4935,6 +4710,13 @@ packages:
       pirates: 4.0.6
       ts-interface-checker: 0.1.13
 
+  /superjson@1.13.3:
+    resolution: {integrity: sha512-mJiVjfd2vokfDxsQPOwJ/PtanO87LhpYY88ubI5dUB1Ab58Txbyje3+jpm+/83R/fevaq/107NNhtYBLuoTrFg==}
+    engines: {node: '>=10'}
+    dependencies:
+      copy-anything: 3.0.5
+    dev: false
+
   /supports-color@5.5.0:
     resolution: {integrity: sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==}
     engines: {node: '>=4'}
@@ -5112,12 +4894,6 @@ packages:
     dependencies:
       media-typer: 0.3.0
       mime-types: 2.1.35
-    dev: false
-
-  /typescript@4.1.6:
-    resolution: {integrity: sha512-pxnwLxeb/Z5SP80JDRzVjh58KsM6jZHRAOtTpS7sXLS4ogXNKC9ANxHHZqLLeVHZN35jCtI4JdmLLbLiC1kBow==}
-    engines: {node: '>=4.2.0'}
-    hasBin: true
     dev: false
 
   /typescript@5.4.5:

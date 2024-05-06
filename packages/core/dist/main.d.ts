@@ -1,5 +1,5 @@
 import * as react from 'react';
-export { P as ParetoPage, a as ParetoRuntimeConfig } from './types-C5iFBvfz.js';
+export { P as ParetoPage, a as ParetoRuntimeConfig } from './types-CXhhAA3U.js';
 import * as react_jsx_runtime from 'react/jsx-runtime';
 export { Helmet, HelmetProvider } from 'react-helmet-async';
 import 'express';
@@ -16,10 +16,6 @@ interface ISOStyle {
          * @default false
          */
         prepend: boolean;
-        /**
-         * @default 's'
-         */
-        prefix: string;
     }) => () => void;
     _getHash: () => string;
 }

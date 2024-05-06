@@ -5,7 +5,7 @@ export interface ParetoPage<
 > {
   (props: { initialData: T }): JSX.Element;
   getServerSideProps?: (req: Request, res: Response) => Promise<T>;
-  setUpClientPromise?: () => void;
+  setUpClient?: (data?: Record<string,any>) => Promise<any>;
   [key: string]: any;
 }
 

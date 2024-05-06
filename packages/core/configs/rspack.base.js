@@ -10,13 +10,14 @@ const cssLoader = (modules) => {
   return {
     loader: require.resolve("css-loader"),
     options: {
-      importLoaders: 1,
+      importLoaders: 2,
       modules: modules
         ? {
             localIdentName: __DEV__
               ? "[local]-[hash:base64:5]"
               : "[hash:base64:8]",
             namedExport: false,
+            mode: "local",
           }
         : "global",
       sourceMap: true,

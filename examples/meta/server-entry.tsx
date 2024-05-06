@@ -1,10 +1,9 @@
-import { renderToPipeableStream } from "react-dom/server";
 import express from "express";
-import App from "./root";
-import { getRuntimeConfig, pageEntries } from "@pareto/core/node";
+import {
+  paretoRequestHandler,
+} from "@pareto/core/node";
 import { sleep } from "./utils";
 import { HelmetProvider } from "@pareto/core";
-import { Transform } from "stream";
 
 const app = express();
 
@@ -68,73 +67,23 @@ app.use("/api/recommends", async (req, res) => {
   });
 });
 
-app.get("*", async (req, res) => {
-  const path = req.path.slice(1);
-  if (!pageEntries[path]) {
-    return;
-  }
-
-  const { pages, assets } = getRuntimeConfig();
-  const asset = assets[path];
-  const { js, css } = asset;
-  const jsArr = typeof js === "string" ? [js] : [...(js || [])];
-  const cssArr = typeof css === "string" ? [css] : [...(css || [])];
-
-  const preloadJS = jsArr.map((js) => {
-    return <link rel="preload" href={js} as="script" key={js} />;
-  });
-  const loadedCSS = cssArr.map((css) => {
-    return <link rel="stylesheet" href={css} type="text/css" key={css} />;
-  });
-  const loadedJs = jsArr.map((js) => {
-    return <script src={js} async key={js} />;
-  });
-
-  const Page = pages[path];
-  const initialData = await Page.getServerSideProps?.(req, res);
-  const helmetContext = {} as any;
-
-  const { pipe, abort } = renderToPipeableStream(
-    <HelmetProvider context={helmetContext}>
-      <App
-        Page={Page}
-        Links={[...loadedCSS, ...preloadJS]}
-        Scripts={loadedJs}
-        initialData={initialData}
-      />
-    </HelmetProvider>,
-    {
-      onShellReady() {
-        const { helmet } = helmetContext;
-        const helmetContent = `
-        ${helmet.title.toString()}
-        ${helmet.priority.toString()}
-        ${helmet.meta.toString()}
-        ${helmet.link.toString()}
-        ${helmet.script.toString()}
-      `;
-        const injectableTransform = new Transform({
-          transform(chunk, encoding, callback) {
-            const data = chunk.toString();
-
-            if (data.includes("<head>")) {
-              const newData = data.replace("<head>", `<head>${helmetContent}`);
-
-              this.push(newData);
-            } else {
-              this.push(data);
-            }
-
-            callback();
-          },
-        });
-        pipe(injectableTransform).pipe(res);
-      },
-    }
-  );
-  setTimeout(() => {
-    abort();
-  }, ABORT_DELAY);
-});
+app.get(
+  "*",
+  paretoRequestHandler({
+    delay: ABORT_DELAY,
+    pageWrapper: (Page) => {
+      const helmetContext = {} as any;
+      return {
+        page: (props) => (
+          // @ts-ignore react19
+          <HelmetProvider context={helmetContext}>
+            <Page {...props} />
+          </HelmetProvider >
+        ),
+        helmetContext,
+      };
+    },
+  })
+);
 
 export { app };

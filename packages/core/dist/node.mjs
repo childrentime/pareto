@@ -1,10 +1,10 @@
 import {
+  Scripts,
   __commonJS,
   __require,
-  __spreadValues,
   __toESM,
   init_esm_shims
-} from "./chunk-TSWIMCPP.mjs";
+} from "./chunk-ATHF7DWE.mjs";
 
 // constant.js
 var require_constant = __commonJS({
@@ -49,7 +49,7 @@ var require_page_config = __commonJS({
     };
     if (fs.existsSync(CONFIG_PATH)) {
       const customConfig = __require(CONFIG_PATH);
-      pageConfig = __spreadValues(__spreadValues({}, pageConfig), customConfig);
+      pageConfig = { ...pageConfig, ...customConfig };
     }
     module.exports = pageConfig;
   }
@@ -71,18 +71,18 @@ var require_entry = __commonJS({
       CLIENT_ENTRY_PATH,
       CLIENT_WRAPPER
     } = require_constant();
-    var pageEntries2 = fs.readdirSync(PAGE_DIR).reduce((entry, filename) => {
+    var pageEntries3 = fs.readdirSync(PAGE_DIR).reduce((entry, filename) => {
       const pageEntry = path.resolve(PAGE_DIR, filename, "index.tsx");
       entry[filename] = pageEntry;
       return entry;
     }, {});
     var getServerEntry = () => {
       const getPagesStr = () => {
-        const importStr = Object.entries(pageEntries2).reduce((result, [pageName, modulePath]) => {
+        const importStr = Object.entries(pageEntries3).reduce((result, [pageName, modulePath]) => {
           return result + `import ${pageName} from '${modulePath}';
 `;
         }, "") + "\n";
-        const pageNames = Object.keys(pageEntries2);
+        const pageNames = Object.keys(pageEntries3);
         const exportStr = `const pages = { ${pageNames.join(", ")} };
 
 `;
@@ -109,7 +109,7 @@ var require_entry = __commonJS({
     var getClientEntries = () => {
       fs.ensureDirSync(ENTRY);
       fs.ensureDirSync(CLIENT_ENTRY_PATH);
-      return Object.entries(pageEntries2).reduce(
+      return Object.entries(pageEntries3).reduce(
         (clientEntries, [pageName, modulePath]) => {
           const ext = modulePath.slice(
             modulePath.lastIndexOf("."),
@@ -131,14 +131,14 @@ startApp(page)`;
     module.exports = {
       getServerEntry,
       getClientEntries,
-      pageEntries: pageEntries2
+      pageEntries: pageEntries3
     };
   }
 });
 
 // node.ts
 init_esm_shims();
-var import_entry = __toESM(require_entry());
+var import_entry2 = __toESM(require_entry());
 
 // configs/runtime.config.ts
 init_esm_shims();
@@ -147,9 +147,109 @@ var getRuntimeConfig = () => config;
 var setRuntimeConfig = (value) => {
   config = value;
 };
-var export_pageEntries = import_entry.pageEntries;
+
+// render/server.tsx
+init_esm_shims();
+var import_entry = __toESM(require_entry());
+import { renderToPipeableStream, renderToStaticMarkup } from "react-dom/server";
+import superjson from "superjson";
+import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+var PADDING_EL = '<div style="height: 0">' + "\u200B".repeat(300) + "</div>";
+var HEAD_CLOSE_HTML = `</head><body>${PADDING_EL}<div id="main">`;
+var paretoRequestHandler = (props = {}) => async (req, res) => {
+  const __csr = req.query.__csr;
+  const path = req.path.slice(1);
+  if (!import_entry.pageEntries[path]) {
+    return;
+  }
+  const { pages, assets } = getRuntimeConfig();
+  const asset = assets[path];
+  const { js, css } = asset;
+  const jsArr = typeof js === "string" ? [js] : [...js || []];
+  const cssArr = typeof css === "string" ? [css] : [...css || []];
+  const preloadJS = jsArr.map((js2) => {
+    return /* @__PURE__ */ jsx("link", { rel: "preload", href: js2, as: "script" }, js2);
+  });
+  const loadedCSS = cssArr.map((css2) => {
+    return /* @__PURE__ */ jsx("link", { rel: "stylesheet", href: css2, type: "text/css" }, css2);
+  });
+  const loadedJs = jsArr.map((js2) => {
+    return /* @__PURE__ */ jsx("script", { src: js2, async: true }, js2);
+  });
+  const renderHeader = (metas) => {
+    return renderToStaticMarkup(
+      /* @__PURE__ */ jsxs(Fragment, { children: [
+        /* @__PURE__ */ jsx("meta", { charSet: "utf-8" }),
+        /* @__PURE__ */ jsx("meta", { name: "viewport", content: "width=device-width, initial-scale=1" }),
+        metas?.map((meta) => meta),
+        loadedCSS.map((css2) => css2),
+        preloadJS.map((js2) => js2)
+      ] })
+    );
+  };
+  res.set({
+    "X-Accel-Buffering": "no",
+    "Content-Type": "text/html; charset=UTF-8"
+  });
+  res.write(`<!DOCTYPE html><html lang="zh-Hans"><head>${renderHeader()}`);
+  res.flushHeaders();
+  const Page = __csr ? () => null : pages[path];
+  const initialData = !__csr ? await Page.getServerSideProps?.(req, res) : {};
+  props.pageWrapper = props?.pageWrapper || ((Page2) => {
+    return {
+      page: Page2,
+      criticalCssMap: /* @__PURE__ */ new Map(),
+      helmetContext: {}
+    };
+  });
+  const {
+    page: WrapperPage,
+    helmetContext = {},
+    criticalCssMap = /* @__PURE__ */ new Map()
+    // @ts-ignore 
+  } = props.pageWrapper(Page, initialData);
+  const { pipe, abort } = renderToPipeableStream(
+    /* @__PURE__ */ jsxs(Fragment, { children: [
+      /* @__PURE__ */ jsx(WrapperPage, { initialData: initialData || {} }),
+      /* @__PURE__ */ jsx(
+        "script",
+        {
+          dangerouslySetInnerHTML: {
+            __html: `window.__INITIAL_DATA__ = '${superjson.stringify(
+              initialData?.getState() || initialData
+            )}';`
+          }
+        }
+      ),
+      loadedJs.map((Script) => Script),
+      /* @__PURE__ */ jsx(Scripts, {})
+    ] }),
+    {
+      onShellReady() {
+        const { helmet } = helmetContext;
+        const helmetContent = helmet ? `
+          ${helmet.title.toString()}
+          ${helmet.priority.toString()}
+          ${helmet.meta.toString()}
+          ${helmet.link.toString()}
+          ${helmet.script.toString()}
+        ` : "";
+        const styles = [...criticalCssMap.keys()].map((key) => {
+          return `<style id="${key}">${criticalCssMap.get(key)}</style>`;
+        }).join("\n");
+        res.write(`${helmetContent}${styles}${HEAD_CLOSE_HTML}`);
+        pipe(res);
+      }
+    }
+  );
+  setTimeout(() => {
+    abort();
+  }, props?.delay || 1e4);
+};
+var export_pageEntries = import_entry2.pageEntries;
 export {
   getRuntimeConfig,
   export_pageEntries as pageEntries,
+  paretoRequestHandler,
   setRuntimeConfig
 };

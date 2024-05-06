@@ -34,17 +34,21 @@ const Home: ParetoPage = function () {
   );
 };
 
-Home.Store = HomeStore;
-
 Home.getServerSideProps = async () => {
   // stream ssr & init server promise
   promiseMap.set(getRecommendsKey, getRecommends());
-  return {};
+  const store = new HomeStore();
+  await store.getInitialProps();
+  return store;
 };
 
-Home.setUpClientPromise = () => {
+Home.setUpClient = async (data) => {
   // mock client promise, it only will be resolved when server data is ready
   mockClientPromise(getRecommendsKey);
+  const store = new HomeStore();
+  store.hydrate(data as any);
+  return store;
+
 };
 
 export default observer(Home);

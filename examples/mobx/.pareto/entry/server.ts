@@ -1,6 +1,6 @@
 
-// import home from '/Users/zhangyuanqing/works/github/pareto/examples/mobx/app/home/index.tsx';
-const home = {};
+import home from '/Users/zhangyuanqing/works/github/pareto/examples/mobx/app/home/index.tsx';
+
 
 import { setRuntimeConfig } from "@pareto/core/node";
 

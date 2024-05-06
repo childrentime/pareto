@@ -1,7 +1,5 @@
-import { renderToPipeableStream } from "react-dom/server";
 import express from "express";
-import App from "./root";
-import { getRuntimeConfig, pageEntries } from "@pareto/core/node";
+import { paretoRequestHandler } from "@pareto/core/node";
 import { sleep } from "./utils";
 
 const app = express();
@@ -66,47 +64,6 @@ app.use("/api/recommends", async (req, res) => {
   });
 });
 
-app.get("*", async (req, res) => {
-  const path = req.path.slice(1);
-  if (!pageEntries[path]) {
-    return;
-  }
-
-  const { pages, assets } = getRuntimeConfig();
-  const asset = assets[path];
-  const { js, css } = asset;
-  const jsArr = typeof js === "string" ? [js] : [...(js || [])];
-  const cssArr = typeof css === "string" ? [css] : [...(css || [])];
-
-  const preloadJS = jsArr.map((js) => {
-    return <link rel="preload" href={js} as="script" key={js} />;
-  });
-  const loadedCSS = cssArr.map((css) => {
-    return <link rel="stylesheet" href={css} type="text/css" key={css} />;
-  });
-  const loadedJs = jsArr.map((js) => {
-    return <script src={js} async key={js} />;
-  });
-
-  const Page = pages[path];
-  const initialData = await Page.getServerSideProps?.(req, res);
-
-  const { pipe, abort } = renderToPipeableStream(
-    <App
-      Page={Page}
-      Links={[...loadedCSS, ...preloadJS]}
-      Scripts={loadedJs}
-      initialData={initialData}
-    />,
-    {
-      onShellReady() {
-        pipe(res);
-      },
-    }
-  );
-  setTimeout(() => {
-    abort();
-  }, ABORT_DELAY);
-});
+app.get("*", paretoRequestHandler({ delay: ABORT_DELAY }));
 
 export { app };

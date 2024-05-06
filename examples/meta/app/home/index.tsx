@@ -50,7 +50,7 @@ Home.getServerSideProps = async () => {
   return repositories;
 };
 
-Home.setUpClientPromise = () => {
+Home.setUpClient = async () => {
   // mock client promise, it only will be resolved when server data is ready
   mockClientPromise(getRecommendsKey);
 };

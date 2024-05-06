@@ -63,7 +63,7 @@ const defaultConfig = {
         use: generateCssLoaders({
           useStyle: true,
           useSass: true,
-          userModules: true,
+          useModules: true,
         }),
       },
     ],

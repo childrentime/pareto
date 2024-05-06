@@ -12,10 +12,6 @@ export interface ISOStyle {
      * @default false
      */
     prepend: boolean;
-    /**
-     * @default 's'
-     */
-    prefix: string;
   }) => () => void;
   _getHash: () => string;
 }

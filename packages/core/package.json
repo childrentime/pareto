@@ -36,8 +36,9 @@
     "pareto": "bin/index.js"
   },
   "scripts": {
-    "start": "tsup",
-    "dev": "tsup --watch"
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "postinstall": "pnpm build"
   },
   "author": "",
   "license": "ISC",

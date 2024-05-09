@@ -27,6 +27,8 @@ const createDemandEntryMiddleware = ({ clientWatcher, pageEntries, serverWatcher
         // 添加server端入口
         recoverEntryContent(pageEntries[name]);
 
+        clientCompiler.compiledEntries[name] = clientCompiler.allEntries[name];
+
         const invalidateClientWatcherPromise = (() => {
           return new Promise((resolve, reject) => {
             clientWatcher.invalidate((err) => {
@@ -43,9 +45,7 @@ const createDemandEntryMiddleware = ({ clientWatcher, pageEntries, serverWatcher
         const afterEmitClientPromise = (() => {
           return new Promise((resolve, reject) => {
             clientCompiler.hooks.afterEmit.tap("emit complete", () => {
-
               resolve();
-
             });
           });
         })();

@@ -36,8 +36,6 @@ module.exports = class WebpackDemandEntryPlugin {
 
         return {
           ...baseEntry,
-          // TODO: 等rspack支持了动态entry删掉
-          ...entry,
           ...Object.keys(compiler.compiledEntries).reduce((all, key) => {
             const config = compiler.compiledEntries[key];
             if (config) {
@@ -49,8 +47,8 @@ module.exports = class WebpackDemandEntryPlugin {
       };
 
       // TODO: rspack不支持 dynamic entry
-      // EntryOptionPlugin.applyEntryOption(compiler, context, newEntry);
-      EntryOptionPlugin.applyEntryOption(compiler, context, entry);
+      EntryOptionPlugin.applyEntryOption(compiler, context, newEntry);
+      // EntryOptionPlugin.applyEntryOption(compiler, context, entry);
       return true;
     });
   }

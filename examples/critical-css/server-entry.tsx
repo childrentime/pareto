@@ -1,9 +1,9 @@
 import express from "express";
 import {
   paretoRequestHandler,
+  criticalPageWrapper
 } from "@pareto/core/node";
 import { sleep } from "./utils";
-import { ISOStyle, StyleContext } from "@pareto/core";
 
 const app = express();
 
@@ -72,21 +72,7 @@ app.get(
   paretoRequestHandler({
     delay: ABORT_DELAY,
     pageWrapper: (Page) => {
-      const criticalCssMap = new Map<string, string>();
-      const insertCss = (styles: ISOStyle[]) =>
-        styles.forEach((style) => {
-          criticalCssMap.set(style._getHash(), style._getContent());
-        });
-
-      return {
-        page: (props) => (
-          // @ts-ignore react19
-          <StyleContext value={{ insertCss }}>
-            <Page {...props} />
-          </StyleContext>
-        ),
-        criticalCssMap,
-      }
+     return criticalPageWrapper({ page: Page });
     },
   })
 );

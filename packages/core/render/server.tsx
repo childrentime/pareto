@@ -6,6 +6,8 @@ import { Scripts } from "../stream-helpers";
 import superjson from "superjson";
 import { ParetoPage } from "../types";
 import { Transform } from "stream";
+import { ISOStyle, StyleContext } from "../useStyles";
+import { HelmetProvider } from "../head";
 
 // magically speed up ios rendering
 const PADDING_EL = '<div style="height: 0">' + "\u200b".repeat(300) + "</div>";
@@ -22,6 +24,49 @@ export interface ParetoRequestHandler {
     helmetContext?: { helmet?: any };
   };
 }
+
+export const criticalPageWrapper = (props: {
+  page: ParetoPage;
+}): {
+  page: ParetoPage;
+  criticalCssMap: Map<string, string>;
+} => {
+  const { page: Page } = props;
+  const criticalCssMap = new Map<string, string>();
+  const insertCss = (styles: ISOStyle[]) =>
+    styles.forEach((style) => {
+      criticalCssMap.set(style._getHash(), style._getContent());
+    });
+
+  return {
+    page: (props) => (
+      // @ts-ignore react19
+      <StyleContext value={{ insertCss }}>
+        <Page {...props} />
+      </StyleContext>
+    ),
+    criticalCssMap,
+  };
+};
+
+export const helmetPageWrapper = (props: {
+  page: ParetoPage;
+}): {
+  page: ParetoPage;
+  helmetContext: any;
+} => {
+  const helmetContext = {} as any;
+  const { page: Page } = props;
+  return {
+    page: (props) => (
+      // @ts-ignore react19
+      <HelmetProvider context={helmetContext}>
+        <Page {...props} />
+      </HelmetProvider>
+    ),
+    helmetContext,
+  };
+};
 
 export const paretoRequestHandler =
   (props: ParetoRequestHandler = {}) =>
@@ -131,9 +176,9 @@ export const paretoRequestHandler =
               callback();
             },
             flush(callback) {
-              this.push('</body></html>');
+              this.push("</body></html>");
               callback();
-            }
+            },
           });
           pipe(transform).pipe(res);
         },

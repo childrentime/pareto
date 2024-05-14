@@ -1,0 +1,60 @@
+# Critical CSS
+
+For detailed reference information about critical CSS, please refer to https://web.dev/articles/extract-critical-css.
+
+## How to enable critical CSS
+
+Generally, one of our React components might look like this.
+
+```tsx
+import styles from './style.module.scss'
+
+const Component = () => {
+  return (
+    <div className={styles.container}>
+      <h1 className={styles.title}>Hello World</h1>
+    </div>
+  )
+}
+```
+
+```scss
+.container {
+  background-color: #f0f0f0;
+}
+.title {
+  color: #333;
+}
+```
+
+Frameworks like Next.js, or the mini-css-extract-plugin that people might use, will extract CSS into a separate file.
+
+It has a significant drawback in that it extracts the CSS for any module you import, which can sometimes be unnecessary.
+
+```tsx
+const ABTestComponent = () => {
+  return ab ? <ComponentA/> : <ComponentB>
+}
+```
+
+For example, in the case above, for people who are on the control side of the A/B test, the CSS for any other module is unnecessary.
+
+We have built an internal wrapper around [isomorphic-style-loader](https://github.com/kriasoft/isomorphic-style-loader). Now, you can use the `useStyles` hook to collect the CSS needed during the rendering process.
+
+```tsx
+import styles from './style.iso.scss';
+import { useStyles } from "@pareto/core";
+
+const Component = () => {
+  useStyles(styles);
+
+  return (
+    <div className={styles.container}>
+      <h1 className={styles.title}>Hello World</h1>
+    </div>
+  )
+}
+```
+
+In order to distinguish it from external CSS, we only enable critical CSS collection for files ending in `.iso.scss`.
+

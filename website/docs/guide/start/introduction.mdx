@@ -1,0 +1,20 @@
+# Introduction
+
+## Position
+
+Pareto is a React SSR framework based on rspack, dedicated to making your use of streaming rendering simple. It doesn't have many complex encapsulations, 
+essentially it's just a simple wrapper for React SSR applications.
+
+## Project Background
+
+Pareto is designed as a streamlined `MPA` architecture, 
+so it might be more suitable for those who need to develop embedded web pages in mobile webviews. 
+We considered many performance optimization factors from the beginning of the design, and combined it with 
+streaming rendering. For example:
+
+1. Critical CSS: Pareto has built-in support for critical CSS, which is much faster than using external CSS. 
+For more details, you can refer to https://web.dev/articles/extract-critical-css?hl=zh-cn
+2. `react-helmet-async`: Pareto has built-in support for metadata, which will be sent to the browser at the beginning 
+of the request.
+3. SPA: Pareto has built-in support for SPA mode. When your server traffic is too large, you can 
+choose to switch to SPA mode to increase capacity.

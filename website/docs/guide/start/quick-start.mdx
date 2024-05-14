@@ -1,0 +1,45 @@
+# Quick Start
+
+import { PackageManagerTabs } from '@theme';
+
+## 1. Initialize the project
+
+You can create a Rspress project using the `create-pareto` cli:
+
+<PackageManagerTabs command="create pareto@latest" />
+
+Input the project directory name, and then the cli will create the project for you.
+
+## 2. Start Dev Server
+
+Start the local development service with the following command:
+
+```sh
+npm run dev 
+```
+
+:::tip TIP
+
+For the dev command, you can specify the port number or host of the development service with the `--port` or `--host` parameter, such as `pareto dev --port 8080 --host 0.0.0.0`.
+
+:::
+
+## 3. Build in Production
+
+Build the production bundle with the following command
+:
+
+```bash
+npm run build
+```
+
+By default, Pareto will set `.pareto` as the output directory.
+
+## 4. Start in Production
+
+Start the production bundle with the following command
+:
+
+```bash
+npm run start
+```

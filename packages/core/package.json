@@ -29,6 +29,16 @@
         "types": "./dist/node.d.ts",
         "default": "./dist/node.js"
       }
+    },
+    "./client": {
+      "import": {
+        "types": "./dist/client.d.mts",
+        "default": "./dist/client.mjs"
+      },
+      "require": {
+        "types": "./dist/client.d.ts",
+        "default": "./dist/client.js"
+      }
     }
   },
   "types": "./dist/main.d.ts",

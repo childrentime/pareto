@@ -1,7 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["main.ts", "node.ts"],
+  entry: ["main.ts", "node.ts","client.ts"],
   clean: true,
   splitting: true,
   outDir: "dist",

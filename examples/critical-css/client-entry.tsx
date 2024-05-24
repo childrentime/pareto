@@ -1,12 +1,8 @@
 import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
-import { InsertCss, ParetoPage, StyleContext } from "@pareto/core";
 import superjson from "superjson";
-
-const insertCss: InsertCss = (styles) => {
-  const removeCss = styles.map((style) => style._insertCss());
-  return () => removeCss.forEach((dispose) => dispose());
-};
+import { PageContext } from "@pareto/core/client";
+import { ParetoPage } from "@pareto/core";
 
 const startApp = async (Page: ParetoPage) => {
   const root = document.getElementById("main") as HTMLElement;
@@ -16,10 +12,9 @@ const startApp = async (Page: ParetoPage) => {
   hydrateRoot(
     root,
     <StrictMode>
-      {/*   @ts-ignore react 19 */}
-      <StyleContext value={{ insertCss }}>
+      <PageContext>
         <Page initialData={__INITIAL_DATA__} />
-      </StyleContext>
+      </PageContext>
     </StrictMode>
   );
 };

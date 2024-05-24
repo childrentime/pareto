@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { HelmetProvider, ParetoPage } from "@pareto/core";
 import superjson from 'superjson';
+import { PageContext } from "@pareto/core/client";
 
 const startApp = async (Page: ParetoPage) => {
   const root = document.getElementById("main") as HTMLElement;
@@ -11,9 +12,9 @@ const startApp = async (Page: ParetoPage) => {
   hydrateRoot(
     root,
     <StrictMode>
-      <HelmetProvider>
+      <PageContext>
         <Page initialData={__INITIAL_DATA__} />
-      </HelmetProvider>
+      </PageContext>
     </StrictMode>
   );
 };

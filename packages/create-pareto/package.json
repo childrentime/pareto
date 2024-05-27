@@ -1,0 +1,34 @@
+{
+  "name": "create-pareto",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "pareto template generator",
+  "author": "childrentime",
+  "contributors": [
+    "Lesenelir"
+  ],
+  "bin": {
+    "create-pareto": "./index.js"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "templates": "cp -r ../../examples templates && rm -rf templates/*/node_modules && rm -rf templates/*/.pareto",
+    "build": "tsup src/bin/index.ts",
+    "start": "pnpm build && node index.js"
+  },
+  "keywords": [],
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^11.2.0",
+    "kolorist": "^1.8.0",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^16",
+    "@types/prompts": "^2.4.9"
+  }
+}

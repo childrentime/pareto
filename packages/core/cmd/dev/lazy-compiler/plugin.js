@@ -1,4 +1,7 @@
-const { EntryOptionPlugin } = require("@rspack/core");
+const runner = process.env.runner || "webpack";
+const useWebpack = runner === 'webpack';
+
+const { EntryOptionPlugin } = useWebpack ? require('webpack') : require("@rspack/core");
 const { clearEntryContent } = require("./replace");
 
 module.exports = class WebpackDemandEntryPlugin {

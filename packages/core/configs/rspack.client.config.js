@@ -1,13 +1,17 @@
 const AssetsPlugin = require("assets-webpack-plugin");
 const babelConfig = require("./babel.config");
 const { getClientEntries } = require("./entry");
-const rspack = require("@rspack/core");
+
+const runner = process.env.runner || "webpack";
+const useWebpack = runner === 'webpack';
+const rspack = useWebpack ? require('webpack') :  require("@rspack/core");
 
 const { generateCssLoaders } = require("./rspack.base");
 const WebpackDemandEntryPlugin = require("../cmd/dev/lazy-compiler/plugin");
 const { pageEntries } = require("./entry");
 const { CLIENT_OUTPUT_PATH } = require("../constant");
 const pageConfig = require("./page.config");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 /**
  * @type {import("webpack").Configuration}
@@ -76,8 +80,8 @@ const defaultConfig = {
       path: CLIENT_OUTPUT_PATH,
       entrypoints: true,
     }),
-    new rspack.ProgressPlugin({ prefix: "client" }),
-    new rspack.CssExtractRspackPlugin({}),
+    // new rspack.ProgressPlugin({ prefix: "client" }),
+    useWebpack ? new MiniCssExtractPlugin() : new rspack.CssExtractRspackPlugin({}),
     new WebpackDemandEntryPlugin({
       pageEntries,
     }),

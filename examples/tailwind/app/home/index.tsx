@@ -25,7 +25,7 @@ const Home: ParetoPage<InitialData> = (props) => {
             <div>
               <Image src={repo.avatar} />
             </div>
-            <div className="ml-1">{repo.name}</div>
+            <div className="ml-1 text-red-500">{repo.name}</div>
           </div>
         ))}
       </div>

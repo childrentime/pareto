@@ -1,10 +1,15 @@
 const express = require("express");
-const rspack = require("@rspack/core");
+
+const runner = process.env.runner || "webpack";
+const useWebpack = runner === 'webpack';
+const rspack = useWebpack ? require('webpack') :  require("@rspack/core");
+
 const { serverConfig } = require("../../configs/rspack.server.config");
 const clearModule = require("clear-module");
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpackHotMiddleware = require("webpack-hot-middleware");
-const ReactRefreshPlugin = require("@rspack/plugin-react-refresh");
+const ReactRefreshPlugin = useWebpack ? require('@pmmmwh/react-refresh-webpack-plugin') :  require("@rspack/plugin-react-refresh");
+
 const { clientConfig } = require("../../configs/rspack.client.config");
 const path = require("path");
 const { createDemandEntryMiddleware } = require("./lazy-compiler");

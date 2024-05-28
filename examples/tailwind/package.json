@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "pareto dev",
+    "dev": "runner=webpack pareto dev",
+    "dev:rspack": "runner=rspack pareto dev",
     "build": "pareto build",
     "start": "node .pareto/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"

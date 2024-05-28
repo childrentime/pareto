@@ -2,7 +2,11 @@ const nodeExternals = require("webpack-node-externals");
 const path = require("path");
 const babelConfig = require("./babel.config");
 const { getServerEntry } = require("./entry");
-const rspack = require("@rspack/core");
+
+const runner = process.env.runner || "webpack";
+const useWebpack = runner === 'webpack';
+const rspack = useWebpack ? require('webpack') :  require("@rspack/core");
+console.log('useWebpack',useWebpack)
 
 const cwd = process.cwd();
 const { generateCssLoaders } = require("./rspack.base");
@@ -79,7 +83,7 @@ const defaultConfig = {
     extensions: [".js", ".jsx", ".json", ".mjs", ".wasm", ".ts", ".tsx"],
   },
   plugins: [
-    new rspack.ProgressPlugin({ prefix: "server" }),
+    // new rspack.ProgressPlugin({ prefix: "server" }),
     new WebpackDemandEntryPlugin({
       pageEntries,
     }),

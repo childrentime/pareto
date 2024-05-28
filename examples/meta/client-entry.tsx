@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
-import { HelmetProvider, ParetoPage } from "@pareto/core";
+import { ParetoPage } from "@pareto/core";
 import superjson from 'superjson';
 import { PageContext } from "@pareto/core/client";
 

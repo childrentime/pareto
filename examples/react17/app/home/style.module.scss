@@ -1,0 +1,24 @@
+.title {
+  font-size: 20px;
+  font-weight: bold;
+  line-height: normal;
+}
+
+.container {
+  padding: 12px;
+}
+
+.repo {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+
+  > div:nth-child(2) {
+    margin-left: 4px;
+  }
+}
+
+.repos {
+  margin-top: 16px;
+}

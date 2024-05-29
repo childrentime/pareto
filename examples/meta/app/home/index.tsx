@@ -1,11 +1,12 @@
-import type { ParetoPage } from "@pareto/core";
-import { promiseMap, Image, mockClientPromise, Helmet } from "@pareto/core";
+import type { ParetoPage } from "@paretojs/core";
+import { promiseMap, Image, mockClientPromise } from "@paretojs/core";
 import { Suspense } from "react";
 import { getRecommends, getRecommendsKey } from "./stream";
 import { fetchJson } from "../../utils";
 import styles from "./style.module.scss";
 import { Recommends } from "./recommends";
 import { RecommendsSkeleton } from "./recommends/loading";
+import { Helmet } from "react-helmet-async";
 
 interface InitialData {
   repositories: {

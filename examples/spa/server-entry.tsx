@@ -1,5 +1,5 @@
 import express from "express";
-import { paretoRequestHandler } from "@pareto/core/node";
+import { paretoRequestHandler } from "@paretojs/core/node";
 import { sleep } from "./utils";
 
 const app = express();

@@ -1,7 +1,7 @@
 import express from "express";
 import {
   paretoRequestHandler,
-} from "@pareto/core/node";
+} from "@paretojs/core/node";
 import { sleep } from "./utils";
 import { ZustandProvider } from "./lib/zustand";
 

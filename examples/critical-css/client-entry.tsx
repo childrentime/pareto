@@ -1,8 +1,8 @@
 import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import superjson from "superjson";
-import { PageContext } from "@pareto/core/client";
-import { ParetoPage } from "@pareto/core";
+import { PageContext } from "@paretojs/core/client";
+import { ParetoPage } from "@paretojs/core";
 
 const startApp = async (Page: ParetoPage) => {
   const root = document.getElementById("main") as HTMLElement;

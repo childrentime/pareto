@@ -1,8 +1,8 @@
 import { StrictMode } from "react";
 import { hydrateRoot, createRoot } from "react-dom/client";
-import { ParetoPage } from "@pareto/core";
+import { ParetoPage } from "@paretojs/core";
 import superjson from "superjson";
-import { PageContext } from "@pareto/core/client";
+import { PageContext } from "@paretojs/core/client";
 
 const url = new URL(window.location.href);
 const __csr = !!url.searchParams.get("__csr");

@@ -1,9 +1,9 @@
 import express from "express";
 import {
   paretoRequestHandler,
-} from "@pareto/core/node";
+} from "@paretojs/core/node";
 import { sleep } from "./utils";
-import { HelmetProvider } from "@pareto/core";
+import { HelmetProvider } from "react-helmet-async";
 
 const app = express();
 

@@ -1,4 +1,4 @@
-import { Image, promiseMap } from "@pareto/core";
+import { Image, promiseMap } from "@paretojs/core";
 import { use } from "react";
 import { getRecommendsKey } from "../stream";
 import styles from "./style.module.scss";

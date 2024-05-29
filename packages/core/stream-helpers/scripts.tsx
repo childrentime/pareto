@@ -1,6 +1,7 @@
-import { Suspense, use } from "react";
+import { Suspense } from "react";
 import { promiseMap } from "./server.promise";
 import { STREAMING_SERIALIZATION_EVENT } from "./constant";
+import { use } from "../polyfill";
 
 export function Scripts() {;
   const promises = [...promiseMap.values()];

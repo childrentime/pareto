@@ -1,5 +1,5 @@
 /// <reference types="react/canary" />
-/// <reference types="@pareto/core/env" />
+/// <reference types="@paretojs/core/env" />
 
 declare global {
   interface Window {

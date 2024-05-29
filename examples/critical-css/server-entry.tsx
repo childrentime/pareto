@@ -2,7 +2,7 @@ import express from "express";
 import {
   paretoRequestHandler,
   criticalPageWrapper
-} from "@pareto/core/node";
+} from "@paretojs/core/node";
 import { sleep } from "./utils";
 
 const app = express();

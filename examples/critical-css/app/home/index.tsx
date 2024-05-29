@@ -1,5 +1,5 @@
-import type { ParetoPage } from "@pareto/core";
-import { promiseMap, useStyles, Image, mockClientPromise } from "@pareto/core";
+import type { ParetoPage } from "@paretojs/core";
+import { promiseMap, useStyles, Image, mockClientPromise } from "@paretojs/core";
 import { Suspense } from "react";
 import { getRecommends, getRecommendsKey } from "./stream";
 import { fetchJson } from "../../utils";

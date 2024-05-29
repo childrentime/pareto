@@ -7,7 +7,8 @@ import superjson from "superjson";
 import { ParetoPage } from "../types";
 import { Transform } from "stream";
 import { ISOStyle, StyleContext } from "../useStyles";
-import { HelmetProvider } from "../head";
+import { HelmetProvider } from "react-helmet-async";
+import { IS_REACT_19 } from "../utils/env";
 
 // magically speed up ios rendering
 const PADDING_EL = '<div style="height: 0">' + "\u200b".repeat(300) + "</div>";
@@ -37,13 +38,14 @@ export const criticalPageWrapper = (props: {
     styles.forEach((style) => {
       criticalCssMap.set(style._getHash(), style._getContent());
     });
+    const  StyleProvider = IS_REACT_19 ? StyleContext : StyleContext.Provider;
 
   return {
     page: (props) => (
       // @ts-ignore react19
-      <StyleContext value={{ insertCss }}>
+      <StyleProvider value={{ insertCss }}>
         <Page {...props} />
-      </StyleContext>
+      </StyleProvider>
     ),
     criticalCssMap,
   };
@@ -59,7 +61,6 @@ export const helmetPageWrapper = (props: {
   const { page: Page } = props;
   return {
     page: (props) => (
-      // @ts-ignore react19
       <HelmetProvider context={helmetContext}>
         <Page {...props} />
       </HelmetProvider>

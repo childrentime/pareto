@@ -37,7 +37,7 @@ const getServerEntry = () => {
   const getRuntimeStr = () => {
     const assetsStr = `const assets = __non_webpack_require__('../client/webpack-assets.json');\n\n`;
     return {
-      importStr: `import { setRuntimeConfig } from "@pareto/core/node";\n\n`,
+      importStr: `import { setRuntimeConfig } from "@paretojs/core/node";\n\n`,
       runStr: assetsStr + "setRuntimeConfig({ pages, assets });\n",
     };
   };

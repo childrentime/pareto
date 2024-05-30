@@ -1,6 +1,6 @@
 {
   "name": "create-pareto",
-  "version": "0.0.1-beta.8",
+  "version": "0.0.1",
   "type": "module",
   "description": "pareto template generator",
   "author": "childrentime",

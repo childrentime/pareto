@@ -5,6 +5,7 @@ import { version } from "../package.json";
 import { fileURLToPath } from "node:url";
 
 execSync("npm run build", { stdio: "inherit" });
+execSync("npm run templates", {stdio: "inherit"});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

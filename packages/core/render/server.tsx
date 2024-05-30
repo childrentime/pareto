@@ -18,17 +18,13 @@ const HEAD_CLOSE_HTML = `</head><body>${PADDING_EL}<div id="main">`;
 export interface ParetoRequestHandler {
   delay?: number;
   pageWrapper?: (
-    page: ParetoPage,
+    page: ParetoPage | (() => null),
     data: Record<string, any> | undefined
-  ) => {
-    page: ParetoPage;
-    criticalCssMap?: Map<string, string>;
-    helmetContext?: { helmet?: any };
-  };
+  ) => ParetoPage;
 }
 
 export const criticalPageWrapper = (props: {
-  page: ParetoPage;
+  page: ParetoPage | (() => null);
 }): {
   page: ParetoPage;
   criticalCssMap: Map<string, string>;
@@ -39,7 +35,7 @@ export const criticalPageWrapper = (props: {
     styles.forEach((style) => {
       criticalCssMap.set(style._getHash(), style._getContent());
     });
-    const  StyleProvider = IS_REACT_19 ? StyleContext : StyleContext.Provider;
+  const StyleProvider = IS_REACT_19 ? StyleContext : StyleContext.Provider;
 
   return {
     page: (props) => (
@@ -53,7 +49,7 @@ export const criticalPageWrapper = (props: {
 };
 
 export const helmetPageWrapper = (props: {
-  page: ParetoPage;
+  page: ParetoPage | (() => null);
 }): {
   page: ParetoPage;
   helmetContext: any;
@@ -74,7 +70,7 @@ export const paretoRequestHandler =
   (props: ParetoRequestHandler = {}) =>
   async (req: Request, res: Response) => {
     const __csr = req.query.__csr;
-    const isCsr = !!__csr && enableSpa
+    const isCsr = !!__csr && enableSpa;
     const path = req.path.slice(1);
     if (!pageEntries[path]) {
       return;
@@ -120,26 +116,19 @@ export const paretoRequestHandler =
     const initialData = !isCsr
       ? await (Page as ParetoPage).getServerSideProps?.(req, res)
       : {};
-
-    props.pageWrapper =
-      props?.pageWrapper ||
-      ((Page) => {
-        return {
-          page: Page,
-          criticalCssMap: new Map<string, string>(),
-          helmetContext: {},
-        };
-      });
-    const {
-      page: WrapperPage,
-      helmetContext = {},
-      criticalCssMap = new Map<string, string>(),
-      // @ts-ignore
-    } = props.pageWrapper(Page, initialData);
+    const wrapperPage = props.pageWrapper
+      ? props.pageWrapper(Page, initialData)
+      : Page;
+    const { page: helmetPage, helmetContext } = helmetPageWrapper({
+      page: wrapperPage,
+    });
+    const { page: CriticalPage, criticalCssMap } = criticalPageWrapper({
+      page: helmetPage,
+    });
 
     const { pipe, abort } = renderToPipeableStream(
       <>
-        <WrapperPage initialData={initialData || {}} />
+        <CriticalPage initialData={initialData || {}} />
         <script
           dangerouslySetInnerHTML={{
             __html: `window.__INITIAL_DATA__ = '${superjson.stringify(

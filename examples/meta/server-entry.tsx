@@ -1,9 +1,8 @@
 import express from "express";
-import {
-  paretoRequestHandler,
-} from "@paretojs/core/node";
+import { paretoRequestHandler } from "@paretojs/core/node";
 import { sleep } from "./utils";
-import { HelmetProvider } from "react-helmet-async";
+import { Helmet } from "react-helmet-async";
+import Meta from "./shared-meta";
 
 const app = express();
 
@@ -72,16 +71,12 @@ app.get(
   paretoRequestHandler({
     delay: ABORT_DELAY,
     pageWrapper: (Page) => {
-      const helmetContext = {} as any;
-      return {
-        page: (props) => (
-          // @ts-ignore react19
-          <HelmetProvider context={helmetContext}>
-            <Page {...props} />
-          </HelmetProvider >
-        ),
-        helmetContext,
-      };
+      return (props) => (
+        <>
+          <Meta />
+          <Page {...props} />
+        </>
+      );
     },
   })
 );

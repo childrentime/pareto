@@ -71,13 +71,11 @@ app.get(
   paretoRequestHandler({
     delay: ABORT_DELAY,
     pageWrapper: (Page, store) => {
-      return {
-        page: (props) => (
-          <Provider store={store}>
-            <Page {...props} />
-          </Provider>
-        ),
-      };
+      return (props) => (
+        <Provider store={store}>
+          <Page {...props} />
+        </Provider>
+      );
     },
   })
 );

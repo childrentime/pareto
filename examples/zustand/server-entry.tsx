@@ -1,7 +1,5 @@
 import express from "express";
-import {
-  paretoRequestHandler,
-} from "@paretojs/core/node";
+import { paretoRequestHandler } from "@paretojs/core/node";
 import { sleep } from "./utils";
 import { ZustandProvider } from "./lib/zustand";
 
@@ -72,13 +70,11 @@ app.get(
   paretoRequestHandler({
     delay: ABORT_DELAY,
     pageWrapper: (Page, store) => {
-      return {
-        page: (props) => (
-          <ZustandProvider value={(store)}>
-            <Page {...props} />
-          </ZustandProvider>
-        ),
-      };
+      return (props) => (
+        <ZustandProvider value={store}>
+          <Page {...props} />
+        </ZustandProvider>
+      );
     },
   })
 );

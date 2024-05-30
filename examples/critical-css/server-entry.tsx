@@ -1,7 +1,6 @@
 import express from "express";
 import {
   paretoRequestHandler,
-  criticalPageWrapper
 } from "@paretojs/core/node";
 import { sleep } from "./utils";
 
@@ -71,9 +70,6 @@ app.get(
   "*",
   paretoRequestHandler({
     delay: ABORT_DELAY,
-    pageWrapper: (Page) => {
-     return criticalPageWrapper({ page: Page });
-    },
   })
 );
 

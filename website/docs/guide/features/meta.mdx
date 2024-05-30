@@ -1,0 +1,78 @@
+# Meta
+
+Pareto uses `react-helmet-async` for metadata management.
+So you can use all the features available in the react-helmet-async library.
+
+## Examples
+
+```tsx
+import { Helmet } from "react-helmet-async";
+
+const App = () => {
+  return (
+    <>
+      <Helmet>
+        <title>Home</title>
+      </Helmet>
+      <div>hello world</div>
+    </>
+  );
+};
+```
+
+That's it!. The title tag will be automatically moved to the head tag during server-side rendering.
+
+## Common Tags
+
+Sometimes you want to set some common meta tags between multiple routes.
+You can define a `shared-meta.tsx` file and import it separately in `client-entry.tsx` and `server-entry.tsx`.
+
+```tsx
+// shared-meta.tsx
+import { Helmet } from "react-helmet-async";
+const Meta = () => {
+  return (
+    <Helmet>
+      <title>A fancy webpage</title>
+      <link rel="notImportant" href="https://www.chipotle.com" />
+      <meta name="whatever" content="notImportant" />
+      <link rel="canonical" href="https://www.tacobell.com" />
+      <meta property="og:title" content="A very important title" />
+    </Helmet>
+  );
+};
+export default Meta;
+
+// client-entry.tsx
+hydrateRoot(
+  root,
+  <StrictMode>
+    <PageContext>
+      <Meta />
+      <Page initialData={__INITIAL_DATA__} />
+    </PageContext>
+  </StrictMode>
+);
+// server-entry.tsx
+app.get(
+  "*",
+  paretoRequestHandler({
+    delay: ABORT_DELAY,
+    pageWrapper: (Page) => {
+      return (props) => (
+        <>
+          <Meta />
+          <Page {...props} />
+        </>
+      );
+    },
+  })
+);
+```
+
+## Pitfall
+
+:::note
+Do not use `Helmet` in streamed components, it will not take effect, 
+because streamed components are not rendered immediately.
+:::

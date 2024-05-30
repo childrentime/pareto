@@ -1,0 +1,91 @@
+# Stream
+
+Pareto provides first-class support for stream rendering.
+
+## Usage
+
+:::note
+We assume that you already have experience using stream rendering. If not, you can refer to these articles to understand what stream rendering is.
+
+- [pareto blog](/blog/index)
+- https://github.com/reactwg/react-18/discussions/37
+- https://github.com/reactwg/react-18/discussions/22
+- https://innovation.ebayinc.com/tech/engineering/async-fragments-rediscovering-progressive-html-rendering-with-marko/
+
+:::
+
+### Define stream request and key
+
+Based on experience, we only need to stream the requests of modules with slow interfaces. First, let's define the request method and key value.
+
+```ts
+// data.ts
+export const getRecommendsKey = "getRecommends";
+export const getRecommends = () => fetch("/api/recommends");
+```
+
+### Setup server side promise
+
+Pareto exports a promiseMap object to maintain the promise status of each request corresponding to the key value. Let's set it up.
+
+```tsx
+Home.getServerSideProps = async () => {
+  // we don't need wait for stream request
+  promiseMap.set(getRecommendsKey, getRecommends());
+  // request that need wait
+  const repositories = await fetch("/api/repositories");
+  return repositories;
+};
+```
+
+### Setup client side promise
+
+A well-known joke is: React needs to maintain consistency between the first render on the server and the client, and we also need to synchronize the promise status between the server and the client.
+
+```tsx
+Home.setUpClient = async () => {
+  // mock client promise, it only will be resolved when server stream data is ready
+  mockClientPromise(getRecommendsKey);
+};
+```
+
+### Consume Promise
+
+Oh heavens! We've finally arrived here. By using use and suspence in React to consume our request promises, we can achieve stream transmission.
+
+:::note
+The `use` hook was only introduced in React 19, so for React 18, you need to use the `use` function exported from `Pareto`. Note that it only implements the ability to consume promises.
+:::
+
+```tsx
+// React19
+import { use } from "react";
+// React18
+import { use } from "@paretojs/core";
+
+const Home = () => {
+  return (
+    <div>
+      <div>hello world</div>
+      <Suspense fallback={<RecommendsSkeleton />}>
+        <Recommends />
+      </Suspense>
+    </div>
+  );
+};
+
+const Recommends = () => {
+  const { feeds } = use(promiseMap.get(getRecommendsKey)!);
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.title}>Recommends</div>
+      {feeds.map((item, index) => (
+        <div className={styles.item} key={index}>
+          ...
+        </div>
+      ))}
+    </div>
+  );
+};
+```

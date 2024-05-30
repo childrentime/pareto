@@ -5,14 +5,14 @@ export default defineConfig({
   root: path.join(__dirname, 'docs'),
   title: 'Pareto',
   description: 'Pareto is an SSR (Server Side Rendering) framework centered on stream rendering.',
-  icon: '/rspress-icon.png',
+  icon: '/logo-icon.png',
   logo: {
-    light: '/rspress-light-logo.png',
-    dark: '/rspress-dark-logo.png',
+    light: '/logo.png',
+    dark: '/logo-dark.png',
   },
   themeConfig: {
     socialLinks: [
-      { icon: 'github', mode: 'link', content: 'https://github.com/web-infra-dev/rspress' },
+      { icon: 'github', mode: 'link', content: 'https://github.com/childrentime/pareto' },
     ],
   },
 });

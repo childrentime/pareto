@@ -13,6 +13,6 @@ hero:
       text: Github
       link: https://github.com/web-infra-dev/rspress
   image:
-    src: /rspress-icon.png
+    src: /logo-icon.png
     alt: Pareto Logo
 ---

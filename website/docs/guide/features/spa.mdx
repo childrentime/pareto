@@ -1,0 +1,28 @@
+# SPA
+
+Pareto provides good support for client-side rendering
+
+## Usage
+
+Sometimes, when your website traffic is too high, not using server-side rendering can greatly 
+increase your server's traffic capacity. In Pareto, you can enable this feature by setting `enableSpa: true` 
+in the `pareto.config.ts`. When this configuration is enabled, if your URL link contains a `__csr` parameter and it is 
+truthy, Pareto will only return an empty HTML skeleton from the server, with the remaining content loaded by 
+the client-side JavaScript.
+
+```ts
+// pareto.config.ts
+import { ParetoConfig } from "@paretojs/core/config";
+
+const config: ParetoConfig = {
+  enableSpa: true
+};
+
+export default config;
+```
+
+:::note
+It's important to note that when you start using the SPA capability, you need to determine whether you are currently
+
+in SPA mode and request the corresponding data on the client side. You can refer to this [example](https://github.com/childrentime/pareto/tree/main/examples/spa) to accomplish this.
+:::

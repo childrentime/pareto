@@ -9,6 +9,7 @@ import { Transform } from "stream";
 import { ISOStyle, StyleContext } from "../useStyles";
 import { HelmetProvider } from "react-helmet-async";
 import { IS_REACT_19 } from "../utils/env";
+import { enableSpa } from "../configs/page.config";
 
 // magically speed up ios rendering
 const PADDING_EL = '<div style="height: 0">' + "\u200b".repeat(300) + "</div>";
@@ -73,6 +74,7 @@ export const paretoRequestHandler =
   (props: ParetoRequestHandler = {}) =>
   async (req: Request, res: Response) => {
     const __csr = req.query.__csr;
+    const isCsr = !!__csr && enableSpa
     const path = req.path.slice(1);
     if (!pageEntries[path]) {
       return;
@@ -114,8 +116,8 @@ export const paretoRequestHandler =
     res.write(`<!DOCTYPE html><html lang="zh-Hans"><head>${renderHeader()}`);
     res.flushHeaders();
 
-    const Page = __csr ? () => null : pages[path];
-    const initialData = !__csr
+    const Page = isCsr ? () => null : pages[path];
+    const initialData = !isCsr
       ? await (Page as ParetoPage).getServerSideProps?.(req, res)
       : {};
 

@@ -1,5 +1,5 @@
 import { rspack } from "@rspack/core";
-import { ParetoConfig } from "@pareto/core/config";
+import { ParetoConfig } from "@paretojs/core/config";
 
 const config: ParetoConfig = {
   pageDir: "pages",

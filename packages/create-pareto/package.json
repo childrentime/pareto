@@ -1,6 +1,6 @@
 {
   "name": "create-pareto",
-  "version": "0.0.1",
+  "version": "0.0.1-beta.8",
   "type": "module",
   "description": "pareto template generator",
   "author": "childrentime",
@@ -15,9 +15,11 @@
     "templates"
   ],
   "scripts": {
-    "templates": "cp -r ../../examples templates && rm -rf templates/*/node_modules && rm -rf templates/*/.pareto",
+    "templates": "rsync -av --progress ../../examples/ templates --exclude node_modules --exclude .pareto",
     "build": "tsup src/bin/index.ts",
-    "start": "pnpm build && node index.js"
+    "start": "pnpm build && node index.js",
+    "release:prepare": "bump",
+    "publish:ci": "tsx scripts/publish.ts"
   },
   "keywords": [],
   "license": "MIT",

@@ -11,6 +11,9 @@
   "license": "ISC",
   "devDependencies": {
     "tsup": "^8.0.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "@jsdevtools/version-bump-prompt": "^6.1.0",
+    "tsx": "^4.11.0",
+    "consola": "^3.2.3"
   }
 }

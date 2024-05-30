@@ -8,15 +8,27 @@ importers:
 
   .:
     devDependencies:
+      '@jsdevtools/version-bump-prompt':
+        specifier: ^6.1.0
+        version: 6.1.0
+      consola:
+        specifier: ^3.2.3
+        version: 3.2.3
       tsup:
         specifier: ^8.0.2
         version: 8.0.2(typescript@5.4.5)
+      tsx:
+        specifier: ^4.11.0
+        version: 4.11.0
       typescript:
         specifier: ^5.4.5
         version: 5.4.5
 
   examples/base:
     dependencies:
+      '@paretojs/core':
+        specifier: latest
+        version: link:../../packages/core
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
@@ -41,13 +53,12 @@ importers:
       superjson:
         specifier: ^1.13.3
         version: 1.13.3
-    devDependencies:
-      '@paretojs/core':
-        specifier: workspace:*
-        version: link:../../packages/core
 
   examples/critical-css:
     dependencies:
+      '@paretojs/core':
+        specifier: latest
+        version: link:../../packages/core
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
@@ -72,13 +83,12 @@ importers:
       superjson:
         specifier: 1.13.3
         version: 1.13.3
-    devDependencies:
-      '@paretojs/core':
-        specifier: workspace:*
-        version: link:../../packages/core
 
   examples/lazy-route:
     dependencies:
+      '@paretojs/core':
+        specifier: latest
+        version: link:../../packages/core
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
@@ -103,13 +113,12 @@ importers:
       superjson:
         specifier: ^1.13.3
         version: 1.13.3
-    devDependencies:
-      '@paretojs/core':
-        specifier: workspace:*
-        version: link:../../packages/core
 
   examples/meta:
     dependencies:
+      '@paretojs/core':
+        specifier: latest
+        version: link:../../packages/core
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
@@ -134,13 +143,12 @@ importers:
       superjson:
         specifier: ^1.13.3
         version: 1.13.3
-    devDependencies:
-      '@paretojs/core':
-        specifier: workspace:*
-        version: link:../../packages/core
 
   examples/mobx:
     dependencies:
+      '@paretojs/core':
+        specifier: latest
+        version: link:../../packages/core
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
@@ -171,13 +179,12 @@ importers:
       superjson:
         specifier: ^1.13.3
         version: 1.13.3
-    devDependencies:
-      '@paretojs/core':
-        specifier: workspace:*
-        version: link:../../packages/core
 
   examples/rspack:
     dependencies:
+      '@paretojs/core':
+        specifier: latest
+        version: link:../../packages/core
       '@rspack/core':
         specifier: ^0.7.0
         version: 0.7.0
@@ -205,13 +212,12 @@ importers:
       superjson:
         specifier: ^1.13.3
         version: 1.13.3
-    devDependencies:
-      '@paretojs/core':
-        specifier: workspace:*
-        version: link:../../packages/core
 
   examples/spa:
     dependencies:
+      '@paretojs/core':
+        specifier: latest
+        version: link:../../packages/core
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
@@ -236,13 +242,12 @@ importers:
       superjson:
         specifier: ^1.13.3
         version: 1.13.3
-    devDependencies:
-      '@paretojs/core':
-        specifier: workspace:*
-        version: link:../../packages/core
 
   examples/tailwind:
     dependencies:
+      '@paretojs/core':
+        specifier: latest
+        version: link:../../packages/core
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
@@ -270,13 +275,12 @@ importers:
       tailwindcss:
         specifier: ^3.4.3
         version: 3.4.3
-    devDependencies:
-      '@paretojs/core':
-        specifier: workspace:*
-        version: link:../../packages/core
 
   examples/zustand:
     dependencies:
+      '@paretojs/core':
+        specifier: latest
+        version: link:../../packages/core
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
@@ -304,10 +308,6 @@ importers:
       zustand:
         specifier: ^4.5.2
         version: 4.5.2(@types/react@18.3.0)(react@19.0.0-beta-94eed63c49-20240425)
-    devDependencies:
-      '@paretojs/core':
-        specifier: workspace:*
-        version: link:../../packages/core
 
   packages/core:
     dependencies:
@@ -408,9 +408,6 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0
     devDependencies:
-      '@jsdevtools/version-bump-prompt':
-        specifier: ^6.1.0
-        version: 6.1.0
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
@@ -432,12 +429,6 @@ importers:
       '@types/webpack-node-externals':
         specifier: ^3.0.4
         version: 3.0.4(esbuild@0.19.12)
-      consola:
-        specifier: ^3.2.3
-        version: 3.2.3
-      tsx:
-        specifier: ^4.11.0
-        version: 4.11.0
 
   packages/create-pareto:
     dependencies:

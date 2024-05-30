@@ -3,3 +3,5 @@ packages:
   - 'examples/*'
   - 'benchmarks/*'
   - 'website'
+  - '!examples/react18'
+  - '!examples/react17'

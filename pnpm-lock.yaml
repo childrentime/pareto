@@ -176,36 +176,6 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
 
-  examples/react18:
-    dependencies:
-      '@paretojs/core':
-        specifier: 0.0.1-beta.6
-        version: link:../../packages/core
-      '@types/express':
-        specifier: ^4.17.21
-        version: 4.17.21
-      '@types/react':
-        specifier: ^18.3.0
-        version: 18.3.0
-      '@types/react-dom':
-        specifier: ^18.3.0
-        version: 18.3.0
-      express:
-        specifier: ^4.19.2
-        version: 4.19.2
-      react:
-        specifier: 18.3.1
-        version: 18.3.1
-      react-dom:
-        specifier: 18.3.1
-        version: 18.3.1(react@18.3.1)
-      react-helmet-async:
-        specifier: ^2.0.5
-        version: 2.0.5(react@18.3.1)
-      superjson:
-        specifier: ^1.13.3
-        version: 1.13.3
-
   examples/rspack:
     dependencies:
       '@rspack/core':
@@ -6431,17 +6401,6 @@ packages:
       prop-types: 15.8.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      react-fast-compare: 3.2.2
-      shallowequal: 1.1.0
-    dev: false
-
-  /react-helmet-async@2.0.5(react@18.3.1):
-    resolution: {integrity: sha512-rYUYHeus+i27MvFE+Jaa4WsyBKGkL6qVgbJvSBoX8mbsWoABJXdEO0bZyi0F6i+4f0NuIb8AvqPMj3iXFHkMwg==}
-    peerDependencies:
-      react: ^16.6.0 || ^17.0.0 || ^18.0.0
-    dependencies:
-      invariant: 2.2.4
-      react: 18.3.1
       react-fast-compare: 3.2.2
       shallowequal: 1.1.0
     dev: false

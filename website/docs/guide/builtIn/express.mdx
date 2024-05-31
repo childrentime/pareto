@@ -1,0 +1,19 @@
+# Express
+
+The server entry point for Pareto is an Express server by default, so you can use any Express middleware to handle requests.
+
+## Example
+
+```tsx
+// server-entry.tsx
+import morgan from "morgan";
+import express from "express";
+import { paretoRequestHandler } from "@paretojs/core/node";
+
+const app = express();
+
+app.use(morgan('combined'))
+app.get("*", paretoRequestHandler());
+
+export { app };
+```

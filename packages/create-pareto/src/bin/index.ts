@@ -85,11 +85,11 @@ async function main() {
           type: 'select',
           message: 'Choose a project template',
           choices: [
-            {title: 'base-template', value: CHOICES[0]},
-            {title: 'mobx-template', value: CHOICES[4]},
-            {title: 'spa-template', value: CHOICES[6]},
-            {title: 'tailwindcss-template', value: CHOICES[7]},
-            {title: 'zustand-template', value: CHOICES[8]},
+            {title: 'base-template', value: CHOICES.find(c => c.includes('base'))},
+            {title: 'mobx-template', value: CHOICES.find(c => c.includes('mobx'))},
+            {title: 'spa-template', value: CHOICES.find(c => c.includes('spa'))},
+            {title: 'tailwindcss-template', value: CHOICES.find(c => c.includes('tailwind'))},
+            {title: 'zustand-template', value: CHOICES.find(c => c.includes('zustand'))},
           ]
         }
       ],

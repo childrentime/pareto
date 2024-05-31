@@ -1,0 +1,17 @@
+[
+  {
+    "type": "dir",
+    "name": "config",
+    "label": "Config"
+  },
+  {
+    "type": "dir",
+    "name": "client",
+    "label": "Client API"
+  },
+  {
+    "type": "dir",
+    "name": "server",
+    "label": "Server API"
+  }
+]

@@ -6,7 +6,8 @@
   },
   {
     "text": "API",
-    "link": "https://rspress.dev/api/index.html"
+    "link": "/api/config",
+    "activeMatch": "/api/"
   },
   {
     "text": "Blog",

@@ -3,7 +3,7 @@ pageType: home
 
 hero:
   name: Pareto
-  text: is a SSR framework centered on stream rendering.
+  text: is a lightweight SSR framework centered on stream rendering.
   tagline: Easy, Super Fast
   actions:
     - theme: brand

@@ -2,3 +2,71 @@
 
 Pareto supports CSS, SASS, and CSS modules. 
 By convention, files ending in `.module.(css|scss)` are treated as modular CSS.
+
+## Tailwind CSS
+
+[Tailwind CSS](https://tailwindcss.com/) is a utility-first CSS framework that works exceptionally well with Pareto.
+
+Examples: [with Tailwind CSS](https://github.com/childrentime/pareto/tree/main/examples/tailwind)
+
+### Installing Tailwind
+
+Install the Tailwind CSS packages and run the init command to generate both the tailwind.config.js and postcss.config.js files:
+
+```tsx
+npm install -D tailwindcss
+npx tailwindcss init -p
+```
+
+### Configuring Tailwind
+
+Inside tailwind.config.js, add paths to the files that will use Tailwind CSS class names:
+
+```tsx
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./app/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+### Importing Styles
+
+Add the [Tailwind CSS directives](https://tailwindcss.com/docs/functions-and-directives#directives) that Tailwind will use to inject its generated styles to a Global Stylesheet in your application, for example:
+
+```tsx
+// index.css
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+Inside the client entry file (client-entry.tsx), import the index.css stylesheet to apply the styles to every route in your application.
+
+```tsx
+// client-entry.tsx
+import "./index.css";
+
+const startApp = async (Page: ParetoPage) => {
+  ...
+};
+export { startApp };
+```
+
+### Using Classes
+
+After installing Tailwind CSS and adding the global styles, you can use Tailwind's utility classes in your application.
+
+```tsx
+// app/home/index.tsx
+
+export default function Page() {
+  return <h1 className="text-3xl font-bold underline">Hello, Pareto!</h1>
+}
+```

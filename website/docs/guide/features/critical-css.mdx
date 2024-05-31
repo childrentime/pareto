@@ -58,3 +58,19 @@ const Component = () => {
 
 In order to distinguish it from external CSS, we only enable critical CSS collection for files ending in `.iso.scss`.
 
+## Pitfall
+
+Critical CSS can be used with stream rendering, but it's important to note that our useStyles calls must be placed before the use function, otherwise these styles cannot be collected on the server side.
+
+```tsx
+export function Recommends() {
+  useStyles(styles); // Recommend: always place useStyles in top;
+  const { feeds } = use(promiseMap.get(getRecommendsKey)!);
+
+  return (
+    <div className={styles.container}>
+      ...
+    </div>
+  );
+}
+```

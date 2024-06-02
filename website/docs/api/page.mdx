@@ -1,0 +1,35 @@
+# Page
+
+In pareto, pages are defined as the `ParetoPage` type, which provides some utility functions.
+
+## getServerSideProps
+
+getServerSideProps is a function that is called at request time on the server side. It can be used to fetch data from an external API, query a database, or perform other server-side tasks.
+
+## setUpClient
+
+setUpClient is a function that is called on the client side. It can be used to set up the client side of the page, such as initializing a library or setting up event listeners.
+
+## getAssets
+
+In our streaming rendering, we will send down static JS and CSS resources the moment the request reaches the server. This function allows you to customize and add some page-specific static elements. For example, it could be the large image URL of a product detail page.
+For example
+
+```tsx
+const Home: ParetoPage = () => {
+  return (
+    <div>
+      <h1>Home</h1>
+    </div>
+  );
+};
+
+Home.getAssets = () => {
+  return [
+    {
+      type: "image",
+      url: "https://example.com/image.jpg",
+    },
+  ];
+};
+```

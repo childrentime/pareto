@@ -1,0 +1,68 @@
+# Server API
+
+Server API is exposed in `@paretojs/core/node`.
+
+## paretoRequestHandler
+
+paretoRequestHandler is a server-side function for handling pages. It is used in `server-entry.tsx` to render pages on the server.
+For example:
+
+```tsx
+// server-entry.tsx
+import express from "express";
+import { paretoRequestHandler } from "@paretojs/core/node";
+
+const app = express();
+app.get("*", paretoRequestHandler({}));
+```
+
+### paretoRequestHandler options
+
+#### delay
+
+delay is the maximum time the page rendering waits for, refer to [renderToPipeableStream](https://react.dev/reference/react-dom/server/renderToReadableStream#rendertoreadablestream).
+
+#### pageWrapper
+
+pageWrapper is a function that allows you to customize and enhance pages. For example,
+to add the same meta tags to all your pages, you can do the following:
+
+```tsx
+// shared-meta.tsx
+import { Helmet } from "react-helmet-async";
+
+const Meta = () => {
+  return (
+    <Helmet>
+      <title>A fancy webpage</title>
+      <link rel="notImportant" href="https://www.chipotle.com" />
+      <meta name="whatever" content="notImportant" />
+      <link rel="canonical" href="https://www.tacobell.com" />
+      <meta property="og:title" content="A very important title" />
+    </Helmet>
+  );
+};
+
+export default Meta;
+
+// server-entry.tsx
+import express from "express";
+import { paretoRequestHandler } from "@paretojs/core/node";
+
+const app = express();
+app.get(
+  "*",
+  paretoRequestHandler({
+    pageWrapper: (Page) => {
+      return (props) => (
+        <>
+          <Meta />
+          <Page {...props} />
+        </>
+      );
+    },
+  })
+);
+```
+
+The first parameter of the pageWrapper function is the rendered page, and the second parameter is the object returned by getServerSideProps for the rendered page. The second parameter is very useful when you are using a third-party state management library.

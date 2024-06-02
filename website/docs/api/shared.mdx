@@ -1,0 +1,34 @@
+# Shared
+
+Shared API is exposed in `@paretojs/core`.
+
+## useStyles
+
+useStyles is used to collect critical CSS, for example:
+
+```tsx
+import styles from './style.iso.scss'
+
+const Component = () => {
+  return (
+    <div className={styles.container}>
+      <h1 className={styles.title}>Hello World</h1>
+    </div>
+  )
+}
+```
+
+## promiseMap
+
+promiseMap is used to manage the promise status of requests, and it is isomorphic between the server and the client.
+
+## mockClientPromise
+
+mockClientPromise is used to initialize the promise status on the client side.
+
+## use
+
+use is a polyfill. In a `React 19` environment, it will directly use the use exported by `React 19`. In `React 18`, it will fallback to the polyfill defined in pareto. Note that the polyfill use can only be used to resolve promises.
+
+
+

@@ -72,11 +72,13 @@ export const paretoRequestHandler =
     const __csr = req.query.__csr;
     const isCsr = !!__csr && enableSpa;
     const path = req.path.slice(1);
+
     if (!pageEntries[path]) {
       return;
     }
 
     const { pages, assets } = getRuntimeConfig();
+    const Page = isCsr ? () => null : pages[path];
     const asset = assets[path];
     const { js, css } = asset;
     const jsArr = typeof js === "string" ? [js] : [...(js || [])];
@@ -92,6 +94,8 @@ export const paretoRequestHandler =
       return <script src={js} async key={js} />;
     });
 
+    const pageAssets = !isCsr ? (Page as ParetoPage).getAssets?.() || []: [];
+
     const renderHeader = (metas?: JSX.Element[]) => {
       return renderToStaticMarkup(
         <>
@@ -100,6 +104,7 @@ export const paretoRequestHandler =
           {metas?.map((meta) => meta)}
           {loadedCSS.map((css) => css)}
           {preloadJS.map((js) => js)}
+          {pageAssets.map(asset => <link rel="preload" href={asset.url} as={asset.type}/>)}
         </>
       );
     };
@@ -112,7 +117,6 @@ export const paretoRequestHandler =
     res.write(`<!DOCTYPE html><html lang="zh-Hans"><head>${renderHeader()}`);
     res.flushHeaders();
 
-    const Page = isCsr ? () => null : pages[path];
     const initialData = !isCsr
       ? await (Page as ParetoPage).getServerSideProps?.(req, res)
       : {};

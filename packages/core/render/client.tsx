@@ -10,7 +10,7 @@ const insertCss: InsertCss = (styles) => {
 
 export const PageContext = (props: PropsWithChildren<{}>) => {
   const  StyleProvider = IS_REACT_19 ? StyleContext : StyleContext.Provider;
- 
+
   return (
     <HelmetProvider>
       {/* @ts-ignore react19 */}

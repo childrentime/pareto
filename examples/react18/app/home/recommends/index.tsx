@@ -1,6 +1,7 @@
-import { Image, promiseMap,use } from "@paretojs/core";
+import { promiseMap,use } from "@paretojs/core";
 import { getRecommendsKey } from "../stream";
 import styles from "./style.module.scss";
+import { Image } from "../../../utils";
 
 interface RecommendData {
   feeds: {

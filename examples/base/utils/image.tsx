@@ -14,18 +14,3 @@ export const Image = (props: ImageProps) => {
   return <img {...rest} />;
 };
 
-export const BackgroundImage = (props: ImageProps) => {
-  const { preload, src, ...rest } = props;
-  if (!src) {
-    throw new Error("BackgroundImage component must have a src prop");
-  }
-  preload && ReactDom.preload(src, { as: "image" });
-  return (
-    <div
-      style={{
-        backgroundImage: `url(${src})`,
-      }}
-      {...rest}
-    />
-  );
-};

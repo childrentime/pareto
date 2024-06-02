@@ -1,8 +1,8 @@
 import type { ParetoPage } from "@paretojs/core";
-import { promiseMap, useStyles, Image, mockClientPromise } from "@paretojs/core";
+import { promiseMap, useStyles, mockClientPromise } from "@paretojs/core";
 import { Suspense } from "react";
 import { getRecommends, getRecommendsKey } from "./stream";
-import { fetchJson } from "../../utils";
+import { fetchJson, Image } from "../../utils";
 import styles from "./style.iso.scss";
 import { Recommends } from "./recommends";
 import { RecommendsSkeleton } from "./recommends/loading";
@@ -31,7 +31,7 @@ const Home: ParetoPage<InitialData> = (props) => {
           </div>
         ))}
       </div>
-      <Suspense fallback={<RecommendsSkeleton/>}>
+      <Suspense fallback={<RecommendsSkeleton />}>
         <Recommends />
       </Suspense>
     </div>

@@ -1,8 +1,9 @@
-import {  Image, promiseMap } from "@paretojs/core";
+import {   promiseMap } from "@paretojs/core";
 import { use } from "react";
 import { getRecommendsKey } from "../stream";
 import styles from "./style.module.scss";
 import { Helmet } from "react-helmet-async";
+import { Image } from "../../../utils";
 
 interface RecommendData {
   feeds: {

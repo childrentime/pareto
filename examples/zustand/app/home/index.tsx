@@ -1,11 +1,12 @@
 import type { ParetoPage } from "@paretojs/core";
-import { promiseMap, Image, mockClientPromise } from "@paretojs/core";
+import { promiseMap,  mockClientPromise } from "@paretojs/core";
 import { Suspense } from "react";
 import { getRecommends, getRecommendsKey } from "./stream";
 import styles from "./style.module.scss";
 import { Recommends } from "./recommends";
 import { RecommendsSkeleton } from "./recommends/loading";
 import { createHomeStore, useHomeStore } from "./store";
+import { Image } from "../../utils";
 
 const Home: ParetoPage = function () {
   const { repositories } = useHomeStore((state) => {

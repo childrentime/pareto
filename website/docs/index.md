@@ -11,7 +11,7 @@ hero:
       link: /guide/start/quick-start
     - theme: alt
       text: Github
-      link: https://github.com/web-infra-dev/rspress
+      link: https://github.com/childrentime/pareto
   image:
     src: /logo-icon.png
     alt: Pareto Logo

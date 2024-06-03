@@ -165,9 +165,9 @@ async function main() {
       npm: 'npm install'
     },
     dev: {
-      pnpm: 'pnpm start',
-      yarn: 'yarn start',
-      npm: 'npm run start'
+      pnpm: 'pnpm dev',
+      yarn: 'yarn dev',
+      npm: 'npm run dev'
     }
   };
 

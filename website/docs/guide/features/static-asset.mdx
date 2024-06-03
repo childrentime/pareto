@@ -1,0 +1,30 @@
+# Staic Asset
+
+Each route corresponds to a page that has its own static resources, such as CSS, JS, etc.
+
+Pareto will dispatch these static resources in the head tag element the instant a request reaches your server. This allows the browser to download and parse these resources during the gap in server interface requests.
+
+Pareto provides a `getAsset` method, which is useful for adding some page-related static resources. This is very useful in some preview pages.
+
+For exmaple:
+
+```tsx
+const Home: ParetoPage = () => {
+  return (
+    <div>
+      <h1>Home</h1>
+    </div>
+  );
+};
+
+Home.getAssets = () => {
+  return [
+    {
+      type: "image",
+      url: "https://example.com/image.jpg",
+    },
+  ];
+};
+```
+
+The data returned from getAssets will be converted into link tags and inserted into the page. The difference between this and the metadata from `react-async-helmet` is that its dispatch timing will be earlier.

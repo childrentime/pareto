@@ -74,6 +74,8 @@ export const paretoRequestHandler =
     const path = req.path.slice(1);
 
     if (!pageEntries[path]) {
+      res.statusCode = 404;
+      res.end("404")
       return;
     }
 

@@ -84,7 +84,7 @@ const defaultConfig = {
       pageEntries,
     }),
   ],
-  cache: true,
+  cache: false,
   experiments: {
     css: false,
   },

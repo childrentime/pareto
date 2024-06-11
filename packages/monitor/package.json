@@ -1,0 +1,31 @@
+{
+  "name": "@paretojs/monitor",
+  "version": "1.0.0",
+  "description": "",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "types": "./dist/main.d.mts",
+        "default": "./dist/main.mjs"
+      },
+      "require": {
+        "types": "./dist/main.d.ts",
+        "default": "./dist/main.js"
+      }
+    }
+  },
+  "types": "./dist/main.d.ts",
+  "scripts": {
+    "build": "bunchee",
+    "dev": "bunchee --watch",
+    "release:prepare": "bump",
+    "publish:ci": "tsx scripts/publish.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "bunchee": "^5.1.6"
+  }
+}

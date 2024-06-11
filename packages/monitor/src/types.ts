@@ -1,5 +1,3 @@
-
-
 export abstract class Monitor<Data> {
   private dataSource: null | Data;
 
@@ -18,22 +16,19 @@ export abstract class Monitor<Data> {
     return this.dataSource;
   }
 
-  init(): void {
-
-  }
-  collectData(): void {
-
-  }
+  init(): void {}
+  collectData(): void {}
 
   getBoundValue(): number {
     return 10000;
   }
 
-  fixGlitches(): void {
-    
+  fixGlitches(props: { key: string; start: number; end: number }): void {
+    const { key, start, end } = props;
   }
 
-  fixGlitchesInBatch(): void {
-
-  }
+  fixGlitchesInBatch(props: {
+    sources: Record<string, number>,
+    start: number
+  }): void {}
 }

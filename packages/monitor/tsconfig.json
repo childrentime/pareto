@@ -1,6 +1,13 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "bundler"
+    "jsx": "react-jsx",
+    "module": "CommonJS",
+    "lib": ["ES2017","DOM"],
+    "target": "ES2015",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist"
   }
 }

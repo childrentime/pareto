@@ -10,10 +10,12 @@ import { ISOStyle, StyleContext } from "../useStyles";
 import { HelmetProvider } from "react-helmet-async";
 import { IS_REACT_19 } from "../utils/env";
 import { enableSpa } from "../configs/page.config";
+import { PageStart, FirstPaint } from "@paretojs/monitor";
 
 // magically speed up ios rendering
 const PADDING_EL = '<div style="height: 0">' + "\u200b".repeat(300) + "</div>";
-const HEAD_CLOSE_HTML = `</head><body>${PADDING_EL}<div id="main">`;
+const HEAD_CLOSE_HTML = `</head><body>${PADDING_EL}`;
+const BODY_START_HTML = `<div id="main">`;
 
 export interface ParetoRequestHandler {
   delay?: number;
@@ -75,7 +77,7 @@ export const paretoRequestHandler =
 
     if (!pageEntries[path]) {
       res.statusCode = 404;
-      res.end("404")
+      res.end("404");
       return;
     }
 
@@ -96,18 +98,34 @@ export const paretoRequestHandler =
       return <script src={js} async key={js} />;
     });
 
-    const pageAssets = !isCsr ? (Page as ParetoPage).getAssets?.() || []: [];
+    const pageAssets = !isCsr ? (Page as ParetoPage).getAssets?.() || [] : [];
 
     const renderHeader = (metas?: JSX.Element[]) => {
       return renderToStaticMarkup(
         <>
+          <PageStart />
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           {metas?.map((meta) => meta)}
           {loadedCSS.map((css) => css)}
           {preloadJS.map((js) => js)}
-          {pageAssets.map(asset => <link rel="preload" href={asset.url} as={asset.type}/>)}
+          {pageAssets.map((asset) => (
+            <link rel="preload" href={asset.url} as={asset.type} />
+          ))}
         </>
+      );
+    };
+
+    const renderFirstPaint = () => {
+      return renderToStaticMarkup(<FirstPaint />);
+    };
+
+    const renderMonitorInfos = () => {
+      return renderToStaticMarkup(
+        <script
+          id="MONITOR"
+          dangerouslySetInnerHTML={{ __html: res.locals.monitorInfos }}
+        />
       );
     };
 
@@ -117,11 +135,14 @@ export const paretoRequestHandler =
       "Content-Type": "text/html; charset=UTF-8",
     });
     res.write(`<!DOCTYPE html><html lang="zh-Hans"><head>${renderHeader()}`);
+    req.monitor.mark("renderTopChunk");
     res.flushHeaders();
 
     const initialData = !isCsr
       ? await (Page as ParetoPage).getServerSideProps?.(req, res)
       : {};
+
+    req.monitor.mark("loadFirstScreenData");
     const wrapperPage = props.pageWrapper
       ? props.pageWrapper(Page, initialData)
       : Page;
@@ -147,6 +168,7 @@ export const paretoRequestHandler =
       </>,
       {
         onShellReady() {
+          req.monitor.mark("onShellReady");
           // head injection
           const { helmet } = helmetContext;
           const helmetContent = helmet
@@ -166,7 +188,9 @@ export const paretoRequestHandler =
             })
             .join("\n");
 
-          res.write(`${helmetContent}${styles}${HEAD_CLOSE_HTML}`);
+          res.write(
+            `${helmetContent}${styles}${HEAD_CLOSE_HTML}${renderFirstPaint()}${BODY_START_HTML}`
+          );
 
           let transform = new Transform({
             transform(chunk, encoding, callback) {
@@ -174,11 +198,15 @@ export const paretoRequestHandler =
               callback();
             },
             flush(callback) {
-              this.push("</body></html>");
+              req.monitor.mark("pipeEnd");
+              this.push(`${renderMonitorInfos()}</body></html>`);
               callback();
             },
           });
           pipe(transform).pipe(res);
+        },
+        onAllReady() {
+          req.monitor.mark("onAllReady");
         },
       }
     );

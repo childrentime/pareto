@@ -1,5 +1,7 @@
 /// <reference types="react/canary" />
 /// <reference types="react-dom/canary" />
+/// <reference types="@paretojs/monitor/global" />
+
 // CSS modules
 type CSSModuleClasses = { readonly [key: string]: string }
 

@@ -37,7 +37,7 @@ export class PerformanceMonitor extends BaseMonitor<PerformanceNavigationTiming>
     this.name = "performance";
   }
 
-  get records(): Record<string, number>{
+  get records(): Record<string, number> {
     if (this.dataSource) {
       return RECORD_KEYS.reduce((acc, key) => {
         acc[key] = this.dataSource[key];
@@ -49,9 +49,21 @@ export class PerformanceMonitor extends BaseMonitor<PerformanceNavigationTiming>
   }
 
   init(): void {
-    this.dataSource = performance.getEntriesByType(
+    const navigationEntry = performance.getEntriesByType(
       "navigation"
     )[0] as PerformanceNavigationTiming;
+
+    const dataSource = {} as PerformanceNavigationTiming;
+    for (const key in navigationEntry) {
+      if (
+        typeof navigationEntry[key] === "number" &&
+        RECORD_KEYS.includes(key)
+      ) {
+        dataSource[key] = navigationEntry[key] + performance.timeOrigin;
+      }
+    }
+    console.log("dataSource", dataSource);
+    this.dataSource = dataSource;
   }
 
   getBoundValue(key?: string): number {

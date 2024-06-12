@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "jsx": "react-jsx",
-    "module": "CommonJS",
+    "module": "ESNext",
     "lib": ["ES2017","DOM"],
     "target": "ES2015",
     "allowSyntheticDefaultImports": true,

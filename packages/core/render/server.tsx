@@ -101,6 +101,7 @@ export const paretoRequestHandler =
     const pageAssets = !isCsr ? (Page as ParetoPage).getAssets?.() || [] : [];
 
     const renderHeader = (metas?: JSX.Element[]) => {
+      console.log('start', PageStart)
       return renderToStaticMarkup(
         <>
           <PageStart />

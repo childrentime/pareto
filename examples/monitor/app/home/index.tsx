@@ -6,16 +6,7 @@ import { fetchJson, Image } from "../../utils";
 import styles from "./style.module.scss";
 import { Recommends } from "./recommends";
 import { RecommendsSkeleton } from "./recommends/loading";
-import {
-  FirstScreen,
-  NodeMonitor,
-  PerformanceMonitor,
-  ResourceMonitor,
-  VitalsMonitor,
-  applyMonitors,
-  logTimeToInteractiveTime,
-  reportWebVitals,
-} from "@paretojs/monitor";
+// import { report, FirstScreen } from "@paretojs/monitor";
 
 interface InitialData {
   repositories: {
@@ -28,18 +19,7 @@ const Home: ParetoPage<InitialData> = (props) => {
   const { repositories } = props.initialData;
 
   useEffect(() => {
-    logTimeToInteractiveTime();
-    const monitorList = [
-      VitalsMonitor,
-      PerformanceMonitor,
-      NodeMonitor,
-      ResourceMonitor,
-    ];
-
-    applyMonitors(monitorList).then((monitors) => {
-      console.log("monitor", monitors);
-    });
-    reportWebVitals();
+    // report();
   }, []);
 
   return (
@@ -60,7 +40,7 @@ const Home: ParetoPage<InitialData> = (props) => {
           <Recommends />
         </Suspense>
       </div>
-      <FirstScreen />
+      {/* <FirstScreen /> */}
     </>
   );
 };

@@ -2,7 +2,7 @@ import peerDepsExternal from "rollup-plugin-peer-deps-external";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
-import postcss from 'rollup-plugin-postcss';
+import postcss from "rollup-plugin-postcss";
 
 /**
  * @type {import('rollup').RollupOptions}
@@ -25,11 +25,11 @@ export default {
     peerDepsExternal(),
     resolve(),
     commonjs(),
-    typescript({ tsconfig: "./tsconfig.json" }), // 使用你的 tsconfig.json 文件
+    typescript({ tsconfig: "./tsconfig.json" }),
     postcss({
       extract: false,
       modules: true,
-      use: ['sass'],
+      use: ["sass"],
     }),
   ],
 };

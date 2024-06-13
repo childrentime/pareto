@@ -9,6 +9,8 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "outDir": "dist",
-    "moduleResolution": "Node"
-  }
+    "moduleResolution": "Node",
+    "resolveJsonModule": true
+  },
+  "exclude": ["scripts"]
 }

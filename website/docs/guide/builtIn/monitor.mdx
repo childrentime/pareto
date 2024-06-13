@@ -1,0 +1,68 @@
+# Monitor
+
+Pareto has built-in monitoring for performance metrics. You can choose a template with the monitor option when creating a project using `create-pareto`.
+
+## SetUp
+
+If you want to manually enable this feature in your project, please follow the steps below.
+
+### Install
+
+```bash
+pnpm i @paretojs/monitor@latest
+```
+
+create or update `pareto.config.ts` in the root directory of your project.
+
+```ts
+import { ParetoConfig } from "@paretojs/core/config";
+
+const config: ParetoConfig = {
+  enableMonitor: true,
+};
+
+export default config;
+```
+
+modify the `server-entry.tsx` file in the root directory of your project.
+
+```tsx
+import { addMonitorMiddleware } from "@paretojs/monitor";
+import express from "express";
+
+const app = express();
+addMonitorMiddleware(app)({
+  showMonitor: true,
+});
+```
+
+modify any route root file in your `app` dictionary.
+
+```tsx
+import { report, FirstScreen } from "@paretojs/monitor";
+
+const Home: ParetoPage<InitialData> = (props) => {
+  const { repositories } = props.initialData;
+
+  useEffect(() => {
+    report().then(console.log);
+  }, []);
+
+  return (
+    <>
+      <div>
+        ...
+      </div>
+      <FirstScreen />
+    </>
+  );
+};
+```
+
+## Result
+
+![Monitor](/monitor.png)
+
+## Report
+
+For information on how to report parameter data and the meaning of parameters, you can refer to this [place](https://github.com/childrentime/pareto/blob/main/packages/monitor/README.md).

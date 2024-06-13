@@ -41,7 +41,7 @@ const TimeLine = ({ source }: { source: TimeLines[] }) => {
                   <div className={styles.timelineMonitorContent}>
                     <span>{rt.name}</span>
                     <span>
-                      {rt.end - rt.start}@[{rt.start - startTime},{" "}
+                      {rt.end - rt.start}@[{rt.start - startTime},
                       {rt.end - startTime}]
                     </span>
                   </div>

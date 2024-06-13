@@ -4,20 +4,10 @@
   flex-direction: column;
   position: fixed;
   right: 0;
-  width: 50px;
-  height: 50px;
+  width: 100px;
+  height: 76px;
   z-index: 100000;
   text-align: center;
-  color: #ff6347;
-  font-family: serif;
-  font-size: 12px;
-  font-weight: 700;
-  font-style: italic;
+  background-size: cover;
   border-radius: 4px;
-  box-shadow: 2px 2px 4px 0 #b3b3b3;
-  background-color: #f0f0f0;
-
-  span:last-child {
-    font-size: 10px;
-  }
 }

@@ -566,6 +566,9 @@ importers:
       '@rollup/plugin-commonjs':
         specifier: ^26.0.1
         version: 26.0.1(rollup@4.18.0)
+      '@rollup/plugin-image':
+        specifier: ^3.0.3
+        version: 3.0.3(rollup@4.18.0)
       '@rollup/plugin-node-resolve':
         specifier: ^15.2.3
         version: 15.2.3(rollup@4.18.0)
@@ -2451,6 +2454,20 @@ packages:
       glob: 10.4.1
       is-reference: 1.2.1
       magic-string: 0.30.10
+      rollup: 4.18.0
+    dev: true
+
+  /@rollup/plugin-image@3.0.3(rollup@4.18.0):
+    resolution: {integrity: sha512-qXWQwsXpvD4trSb8PeFPFajp8JLpRtqqOeNYRUKnEQNHm7e5UP7fuSRcbjQAJ7wDZBbnJvSdY5ujNBQd9B1iFg==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@rollup/pluginutils': 5.1.0(rollup@4.18.0)
+      mini-svg-data-uri: 1.4.4
       rollup: 4.18.0
     dev: true
 
@@ -6709,6 +6726,11 @@ packages:
       schema-utils: 4.2.0
       tapable: 2.2.1
       webpack: 5.91.0(esbuild@0.19.12)(webpack-cli@5.1.4)
+    dev: true
+
+  /mini-svg-data-uri@1.4.4:
+    resolution: {integrity: sha512-r9deDe9p5FJUPZAk3A59wGH7Ii9YrjjWw0jmw/liSbHl2CHiyXj6FcDXDu2K3TjVAXqiJdaw3xxwlZZr9E6nHg==}
+    hasBin: true
     dev: true
 
   /minimatch@3.1.2:

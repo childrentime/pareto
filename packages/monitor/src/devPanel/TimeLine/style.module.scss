@@ -23,16 +23,16 @@
   margin: 10px 0;
   padding-left: 4px;
   line-height: 14px;
-  border-left: 2px solid #ff6347;
+  border-left: 2px solid #47acff;
   font-weight: 700;
   color: #000;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .timelineMonitorContent {
   display: flex;
   font-size: 12px;
-  color: #666;
+  color: #000;
 
   span {
     overflow-x: scroll;
@@ -44,7 +44,7 @@
     }
 
     &:last-child {
-      color: #ff6347;
+      color: #31aaa3;
     }
   }
 }
@@ -54,5 +54,5 @@
   margin: 3px 0;
   min-width: 2px;
   height: 4px;
-  background-color: #ff6347;
+  background-color: #47acff;
 }

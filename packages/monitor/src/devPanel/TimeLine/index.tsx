@@ -27,33 +27,38 @@ const TimeLine = ({ source }: { source: TimeLines[] }) => {
           [styles.timelineMonitorVisible]: showPanel,
         })}
       >
-        {source.map((item, index) => (
-          <div key={index}>
-            <p className={styles.timelineMonitorTitle}>{item.title}</p>
-            {item.spans.map((rt, idx) => {
-              const lineStyle = {
-                left: `${((rt.start - startTime) * 100) / totalTime}%`,
-                width: `${((rt.end - rt.start) / totalTime) * 100}%`,
-              };
-
-              return (
-                <div key={idx}>
-                  <div className={styles.timelineMonitorContent}>
-                    <span>{rt.name}</span>
-                    <span>
-                      {rt.end - rt.start}@[{rt.start - startTime},
-                      {rt.end - startTime}]
-                    </span>
+        {source.map((item, index) => {
+          const { title, spans } = item;
+          return (
+            <div key={index}>
+              <p className={styles.timelineMonitorTitle}>{title}</p>
+              <div className={styles.barChart}>
+                {spans.map((item) => (
+                  <div key={item.name} className={styles.barChartItem}>
+                    <div className={styles.barLabel}>
+                      {item.name}
+                      <span>
+                        {item.end - item.start}@[
+                        {item.start - startTime},{item.end - startTime}]
+                      </span>
+                    </div>
+                    <div
+                      className={styles.bar}
+                      style={{
+                        left: `${
+                          ((item.start - startTime) * 100) / totalTime
+                        }%`,
+                        width: `${
+                          ((item.end - item.start) / totalTime) * 100
+                        }%`,
+                      }}
+                    ></div>
                   </div>
-                  <div
-                    className={styles.timelineMonitorIndicator}
-                    style={lineStyle}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        ))}
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </>
   );

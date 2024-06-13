@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "pareto dev",
-    "build": "pareto build",
+    "build": "NODE_ENV=production pareto build",
     "start": "node .pareto/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

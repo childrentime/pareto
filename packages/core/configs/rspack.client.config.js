@@ -8,12 +8,13 @@ const WebpackDemandEntryPlugin = require("../cmd/dev/lazy-compiler/plugin");
 const { pageEntries } = require("./entry");
 const { CLIENT_OUTPUT_PATH } = require("../constant");
 const pageConfig = require("./page.config");
+const { __DEV__ } = require("../utils/node-env");
 
 /**
  * @type {import("webpack").Configuration}
  */
 const defaultConfig = {
-  mode: process.env.NODE_ENV || "development",
+  mode: __DEV__ ? "development" : 'production',
   node: false,
   entry: getClientEntries(),
   output: {
@@ -78,7 +79,7 @@ const defaultConfig = {
     }),
     new rspack.ProgressPlugin({ prefix: "client" }),
     new rspack.CssExtractRspackPlugin({}),
-    new WebpackDemandEntryPlugin({
+    __DEV__ && new WebpackDemandEntryPlugin({
       pageEntries,
     }),
   ],

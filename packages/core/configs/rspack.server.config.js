@@ -11,12 +11,13 @@ const { APP_PATH } = require("../constant");
 const WebpackDemandEntryPlugin = require("../cmd/dev/lazy-compiler/plugin");
 const { pageEntries } = require("./entry");
 const pageConfig = require("./page.config");
+const { __DEV__ } = require("../utils/node-env");
 
 /**
  * @type {import("webpack").Configuration}
  */
 const defaultConfig = {
-  mode: process.env.NODE_ENV || "development",
+  mode: __DEV__ ? "development" : "production",
   node: false,
   entry: {
     index: [getServerEntry(), path.resolve(cwd, "./server-entry.tsx")],
@@ -80,9 +81,10 @@ const defaultConfig = {
   },
   plugins: [
     new rspack.ProgressPlugin({ prefix: "server" }),
-    new WebpackDemandEntryPlugin({
-      pageEntries,
-    }),
+    __DEV__ &&
+      new WebpackDemandEntryPlugin({
+        pageEntries,
+      }),
   ],
   cache: false,
   experiments: {

@@ -23,3 +23,4 @@ export function reportWebVitals() {
     window["__WEB_VITALS__"].push(["TTI", ttid]);
 });
 }
+

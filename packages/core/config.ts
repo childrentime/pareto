@@ -6,6 +6,7 @@ export type ParetoConfig = {
     isServer: boolean;
   }) => RspackConfiguration;
   enableSpa? : boolean;
+  enableMonitor? : boolean;
 };
 
 export type RspackConfiguration = Configuration;

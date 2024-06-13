@@ -38,6 +38,7 @@ export class ServerMonitor {
     req: Request;
     res: Response;
   }) {
+    this.mark = this.mark.bind(this);
     this[DATA] = {} as Record<NodeEventsValues, number>;
     req.monitor = this;
     this.mark(NodeEvents.NI);

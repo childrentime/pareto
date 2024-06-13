@@ -56,7 +56,7 @@ const Logo = (props: { onClick: () => void }) => {
   return (
     <div
       ref={divRef}
-      className={styles.monitorDragLogo}
+      className={styles.draggableLogoMonitor}
       style={style}
       onClick={onClick}
     >

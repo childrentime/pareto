@@ -1,22 +1,21 @@
-.monitorDragLogo {
+.draggableLogoMonitor {
   display: flex;
   justify-content: center;
   flex-direction: column;
   position: fixed;
   right: 0;
-  // top: 150px;
   width: 50px;
   height: 50px;
   z-index: 100000;
   text-align: center;
-  color: #2196f3;
+  color: #ff6347;
   font-family: serif;
   font-size: 12px;
   font-weight: 700;
   font-style: italic;
   border-radius: 4px;
-  box-shadow: 2px 2px 4px 0 #d7d7d7;
-  background-color: #fff;
+  box-shadow: 2px 2px 4px 0 #b3b3b3;
+  background-color: #f0f0f0;
 
   span:last-child {
     font-size: 10px;

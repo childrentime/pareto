@@ -8,6 +8,7 @@
     "esModuleInterop": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "moduleResolution": "Node"
   }
 }

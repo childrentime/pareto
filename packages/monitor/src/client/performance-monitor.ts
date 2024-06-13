@@ -59,10 +59,9 @@ export class PerformanceMonitor extends BaseMonitor<PerformanceNavigationTiming>
         typeof navigationEntry[key] === "number" &&
         RECORD_KEYS.includes(key)
       ) {
-        dataSource[key] = navigationEntry[key] + performance.timeOrigin;
+        dataSource[key] = Math.round(navigationEntry[key] + performance.timeOrigin);
       }
     }
-    console.log("dataSource", dataSource);
     this.dataSource = dataSource;
   }
 

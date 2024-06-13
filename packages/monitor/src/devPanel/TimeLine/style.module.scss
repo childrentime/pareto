@@ -1,4 +1,4 @@
-.monitorTimeline {
+.timelineMonitor {
   position: fixed;
   left: 0;
   right: 0;
@@ -7,32 +7,32 @@
   padding: 0 4px 30px;
   transform: translateY(100%);
   z-index: 99999;
-  background-color: #fff;
+  background-color: #f0f0f0;
   opacity: 0;
   transition: 0.5s ease;
   overflow-x: hidden;
   overflow-y: scroll;
 
-  &Show {
+  &Visible {
     opacity: 0.97;
     transform: translateY(0);
   }
 }
 
-.monitorTimelineTitle {
+.timelineMonitorTitle {
   margin: 10px 0;
   padding-left: 4px;
   line-height: 14px;
-  border-left: 2px solid #03a9f4;
+  border-left: 2px solid #ff6347;
   font-weight: 700;
   color: #000;
   font-size: 13px;
 }
 
-.monitorTimelineContent {
+.timelineMonitorContent {
   display: flex;
   font-size: 12px;
-  color: #333;
+  color: #666;
 
   span {
     overflow-x: scroll;
@@ -44,15 +44,15 @@
     }
 
     &:last-child {
-      color: #03a9f4;
+      color: #ff6347;
     }
   }
 }
 
-.monitorTimelineLine {
+.timelineMonitorIndicator {
   position: relative;
   margin: 3px 0;
   min-width: 2px;
   height: 4px;
-  background-color: #03a9f4;
+  background-color: #ff6347;
 }

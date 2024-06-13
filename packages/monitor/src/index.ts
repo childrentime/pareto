@@ -8,26 +8,57 @@ import {
   VitalsMonitor,
   logTimeToInteractiveTime,
 } from "./client/vitals-monitor";
-import { buildTimeline, setup } from "./devPanel";
+import { buildTimeline, setup, waitReady } from "./devPanel";
+import { TimeLines } from "./devPanel/types";
 import { reportWebVitals } from "./vitals";
 
 export * from "./server";
 export * from "./script";
 
-export function report() {
-  logTimeToInteractiveTime();
-  const monitorList = [
-    VitalsMonitor,
-    PerformanceMonitor,
-    NodeMonitor,
-    ResourceMonitor,
-  ];
+export async function report() {
+  const waitForNodeMonitorInfos = () => {
+    return new Promise((resolve, reject) => {
+      const interval = setInterval(() => {
+        if (window.__NODE_MONITOR_INFOS__) {
+          clearInterval(interval);
+          resolve(window.__NODE_MONITOR_INFOS__);
+        }
+      }, 200);
 
-  applyMonitors(monitorList).then((monitors) => {
-    const timelines = buildTimeline(monitors);
-    setup(timelines);
-  });
+      setTimeout(() => {
+        clearInterval(interval);
+        reject(new Error("Timed out waiting for __NODE_MONITOR_INFOS__"));
+      }, 10000);
+    });
+  };
+
+  logTimeToInteractiveTime();
   reportWebVitals();
+  await waitForNodeMonitorInfos();
+
+  if (
+    window.__NODE_MONITOR_INFOS__ &&
+    window.__NODE_MONITOR_INFOS__.showMonitor
+  ) {
+    await waitReady();
+    const timelines = await new Promise<TimeLines[]>((resolve) => {
+      setTimeout(async () => {
+        const monitorList = [
+          VitalsMonitor,
+          PerformanceMonitor,
+          NodeMonitor,
+          ResourceMonitor,
+        ];
+  
+        const monitors = await applyMonitors(monitorList);
+        const timelines = buildTimeline(monitors);
+        setup(timelines);
+
+        resolve(timelines)
+      }, 0);
+    });
+    return timelines;
+  }
 }
 
 async function applyMonitors(monitorList: BaseMonitorConstructor[]) {

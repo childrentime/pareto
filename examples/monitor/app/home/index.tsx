@@ -19,18 +19,20 @@ const Home: ParetoPage<InitialData> = (props) => {
   const { repositories } = props.initialData;
 
   useEffect(() => {
-    report();
+    report().then(console.log);
   }, []);
 
   return (
     <>
-      <div className={styles.container}>
+      <div className={styles.container} onClick={() => {
+        console.log('container clicked')
+      }}>
         <div className={styles.title}>Repositories</div>
         <div className={styles.repos}>
           {repositories.map((repo) => (
             <div key={repo.name} className={styles.repo}>
               <div>
-                <Image src={repo.avatar} />
+                <Image src={repo.avatar} preload/>
               </div>
               <div>{repo.name}</div>
             </div>

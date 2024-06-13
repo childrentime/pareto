@@ -23,13 +23,13 @@ const TimeLine = ({ source }: { source: TimeLines[] }) => {
     <>
       <Logo onClick={() => setShowPanel(!showPanel)} />
       <div
-        className={cx(styles.monitorTimeline, {
-          [styles.monitorTimelineShow]: showPanel,
+        className={cx(styles.timelineMonitor, {
+          [styles.timelineMonitorVisible]: showPanel,
         })}
       >
         {source.map((item, index) => (
           <div key={index}>
-            <p className={styles.monitorTimelineTitle}>{item.title}</p>
+            <p className={styles.timelineMonitorTitle}>{item.title}</p>
             {item.spans.map((rt, idx) => {
               const lineStyle = {
                 left: `${((rt.start - startTime) * 100) / totalTime}%`,
@@ -38,7 +38,7 @@ const TimeLine = ({ source }: { source: TimeLines[] }) => {
 
               return (
                 <div key={idx}>
-                  <div className={styles.monitorTimelineContent}>
+                  <div className={styles.timelineMonitorContent}>
                     <span>{rt.name}</span>
                     <span>
                       {rt.end - rt.start}@[{rt.start - startTime},{" "}
@@ -46,7 +46,7 @@ const TimeLine = ({ source }: { source: TimeLines[] }) => {
                     </span>
                   </div>
                   <div
-                    className={styles.monitorTimelineLine}
+                    className={styles.timelineMonitorIndicator}
                     style={lineStyle}
                   />
                 </div>

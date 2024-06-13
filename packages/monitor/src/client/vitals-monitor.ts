@@ -68,8 +68,8 @@ export class VitalsMonitor extends BaseMonitor {
 
     return {
       ...this.dataSource,
-      fpc: firstPaint.startTime,
-      fcp: firstContentfulPaint.startTime,
+      fpc: Math.round(firstPaint.startTime + performance.timeOrigin),
+      fcp: Math.round(firstContentfulPaint.startTime + performance.timeOrigin),
     };
   }
 

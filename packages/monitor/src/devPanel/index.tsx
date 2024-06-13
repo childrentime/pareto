@@ -34,3 +34,15 @@ export function buildTimeline(monitors: BaseMonitor[]): TimeLines[] {
 
   return timelines;
 }
+
+export const waitReady = () => {
+  return new Promise<void>((resolve, reject) => {
+    if (document.readyState === "complete") {
+      resolve();
+    } else {
+      window.addEventListener("load", () => {
+        resolve();
+      });
+    }
+  });
+};

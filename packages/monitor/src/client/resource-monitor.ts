@@ -36,13 +36,9 @@ export class ResourceMonitor extends BaseMonitor<Record<string, number>> {
 
   getFirstScreenImageTiming() {
     // 获取所有图片资源的加载时间
-    let imageResources = performance
-      .getEntriesByType("resource")
-      .filter((resource) => {
-        return [".jpg", ".jpeg", ".png", ".gif"].some((ext) =>
-          resource.name.endsWith(ext)
-        );
-      }) as PerformanceResourceTiming[];
+    let imageResources = performance.getEntriesByType(
+      "resource"
+    ) as PerformanceResourceTiming[];
 
     // 获取首屏的宽度和高度
     let viewportWidth =
@@ -77,8 +73,8 @@ export class ResourceMonitor extends BaseMonitor<Record<string, number>> {
     );
 
     return {
-      imageStart: earliestFetchStart,
-      imageEnd: latestResponseEnd,
+      imageStart: earliestFetchStart + performance.timeOrigin,
+      imageEnd: latestResponseEnd + performance.timeOrigin,
     };
   }
 
@@ -117,10 +113,10 @@ export class ResourceMonitor extends BaseMonitor<Record<string, number>> {
     ) => calc(ary, "max", key);
 
     return {
-      scriptStart: calcMin(script, "fetchStart"),
-      scriptEnd: calcMax(script, "responseEnd"),
-      styleStart: calcMin(style, "fetchStart"),
-      styleEnd: calcMax(style, "responseEnd"),
+      scriptStart: calcMin(script, "fetchStart") + performance.timeOrigin,
+      scriptEnd: calcMax(script, "responseEnd") + performance.timeOrigin,
+      styleStart: calcMin(style, "fetchStart") + performance.timeOrigin,
+      styleEnd: calcMax(style, "responseEnd") + performance.timeOrigin,
     };
   }
 
@@ -160,7 +156,7 @@ export class ResourceMonitor extends BaseMonitor<Record<string, number>> {
       totalTransferSize += transferSize;
     }
 
-    this.recordSources =  {
+    this.recordSources = {
       totalEncodedBodySize: sizeToKB(totalEncodedBodySize),
       totalDecodedBodySize: sizeToKB(totalDecodedBodySize),
       resourceNum,

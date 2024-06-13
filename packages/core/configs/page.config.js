@@ -13,7 +13,8 @@ let pageConfig = {
   configureRspack(config) {
     return config;
   },
-  enableSpa: false
+  enableSpa: false,
+  enableMonitor: false,
 };
 
 for (const CONFIG_PATH of CONFIG_PATHS) {

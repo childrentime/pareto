@@ -20,7 +20,10 @@ export function Recommends() {
   const { feeds }: RecommendData = use(promiseMap.get(getRecommendsKey)!);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} onClick={(e) => {
+      e.stopPropagation();
+      console.log('recommends click')
+    }}>
       <div className={styles.title}>Recommends</div>
       <div className={styles.list}>
         {feeds.map((item, index) => (

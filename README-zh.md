@@ -1,5 +1,7 @@
 # Pareto
 
+[English Version](./README.md)
+
 Pareto 是一个以流式渲染为核心的 SSR（服务器端渲染）框架。 它的目标不是一个类似 `next.js` 或者 `remix` 的全栈框架，而是旨在对常规的 SSR应用进行增强。
 
 你可以直接用 `pareto` 来新建应用，也可以参考这个[模板](./examples/base/)来为你自己的 SSR 应用支持流式渲染功能。
@@ -12,4 +14,4 @@ Pareto 是一个以流式渲染为核心的 SSR（服务器端渲染）框架。
 
 关于流式渲染的文章，可以参考 <https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming#what-is-streaming> <https://github.com/reactwg/react-18/discussions/22>
 
-简单来说，流式渲染可以在常规 SSR 的基础上提升你的 FCP,TTFB 时间。并且它是一个非常大的提升，因为现在我们不需要在服务器上等待所有的的并行接口，我们可以把接口返回时间最长的那个给“流式掉“
+简而言之，流式渲染相较于传统的SSR能够改善您的FCP（首次内容绘制）和TTFB（首字节时间）指标。这种改进很显著，因为现在我们不必等待服务器上所有并行接口的返回。我们可以“流式传输”返回时间最长的接口。

@@ -1,5 +1,7 @@
 # Pareto
 
+[中文版](./README-zh.md)
+
 Pareto is an SSR (Server Side Rendering) framework centered on stream rendering. Its goal is not to be a full-stack framework like `next.js` or `remix`, but to enhance regular SSR applications.
 
 You can use `pareto` directly to create a new application, or you can refer to this [template](./examples/base/) to support stream rendering for your own SSR application.
@@ -12,4 +14,4 @@ Integrating stream rendering into an SSR application is a complex process, and u
 
 For articles about stream rendering, you can refer to <https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming#what-is-streaming> and <https://github.com/reactwg/react-18/discussions/22>.
 
-Simply put, stream rendering can improve your FCP (First Contentful Paint) and TTFB (Time to First Byte) times based on regular SSR. And it's a significant improvement because now we don't have to wait for all parallel interfaces on the server. We can "stream" the one with the longest return time.
+In essence, stream rendering enhances your FCP (First Contentful Paint) and TTFB (Time to First Byte) metrics compared to traditional SSR. This enhancement is notable as it eliminates the need to stall for all concurrent server responses. Instead, we can selectively "stream" the response with the lengthiest processing time.

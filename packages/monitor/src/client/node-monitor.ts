@@ -35,16 +35,10 @@ export class NodeMonitor extends BaseMonitor<
   }
 
   init() {
-    return new Promise((resolve, reject) => {
-      const intervalId = setInterval(() => {
-        const monitorInfos = window["__NODE_MONITOR_INFOS__"];
-  
-        if (monitorInfos) {
-          clearInterval(intervalId);
-          this.dataSource = monitorInfos.serverData;
-          resolve(monitorInfos.serverData);
-        }
-      }, 100); // 每 100 毫秒检查一次
-    });
+    const monitorInfos = window["__NODE_MONITOR_INFOS__"];
+
+    if (monitorInfos) {
+      this.dataSource = monitorInfos.serverData;
+    }
   }
 }

@@ -15,8 +15,24 @@ import { reportWebVitals } from "./vitals";
 export * from "./server";
 export * from "./script";
 
-export async function report() {
+export interface ReportOptions {
+  collectResource?: boolean;
+  collectNode?: boolean;
+  collectVitals?: boolean;
+  collectCustom?: boolean;
+}
+export async function report(options: ReportOptions = {}) {
+  const {
+    collectNode = true,
+    collectResource = true,
+    collectVitals = true,
+    collectCustom = true,
+  } = options;
+
   const waitForNodeMonitorInfos = () => {
+    if (!collectNode) {
+      return Promise.resolve();
+    }
     return new Promise((resolve, reject) => {
       const interval = setInterval(() => {
         if (window.__NODE_MONITOR_INFOS__) {
@@ -33,28 +49,32 @@ export async function report() {
   };
 
   logTimeToInteractiveTime();
-  reportWebVitals();
+  if (collectVitals) {
+    reportWebVitals();
+  }
+
   await waitForNodeMonitorInfos();
 
   if (
-    window.__NODE_MONITOR_INFOS__ &&
-    window.__NODE_MONITOR_INFOS__.showMonitor
+    (window.__NODE_MONITOR_INFOS__ &&
+      window.__NODE_MONITOR_INFOS__.showMonitor) ||
+    !collectNode
   ) {
     await waitReady();
     const timelines = await new Promise<TimeLines[]>((resolve) => {
       setTimeout(async () => {
         const monitorList = [
-          VitalsMonitor,
+          collectCustom && VitalsMonitor,
           PerformanceMonitor,
-          NodeMonitor,
-          ResourceMonitor,
-        ];
-  
+          collectNode && NodeMonitor,
+          collectResource && ResourceMonitor,
+        ].filter(Boolean) as BaseMonitorConstructor[];
+
         const monitors = await applyMonitors(monitorList);
         const timelines = buildTimeline(monitors);
         setup(timelines);
 
-        resolve(timelines)
+        resolve(timelines);
       }, 0);
     });
     return timelines;

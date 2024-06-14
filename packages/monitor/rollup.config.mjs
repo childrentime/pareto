@@ -3,7 +3,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import postcss from "rollup-plugin-postcss";
-import image from '@rollup/plugin-image';
+import terser from "@rollup/plugin-terser";
 /**
  * @type {import('rollup').RollupOptions}
  */
@@ -27,10 +27,11 @@ export default {
     commonjs(),
     typescript({ tsconfig: "./tsconfig.json" }),
     postcss({
-      extract: false,
+      extract: true,
       modules: true,
       use: ["sass"],
+      minimize: true,
     }),
-    image()
+    terser(),
   ],
 };

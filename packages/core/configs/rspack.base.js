@@ -1,6 +1,5 @@
 const rspack = require("@rspack/core");
-
-const __DEV__ = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
+const { __DEV__ } = require("../utils/node-env");
 
 const sassLoader = {
   loader: require.resolve("sass-loader"),
@@ -52,4 +51,42 @@ const generateCssLoaders = (
   return loaders;
 };
 
+/**
+ * @type {import("@rspack/core").Configuration}
+ */
+const spiltChunks = {
+  optimization: {
+    splitChunks: {
+      chunks: "all",
+      maxAsyncRequests: Infinity,
+      maxInitialRequests: Infinity,
+      minSize: 0,
+      cacheGroups: {
+        default: false,
+        defaultVendors: false,
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: "vendor",
+          chunks: "initial",
+          reuseExistingChunk: true,
+        },
+        paretojs: {
+          test: function (module) {
+            const m = module.resource;
+            if (m && (m.includes("pareto/packages/core") || m.includes("@paretojs"))) {
+              return true;
+            }
+            return false;
+          },
+          name: "paretojs",
+          chunks: "initial",
+          reuseExistingChunk: true,
+        },
+      },
+    },
+  },
+};
+
 exports.generateCssLoaders = generateCssLoaders;
+
+exports.spiltChunks = spiltChunks;

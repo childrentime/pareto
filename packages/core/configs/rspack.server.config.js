@@ -5,7 +5,7 @@ const { getServerEntry } = require("./entry");
 const rspack = require("@rspack/core");
 
 const cwd = process.cwd();
-const { generateCssLoaders } = require("./rspack.base");
+const { generateCssLoaders, spiltChunks } = require("./rspack.base");
 
 const { APP_PATH } = require("../constant");
 const WebpackDemandEntryPlugin = require("../cmd/dev/lazy-compiler/plugin");
@@ -90,6 +90,7 @@ const defaultConfig = {
   experiments: {
     css: false,
   },
+  ...spiltChunks,
 };
 
 const serverConfig = pageConfig.configureRspack(defaultConfig, {

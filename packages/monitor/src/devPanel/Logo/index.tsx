@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./style.module.scss";
-import monitorLogo from './monitor.png';
 
 const Logo = (props: { onClick: () => void }) => {
   const { onClick } = props;
@@ -58,9 +57,11 @@ const Logo = (props: { onClick: () => void }) => {
     <div
       ref={divRef}
       className={styles.draggableLogoMonitor}
-      style={{...style, backgroundImage: `url(${monitorLogo})`}}
+      style={style}
       onClick={onClick}
-    />
+    >
+      Monitor
+    </div>
   );
 };
 

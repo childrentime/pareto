@@ -3,18 +3,20 @@ const babelConfig = require("./babel.config");
 const { getClientEntries } = require("./entry");
 const rspack = require("@rspack/core");
 
-const { generateCssLoaders } = require("./rspack.base");
+const { generateCssLoaders, spiltChunks } = require("./rspack.base");
 const WebpackDemandEntryPlugin = require("../cmd/dev/lazy-compiler/plugin");
 const { pageEntries } = require("./entry");
 const { CLIENT_OUTPUT_PATH } = require("../constant");
 const pageConfig = require("./page.config");
-const { __DEV__ } = require("../utils/node-env");
+const { __DEV__, __ANA__ } = require("../utils/node-env");
+const BundleAnalyzerPlugin =
+  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 /**
  * @type {import("webpack").Configuration}
  */
 const defaultConfig = {
-  mode: __DEV__ ? "development" : 'production',
+  mode: __DEV__ ? "development" : "production",
   node: false,
   entry: getClientEntries(),
   output: {
@@ -79,14 +81,17 @@ const defaultConfig = {
     }),
     new rspack.ProgressPlugin({ prefix: "client" }),
     new rspack.CssExtractRspackPlugin({}),
-    __DEV__ && new WebpackDemandEntryPlugin({
-      pageEntries,
-    }),
+    __DEV__ &&
+      new WebpackDemandEntryPlugin({
+        pageEntries,
+      }),
+    __ANA__ && new BundleAnalyzerPlugin(),
   ],
   cache: false,
   experiments: {
     css: false,
   },
+  ...spiltChunks,
 };
 
 const clientConfig = pageConfig.configureRspack(defaultConfig, {

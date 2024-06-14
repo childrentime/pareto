@@ -1,4 +1,5 @@
-import ReactDom from "react-dom";
+
+import { preload as ReactDomPreload } from "react-dom";
 
 export type ImageProps = {
   preload?: boolean;
@@ -10,7 +11,6 @@ export const Image = (props: ImageProps) => {
   if (!rest.src) {
     throw new Error("Image component must have a src prop");
   }
-  preload && ReactDom.preload(rest.src, { as: "image" });
+  preload && ReactDomPreload(rest.src, { as: "image" });
   return <img {...rest} />;
 };
-

@@ -1,4 +1,3 @@
-const nodeExternals = require("webpack-node-externals");
 const path = require("path");
 const babelConfig = require("./babel.config");
 const { getServerEntry } = require("./entry");
@@ -21,6 +20,9 @@ const defaultConfig = {
   node: false,
   entry: {
     index: [getServerEntry(), path.resolve(cwd, "./server-entry.tsx")],
+  },
+  externalsPresets: {
+    node: true,
   },
   output: {
     path: APP_PATH,
@@ -75,7 +77,6 @@ const defaultConfig = {
   optimization: {
     minimize: false,
   },
-  externals: [nodeExternals()],
   resolve: {
     extensions: [".js", ".jsx", ".json", ".mjs", ".wasm", ".ts", ".tsx"],
   },
@@ -85,6 +86,9 @@ const defaultConfig = {
       new WebpackDemandEntryPlugin({
         pageEntries,
       }),
+    new rspack.DefinePlugin({
+      'typeof window': JSON.stringify('undefined')
+    }),
   ],
   cache: false,
   experiments: {

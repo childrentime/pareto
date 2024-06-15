@@ -86,6 +86,9 @@ const defaultConfig = {
         pageEntries,
       }),
     __ANA__ && new BundleAnalyzerPlugin(),
+    new rspack.DefinePlugin({
+      'typeof window': JSON.stringify('object')
+    })
   ],
   cache: false,
   experiments: {

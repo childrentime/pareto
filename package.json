@@ -10,10 +10,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "tsup": "^8.0.2",
-    "typescript": "^5.4.5",
     "@jsdevtools/version-bump-prompt": "^6.1.0",
+    "consola": "^3.2.3",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.0.2",
     "tsx": "^4.11.0",
-    "consola": "^3.2.3"
+    "typescript": "^5.4.5"
   }
 }

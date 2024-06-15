@@ -79,7 +79,6 @@ export const paretoRequestHandler =
     const path = req.path.slice(1);
     const mark = enableMonitor ? req.monitor.mark : () => {};
 
-
     if (!pageEntries[path]) {
       res.statusCode = 404;
       res.end("404");
@@ -123,6 +122,9 @@ export const paretoRequestHandler =
     };
 
     const renderMonitorInfos = () => {
+      if (!enableMonitor) {
+        return ''
+      }
       return renderToStaticMarkup(
         <script
           id="MONITOR"

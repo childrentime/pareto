@@ -1,0 +1,75 @@
+# 监控
+
+Pareto 内置了性能指标监控功能。在使用 `create-pareto` 创建项目时，您可以在选择模板时选择带有监控选项。
+
+## 设置
+
+如果您想在项目中手动启用此功能，请按照以下步骤操作。
+
+### 安装
+
+```bash
+pnpm i @paretojs/monitor@latest
+```
+
+在项目根目录下创建或更新 `pareto.config.ts`。
+
+```ts
+import { ParetoConfig } from "@paretojs/core/config";
+
+const config: ParetoConfig = {
+  enableMonitor: true,
+};
+
+export default config;
+```
+
+修改项目根目录下的 `server-entry.tsx` 文件。
+
+```tsx
+import { addMonitorMiddleware } from "@paretojs/monitor";
+import express from "express";
+
+const app = express();
+addMonitorMiddleware(app)({
+  // 控制是否在前端展示 Monitor UI
+  showMonitor: true,
+});
+```
+
+修改项目根目录下的 `client-entry.tsx` 文件。
+
+```tsx
+import '@paretojs/monitor/main.css'
+```
+
+修改您的 `app` 目录中任何路由根文件。
+
+```tsx
+import { report, FirstScreen } from "@paretojs/monitor";
+
+const Home: ParetoPage<InitialData> = (props) => {
+  const { repositories } = props.initialData;
+
+  useEffect(() => {
+    report().then(console.log);
+  }, []);
+
+  return (
+    <>
+      <div>
+        ...
+      </div>
+      <FirstScreen />
+    </>
+  );
+};
+```
+
+## 结果
+
+![监控](/monitor.png)
+
+## 报告
+
+有关如何报告参数数据以及参数含义的信息，您可以参考这个 [地方](https://github.com/childrentime/pareto/blob/main/packages/monitor/README.md)。

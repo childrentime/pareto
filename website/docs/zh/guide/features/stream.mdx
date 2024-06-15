@@ -1,0 +1,92 @@
+# 流式渲染
+
+Pareto提供了对流式渲染的一流支持。
+
+## 用法
+
+:::note
+
+我们假设您已经有使用流式渲染的经验。如果没有，您可以参考这些文章了解什么是流式渲染。
+
+- [Pareto博客](/blog/index)
+- https://github.com/reactwg/react-18/discussions/37
+- https://github.com/reactwg/react-18/discussions/22
+- https://innovation.ebayinc.com/tech/engineering/async-fragments-rediscovering-progressive-html-rendering-with-marko/
+
+:::
+
+### 定义流请求和键值
+
+根据经验，我们只需要对具有缓慢接口的模块进行流式请求。首先，让我们定义请求方法和键值。
+
+```ts
+// data.ts
+export const getRecommendsKey = "getRecommends";
+export const getRecommends = () => fetch("/api/recommends");
+```
+
+### 设置服务器端Promise
+
+Pareto导出一个promiseMap对象来维护与键值对应的每个请求的Promise状态。让我们设置它。
+
+```tsx
+Home.getServerSideProps = async () => {
+  // 我们不需要等待流请求
+  promiseMap.set(getRecommendsKey, getRecommends());
+  // 需要等待的请求
+  const repositories = await fetch("/api/repositories");
+  return repositories;
+};
+```
+
+### 设置客户端Promise
+
+众所周知的笑话是：React需要在服务器端和客户端的第一次渲染之间保持一致性，我们还需要在服务器端和客户端之间同步Promise状态。
+
+```tsx
+Home.setUpClient = async () => {
+  // 模拟客户端Promise，只有在服务器端流数据准备就绪时才会被解析
+  mockClientPromise(getRecommendsKey);
+};
+```
+
+### 使用Promise
+
+哦天啊！我们终于到达这里。通过在React中使用use和suspense来消耗我们的请求Promise，我们可以实现流式传输。
+
+:::note
+`use`钩子仅在React 19中引入，因此对于React 18，您需要使用从`Pareto`导出的`use`函数。请注意，它仅实现了消耗Promise的能力。
+:::
+
+```tsx
+// React19
+import { use } from "react";
+// React18
+import { use } from "@paretojs/core";
+
+const Home = () => {
+  return (
+    <div>
+      <div>hello world</div>
+      <Suspense fallback={<RecommendsSkeleton />}>
+        <Recommends />
+      </Suspense>
+    </div>
+  );
+};
+
+const Recommends = () => {
+  const { feeds } = use(promiseMap.get(getRecommendsKey)!);
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.title}>Recommends</div>
+      {feeds.map((item, index) => (
+        <div className={styles.item} key={index}>
+          ...
+        </div>
+      ))}
+    </div>
+  );
+};
+```

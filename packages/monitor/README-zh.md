@@ -17,6 +17,7 @@ import express from "express";
 const app = express();
 
 addMonitorMiddleware(app)({
+  // 控制是否在前端展示 Monitor UI
   showMonitor: true,
 });
 ```

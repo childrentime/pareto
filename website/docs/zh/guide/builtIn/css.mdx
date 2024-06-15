@@ -1,0 +1,77 @@
+# CSS
+
+Pareto 支持 CSS、SASS 和 CSS 模块。按照惯例，以 `.module.(css|scss)` 结尾的文件被视为模块化 CSS。
+
+## Tailwind CSS
+
+:::note
+
+Pareto 与 Tailwind CSS 的集成在热更新上还有一点问题，这主要是因为上游的 `rspack` 问题。
+
+:::
+
+{/* [Tailwind CSS](https://tailwindcss.com/) 是一个以实用为先的 CSS 框架，与 Pareto 配合得非常出色。 */}
+
+示例：[使用 Tailwind CSS](https://github.com/childrentime/pareto/tree/main/examples/tailwind)
+
+### 安装 Tailwind
+
+安装 Tailwind CSS 包并运行 init 命令以生成 tailwind.config.js 和 postcss.config.js 文件：
+
+```tsx
+npm install -D tailwindcss
+npx tailwindcss init -p
+```
+
+### 配置 Tailwind
+
+在 tailwind.config.js 中，添加将使用 Tailwind CSS 类名的文件路径：
+
+```tsx
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./app/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+### 导入样式
+
+在全局样式表中添加 [Tailwind CSS 指令](https://tailwindcss.com/docs/functions-and-directives#directives)，Tailwind 将使用这些指令将其生成的样式注入到应用程序中，例如：
+
+```tsx
+// index.css
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+在客户端入口文件（client-entry.tsx）中导入 index.css 样式表，以将样式应用到应用程序中的每个路由。
+
+```tsx
+// client-entry.tsx
+import "./index.css";
+
+const startApp = async (Page: ParetoPage) => {
+  ...
+};
+export { startApp };
+```
+
+### 使用类名
+
+安装 Tailwind CSS 并添加全局样式后，您可以在应用程序中使用 Tailwind 的实用程序类。
+
+```tsx
+// app/home/index.tsx
+
+export default function Page() {
+  return <h1 className="text-3xl font-bold underline">Hello, Pareto!</h1>
+}
+```

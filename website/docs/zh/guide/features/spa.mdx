@@ -1,0 +1,22 @@
+# 单页面应用（SPA）
+
+Pareto 对客户端渲染提供了良好的支持。
+
+## 使用方法
+
+有时，当您的网站流量过高时，不使用服务器端渲染可以增加服务器的流量容量。在 Pareto 中，您可以通过在 `pareto.config.ts` 中设置 `enableSpa: true` 来启用此功能。当启用此配置时，如果您的 URL 链接包含一个 `__csr` 参数且为真值，Pareto 将仅从服务器返回一个空的 HTML 骨架，剩余内容由客户端 JavaScript 加载。
+
+```ts
+// pareto.config.ts
+import { ParetoConfig } from "@paretojs/core/config";
+
+const config: ParetoConfig = {
+  enableSpa: true
+};
+
+export default config;
+```
+
+:::note
+重要提示：当开始使用 SPA 功能时，您需要确定当前是否处于 SPA 模式，并在客户端请求相应的数据。您可以参考这个 [示例](https://github.com/childrentime/pareto/tree/main/examples/spa) 来完成这一点。
+:::

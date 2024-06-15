@@ -1,0 +1,30 @@
+# 静态资源
+
+每个路由对应一个页面，该页面具有自己的静态资源，如 CSS、JS 等。
+
+Pareto 将在请求到达服务器时立即在 head 标签元素中分发这些静态资源。这使得浏览器可以在服务器接口请求间隙下载和解析这些资源。
+
+Pareto 提供了一个 `getAsset` 方法，用于添加一些与页面相关的静态资源。这在某些预览页面（比如商品详情页的头图）中非常有用。
+
+例如：
+
+```tsx
+const Home: ParetoPage = () => {
+  return (
+    <div>
+    <h1>Home</h1>
+    </div>
+  );
+};
+
+Home.getAssets = () => {
+  return [
+    {
+      type: "image",
+      url: "https://example.com/image.jpg",
+    },
+  ];
+};
+```
+
+从 getAssets 返回的数据将被转换为 link 标签并插入页面中。与 `react-async-helmet` 中的元数据不同之处在于，它的分发时机会更早。

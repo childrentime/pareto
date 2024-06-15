@@ -1,0 +1,36 @@
+# 页面
+
+在Pareto中，页面被定义为`ParetoPage`类型，提供一些实用函数。
+
+## getServerSideProps
+
+getServerSideProps是一个在服务器端请求时调用的函数。它可用于从外部API获取数据，查询数据库或执行其他服务器端任务。
+
+## setUpClient
+
+setUpClient是一个在客户端调用的函数。它可用于设置页面的客户端部分，例如初始化库或设置事件监听器。
+
+## getAssets
+
+在我们的流式渲染中，当请求到达服务器时，我们将发送静态JS和CSS资源。该函数允许您自定义并添加一些特定于页面的静态元素。例如，它可以是产品详情页面的大图像URL。
+
+例如
+
+```tsx
+const Home: ParetoPage = () => {
+  return (
+    <div>
+      <h1>Home</h1>
+    </div>
+  );
+};
+
+Home.getAssets = () => {
+  return [
+    {
+      type: "image",
+      url: "https://example.com/image.jpg",
+    },
+  ];
+};
+```

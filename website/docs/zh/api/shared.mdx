@@ -1,0 +1,31 @@
+# 共享 API
+
+共享 API 在 `@paretojs/core` 中暴露。
+
+## useStyles
+
+useStyles 用于收集关键 CSS，例如：
+
+```tsx
+import styles from './style.iso.scss'
+
+const Component = () => {
+  return (
+    <div className={styles.container}>
+      <h1 className={styles.title}>Hello World</h1>
+    </div>
+  )
+}
+```
+
+## promiseMap
+
+promiseMap 用于管理请求的 promise 状态，它在服务器端和客户端之间是同构的。
+
+## mockClientPromise
+
+mockClientPromise 用于在客户端初始化 promise 状态。
+
+## use
+
+use 是一个 polyfill。在 `React 19` 环境中，它将直接使用 `React 19` 导出的 use。在 `React 18` 中，它将回退到 pareto 中定义的 polyfill。请注意，polyfill use 只能用于解决 promises。

@@ -1,0 +1,67 @@
+# 服务器 API
+
+服务器 API 在 `@paretojs/core/node` 中暴露。
+
+## paretoRequestHandler
+
+paretoRequestHandler 是用于处理页面的服务器端函数。它在 `server-entry.tsx` 中用于在服务器上呈现页面。
+例如：
+
+```tsx
+// server-entry.tsx
+import express from "express";
+import { paretoRequestHandler } from "@paretojs/core/node";
+
+const app = express();
+app.get("*", paretoRequestHandler({}));
+```
+
+### paretoRequestHandler 选项
+
+#### delay
+
+delay 是页面呈现等待的最长时间，参考 [renderToPipeableStream](https://react.dev/reference/react-dom/server/renderToReadableStream#rendertoreadablestream)。
+
+#### pageWrapper
+
+pageWrapper 是一个函数，允许您自定义和增强页面。例如，要将相同的元标记添加到所有页面中，可以执行以下操作：
+
+```tsx
+// shared-meta.tsx
+import { Helmet } from "react-helmet-async";
+
+const Meta = () => {
+  return (
+    <Helmet>
+      <title>一个花哨的网页</title>
+      <link rel="notImportant" href="https://www.chipotle.com" />
+      <meta name="whatever" content="notImportant" />
+      <link rel="canonical" href="https://www.tacobell.com" />
+      <meta property="og:title" content="一个非常重要的标题" />
+    </Helmet>
+  );
+};
+
+export default Meta;
+
+// server-entry.tsx
+import express from "express";
+import { paretoRequestHandler } from "@paretojs/core/node";
+
+const app = express();
+app.get(
+  "*",
+  paretoRequestHandler({
+    pageWrapper: (Page) => {
+      return (props) => (
+        <>
+          <Meta />
+          <Page {...props} />
+        </>
+      );
+    },
+  })
+);
+```
+
+pageWrapper 函数的第一个参数是呈现的页面，第二个参数是呈现页面的 getServerSideProps 返回的对象。当您使用第三方状态管理库时，第二个参数非常有用。

@@ -15,4 +15,19 @@ export default defineConfig({
       { icon: 'github', mode: 'link', content: 'https://github.com/childrentime/pareto' },
     ],
   },
+  lang: 'en',
+  locales: [
+    {
+      lang: 'en',
+      label: 'English',
+      title: 'Pareto',
+      description: 'Pareto document',
+    },
+    {
+      lang: 'zh',
+      label: '简体中文',
+      title: 'Pareto',
+      description: 'Pareto 文档',
+    },
+  ],
 });

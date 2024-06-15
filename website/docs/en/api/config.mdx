@@ -1,0 +1,84 @@
+# Pareto Config
+
+## Configuration file
+
+Pareto accepts four types of files as configuration files: pareto.config.(js|ts|mjs|mts).
+
+##  pageDir
+
+- Type: `string`
+- Default: `app`
+
+Specifies the application root directory. For example:
+
+```tsx
+// pareto.config.ts
+import { ParetoConfig } from "@paretojs/core/config";
+
+const config: ParetoConfig = {
+  pageDir: "pages",
+};
+
+export default config;
+```
+
+##  configureRspack
+
+- Type: `function`
+- Default: `undefined`
+
+The configureRspack function supports customizing the functionality of Rspack. For example:
+
+```tsx
+import { rspack } from "@rspack/core";
+import { ParetoConfig } from "@paretojs/core/config";
+
+const config: ParetoConfig = {
+  configureRspack(config, { isServer }) {
+    if (isServer) {
+      config.plugins!.push(
+        new rspack.DefinePlugin({
+          "process.env.password": JSON.stringify("password"),
+        })
+      );
+    }
+    return config;
+  },
+};
+
+export default config;
+```
+
+## enableSpa
+
+- Type: `boolean`
+- Default: `false`
+
+Enable SPA mode. For example:
+
+```tsx
+import { ParetoConfig } from "@paretojs/core/config";
+
+const config: ParetoConfig = {
+  enableSpa: true
+};
+
+export default config;
+```
+
+## enableMonitor
+
+- Type: `boolean`
+- Default: `false`
+
+Enable the monitor. For example:
+
+```tsx
+import { ParetoConfig } from "@paretojs/core/config";
+
+const config: ParetoConfig = {
+  enableMonitor: true
+};
+
+export default config;
+```

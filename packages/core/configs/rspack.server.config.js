@@ -95,6 +95,9 @@ const defaultConfig = {
     css: false,
   },
   ...spiltChunks,
+  performance: {
+    hints: false,
+  }
 };
 
 const serverConfig = pageConfig.configureRspack(defaultConfig, {

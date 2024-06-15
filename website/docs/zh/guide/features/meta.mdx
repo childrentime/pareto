@@ -1,0 +1,78 @@
+# 元信息管理
+
+Pareto 使用 `react-helmet-async` 来进行元数据管理。
+因此，你可以使用 react-helmet-async 库中提供的所有功能。
+
+## 示例
+
+```tsx
+import { Helmet } from "react-helmet-async";
+
+const App = () => {
+  return (
+    <>
+      <Helmet>
+        <title>Home</title>
+      </Helmet>
+      <div>hello world</div>
+    </>
+  );
+};
+```
+
+就是这样！标题标签将在服务器端渲染期间自动移至 head 标签中。
+
+## 常见标签
+
+有时候你想在多个路由之间设置一些共同的元标签。
+你可以定义一个名为 `shared-meta.tsx` 的文件，并在 `client-entry.tsx` 和 `server-entry.tsx` 中单独导入它。
+
+```tsx
+// shared-meta.tsx
+import { Helmet } from "react-helmet-async";
+const Meta = () => {
+  return (
+    <Helmet>
+      <title>一个花哨的网页</title>
+      <link rel="notImportant" href="https://www.chipotle.com" />
+      <meta name="whatever" content="notImportant" />
+      <link rel="canonical" href="https://www.tacobell.com" />
+      <meta property="og:title" content="一个非常重要的标题" />
+    </Helmet>
+  );
+};
+export default Meta;
+
+// client-entry.tsx
+hydrateRoot(
+  root,
+  <StrictMode>
+    <PageContext>
+      <Meta />
+      <Page initialData={__INITIAL_DATA__} />
+    </PageContext>
+  </StrictMode>
+);
+// server-entry.tsx
+app.get(
+  "*",
+  paretoRequestHandler({
+    delay: ABORT_DELAY,
+    pageWrapper: (Page) => {
+      return (props) => (
+        <>
+          <Meta />
+          <Page {...props} />
+        </>
+      );
+    },
+  })
+);
+```
+
+## 注意事项
+
+:::note
+不要在流式组件中使用 `Helmet`，它不会生效，
+因为流式组件不会立即渲染。
+:::

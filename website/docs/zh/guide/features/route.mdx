@@ -1,0 +1,27 @@
+# 基础路由
+
+## 是什么
+
+Pareto使用文件系统路由，页面的文件路径简单地映射到路由路径，使整个项目的路由非常直观。
+
+```bash
+app
+├── home
+│   └── index.tsx #映射到 /home
+└── user
+    └── index.tsx #映射到 /user
+```
+
+## 自定义行为
+
+如果您不想使用 'app' 文件夹作为您的路由文件夹，您也可以通过配置自定义名称。
+
+```ts
+import { ParetoConfig } from "@pareto/core/config";
+
+const config: ParetoConfig = {
+  pageDir: "pages",
+};
+
+export default config;
+```

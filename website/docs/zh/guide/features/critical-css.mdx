@@ -1,0 +1,76 @@
+# 关键 CSS
+
+有关关键 CSS 的详细参考信息，请参阅 https://web.dev/articles/extract-critical-css。
+
+## 如何启用关键 CSS
+
+通常，我们的一个 React 组件可能如下所示。
+
+```tsx
+import styles from './style.module.scss'
+
+const Component = () => {
+  return (
+    <div className={styles.container}>
+      <h1 className={styles.title}>Hello World</h1>
+    </div>
+  )
+}
+```
+
+```scss
+.container {
+  background-color: #f0f0f0;
+}
+.title {
+  color: #333;
+}
+```
+
+像 Next.js 这样的框架，或者人们可能使用的 mini-css-extract-plugin，会将 CSS 提取到单独的文件中。
+
+它有一个显著的缺点，即它会为您导入的任何模块提取 CSS，有时这可能是不必要的。
+
+```tsx
+const ABTestComponent = () => {
+  return ab ? <ComponentA/> : <ComponentB>
+}
+```
+
+例如，在上面的情况下，对于处于 A/B 测试控制端的用户来说，任何其他模块的 CSS 都是不必要的。
+
+我们在 [isomorphic-style-loader](https://github.com/kriasoft/isomorphic-style-loader) 周围构建了一个内部包装器。现在，您可以使用 `useStyles` 钩子在渲染过程中收集所需的 CSS。
+
+```tsx
+import styles from './style.iso.scss';
+import { useStyles } from "@pareto/core";
+
+const Component = () => {
+  useStyles(styles);
+
+  return (
+    <div className={styles.container}>
+      <h1 className={styles.title}>Hello World</h1>
+    </div>
+  )
+}
+```
+
+为了将其与外部 CSS 区分开来，我们仅对以 `.iso.scss` 结尾的文件启用关键 CSS 收集。
+
+## 注意事项
+
+关键 CSS 可以与流式渲染一起使用，但重要的是要注意我们的 `useStyles` 调用必须放在 `use` 函数之前，否则这些样式无法在服务器端收集。
+
+```tsx
+export function Recommends() {
+  useStyles(styles); // 建议：始终将 useStyles 放在顶部;
+  const { feeds } = use(promiseMap.get(getRecommendsKey)!);
+
+  return (
+    <div className={styles.container}>
+      ...
+    </div>
+  );
+}
+```

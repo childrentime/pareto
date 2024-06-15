@@ -17,6 +17,7 @@ import express from "express";
 const app = express();
 
 addMonitorMiddleware(app)({
+  // control whether show monitor ui in frontend
   showMonitor: true,
 });
 ```

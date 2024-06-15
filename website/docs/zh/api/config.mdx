@@ -1,15 +1,15 @@
-# Pareto Config
+# Pareto配置
 
-## Configuration file
+## 配置文件
 
-Pareto accepts four types of files as configuration files: pareto.config.(js|ts|mjs|mts).
+Pareto接受四种类型的文件作为配置文件：pareto.config.(js|ts|mjs|mts)。
 
-##  pageDir
+## pageDir
 
-- Type: `string`
-- Default: `app`
+- 类型：`string`
+- 默认值：`app`
 
-Specifies the application root directory. For example:
+指定应用程序的根目录。例如：
 
 ```tsx
 // pareto.config.ts
@@ -22,12 +22,12 @@ const config: ParetoConfig = {
 export default config;
 ```
 
-##  configureRspack
+## configureRspack
 
-- Type: `function`
-- Default: `undefined`
+- 类型：`function`
+- 默认值：`undefined`
 
-The configureRspack function supports customizing the functionality of Rspack. For example:
+configureRspack函数支持自定义Rspack的功能。例如：
 
 ```tsx
 import { rspack } from "@rspack/core";
@@ -51,16 +51,33 @@ export default config;
 
 ## enableSpa
 
-- Type: `boolean`
-- Default: `false`
+- 类型：`boolean`
+- 默认值：`false`
 
-Enable SPA mode. For example:
+启用SPA模式。例如：
 
 ```tsx
 import { ParetoConfig } from "@paretojs/core/config";
 
 const config: ParetoConfig = {
   enableSpa: true
+};
+
+export default config;
+```
+
+## enableMonitor
+
+- Type: `boolean`
+- Default: `false`
+
+开启监控。例如：
+
+```tsx
+import { ParetoConfig } from "@paretojs/core/config";
+
+const config: ParetoConfig = {
+  enableMonitor: true
 };
 
 export default config;

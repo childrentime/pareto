@@ -1,0 +1,49 @@
+# 快速开始
+
+import { PackageManagerTabs } from '@theme';
+
+## 1. 初始化项目
+
+您可以使用 `create-pareto` 命令行工具创建一个 Rspress 项目：
+
+<PackageManagerTabs command="create pareto@latest" />
+
+输入项目目录名称，然后命令行工具将为您创建项目。
+
+由于 React 19 尚未发布，您需要在根目录下创建一个新的 .npmrc 文件，并添加
+
+```bash
+legacy-peer-deps=true
+```
+
+## 2. 启动开发服务器
+
+使用以下命令启动本地开发服务：
+
+```sh
+npm run dev 
+```
+
+:::提示
+
+对于 dev 命令，您可以使用 `--port` 或 `--host` 参数指定开发服务的端口号或主机，例如 `pareto dev --port 8080 --host 0.0.0.0`。
+
+:::
+
+## 3. 生产环境构建
+
+使用以下命令构建生产捆绑包：
+
+```bash
+npm run build
+```
+
+默认情况下，Pareto 将设置 `.pareto` 作为输出目录。
+
+## 4. 生产环境启动
+
+使用以下命令启动生产捆绑包：
+
+```bash
+npm run start
+```

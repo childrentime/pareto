@@ -1,0 +1,32 @@
+# 简介
+
+## 定位
+
+Pareto是一个基于rspack的React SSR框架，致力于使您对流式渲染的使用变得简单。它并没有很多复杂的封装，本质上只是一个用于React SSR应用程序的简单包装器。
+
+## 项目背景
+
+Pareto被设计为精简的`MPA`架构，因此它可能更适合那些需要在移动Web视图中开发嵌入式网页的人群。我们从设计之初就考虑了许多性能优化因素，并将其与流式渲染结合起来。例如：
+
+1. 关键CSS：Pareto内置支持关键CSS，比使用外部CSS要快得多。有关更多详细信息，您可以参考[提取关键CSS](https://web.dev/articles/extract-critical-css?hl=zh-cn)。
+2. `react-helmet-async`：Pareto内置支持元数据，这些元数据将在请求开始时发送到浏览器。
+3. SPA：Pareto内置支持SPA模式。当您的服务器流量过大时，您可以选择切换到SPA模式以增加 QPS 容量。
+4. 自定义流式渲染架构：与`Next.js`或`Remix`不同，我们在请求开始时立即开始发送静态资源。这有助于改善性能指标。
+
+## 支持的React版本
+
+### React19+
+
+Pareto直接支持React19及以上版本
+
+### React18
+
+Pareto也支持React 18，但由于React 18中未公开使用 `use` hook，因此在启用流式渲染功能时，您需要使用Pareto导出的 `use` 函数。
+
+```tsx
+import { use } from "@paretojs/core";
+```
+
+### React17 & React16.8
+
+Pareto并不直接支持React 17，因为使其兼容性会很复杂。但是，其实也可以在React 16.8之后的任何版本中启用流式渲染。我在这里提供了一个[简单示例](https://github.com/childrentime/pareto/tree/main/examples/react17)，来实现这一点。如果您使用的是低于React 18的版本，您可以考虑参考此示例将流式渲染集成到您的项目中。

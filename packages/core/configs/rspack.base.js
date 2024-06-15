@@ -55,7 +55,7 @@ const generateCssLoaders = (
  * @type {import("@rspack/core").Configuration}
  */
 const spiltChunks = {
-  optimization: {
+  optimization: __DEV__ ? {} : {
     splitChunks: {
       chunks: "all",
       maxAsyncRequests: Infinity,

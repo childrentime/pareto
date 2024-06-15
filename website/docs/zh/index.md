@@ -8,7 +8,7 @@ hero:
   actions:
     - theme: brand
       text: 快速开始
-      link: /guide/start/quick-start
+      link: /zh/guide/start/quick-start
     - theme: alt
       text: Github
       link: https://github.com/childrentime/pareto

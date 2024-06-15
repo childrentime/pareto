@@ -483,6 +483,9 @@ importers:
       webpack-hot-middleware:
         specifier: ^2.26.1
         version: 2.26.1
+      webpack-node-externals:
+        specifier: ^3.0.0
+        version: 3.0.0
     devDependencies:
       '@types/express':
         specifier: ^4.17.21
@@ -9393,6 +9396,11 @@ packages:
       ansi-html-community: 0.0.8
       html-entities: 2.5.2
       strip-ansi: 6.0.1
+    dev: false
+
+  /webpack-node-externals@3.0.0:
+    resolution: {integrity: sha512-LnL6Z3GGDPht/AigwRh2dvL9PQPFQ8skEpVrWZXLWBYmqcaojHNN0onvHzie6rq7EWKrrBfPYqNEzTJgiwEQDQ==}
+    engines: {node: '>=6'}
     dev: false
 
   /webpack-sources@3.2.3:

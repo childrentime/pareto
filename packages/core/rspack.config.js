@@ -1,6 +1,7 @@
 // @ts-check
 const { rspack } = require("@rspack/core");
 const path = require("path");
+const __DEV__ = process.env.NODE_ENV === "development";
 /**
  * @type {import("@rspack/core").Configuration}
  */
@@ -12,19 +13,20 @@ const config = {
   },
   node: false,
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    libraryTarget: 'commonjs'
+    path: path.resolve(__dirname, "dist"),
+    libraryTarget: "commonjs",
   },
   resolve: {
     extensions: [".ts", ".js", ".tsx"],
   },
   externals: {
-    react: 'commonjs react',
-    'react-dom': 'commonjs react-dom',
-    'react-dom/server': 'commonjs react-dom/server',
-    'react-helmet-async': 'commonjs react-helmet-async',
-    '@paretojs/monitor': 'commonjs @paretojs/monitor',
-    superjson: 'commonjs superjson'
+    react: "commonjs react",
+    "react-dom": "commonjs react-dom",
+    "react-dom/server": "commonjs react-dom/server",
+    "react-helmet-async": "commonjs react-helmet-async",
+    "@paretojs/monitor": "commonjs @paretojs/monitor",
+    superjson: "commonjs superjson",
+    "express": "commonjs express",
   },
   externalsPresets: {
     node: true,
@@ -58,13 +60,18 @@ const config = {
 
 const compiler = rspack(config);
 
-compiler.watch(
-  {
-    // 示例
-    aggregateTimeout: 300,
-    poll: undefined,
-  },
-  (err, stats) => {
+if (__DEV__) {
+  compiler.watch(
+    {
+      aggregateTimeout: 300,
+      poll: undefined,
+    },
+    (err, stats) => {
+      console.log(stats?.toString());
+    }
+  );
+} else {
+  compiler.run((err, stats) => {
     console.log(stats?.toString());
-  }
-);
+  });
+}

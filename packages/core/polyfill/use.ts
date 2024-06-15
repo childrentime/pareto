@@ -37,4 +37,4 @@ export const use =
         )
         throw thenable
     }
-  })
+  }) as typeof React.use

@@ -11,6 +11,7 @@ const WebpackDemandEntryPlugin = require("../cmd/dev/lazy-compiler/plugin");
 const { pageEntries } = require("./entry");
 const pageConfig = require("./page.config");
 const { __DEV__ } = require("../utils/node-env");
+const nodeExternals = require("webpack-node-externals");
 
 /**
  * @type {import("webpack").Configuration}
@@ -21,9 +22,8 @@ const defaultConfig = {
   entry: {
     index: [getServerEntry(), path.resolve(cwd, "./server-entry.tsx")],
   },
-  externalsPresets: {
-    node: true,
-  },
+  target: "node",
+  externals: [nodeExternals()],
   output: {
     path: APP_PATH,
     libraryTarget: "commonjs2",

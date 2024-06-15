@@ -23,7 +23,8 @@
     "superjson": "^1.13.3",
     "mobx": "^6.12.3",
     "mobx-react": "^9.1.1",
-    "react-helmet-async": "^2.0.5"
+    "react-helmet-async": "^2.0.5",
+    "@paretojs/monitor": "latest"
   },
   "browserslist": [
     "chrome >= 87",

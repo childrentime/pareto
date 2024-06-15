@@ -11,6 +11,9 @@ const config = {
     client: "./client.ts",
     node: "./node.ts",
   },
+  optimization: {
+    minimize: false,
+  },
   node: false,
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -21,6 +24,8 @@ const config = {
   },
   externals: {
     react: "commonjs react",
+    "react/jsx-runtime": "commonjs react/jsx-runtime",
+    "react/jsx-dev-runtime": "commonjs react/jsx-dev-runtime",
     "react-dom": "commonjs react-dom",
     "react-dom/server": "commonjs react-dom/server",
     "react-helmet-async": "commonjs react-helmet-async",

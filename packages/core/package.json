@@ -1,6 +1,6 @@
 {
   "name": "@paretojs/core",
-  "version": "0.0.7",
+  "version": "0.0.10",
   "description": "",
   "files": [
     "dist",
@@ -10,7 +10,8 @@
     "configs",
     "bin",
     "constant.js",
-    "useStyles"
+    "useStyles",
+    "utils"
   ],
   "type": "commonjs",
   "exports": {

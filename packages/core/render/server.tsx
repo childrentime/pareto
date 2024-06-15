@@ -101,18 +101,23 @@ export const paretoRequestHandler =
 
     const pageAssets = !isCsr ? (Page as ParetoPage).getAssets?.() || [] : [];
 
-    const renderHeader = (metas?: JSX.Element[]) => {
+    const renderHeader = () => {
       return renderToStaticMarkup(
         <>
           <PS />
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          {metas?.map((meta) => meta)}
-          {loadedCSS.map((css) => css)}
-          {preloadJS.map((js) => js)}
-          {pageAssets.map((asset) => (
-            <link rel="preload" href={asset.url} as={asset.type} />
-          ))}
+          {loadedCSS.length > 0 && loadedCSS.map((css) => css)}
+          {preloadJS.length > 0 && preloadJS.map((js) => js)}
+          {pageAssets.length > 0 &&
+            pageAssets.map((asset) => (
+              <link
+                rel="preload"
+                href={asset.url}
+                as={asset.type}
+                key={asset.url}
+              />
+            ))}
         </>
       );
     };
@@ -123,7 +128,7 @@ export const paretoRequestHandler =
 
     const renderMonitorInfos = () => {
       if (!enableMonitor) {
-        return ''
+        return "";
       }
       return renderToStaticMarkup(
         <script

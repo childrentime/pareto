@@ -22,7 +22,8 @@
     "react-dom": "19.0.0-beta-94eed63c49-20240425",
     "superjson": "^1.13.3",
     "zustand": "^4.5.2",
-    "react-helmet-async": "^2.0.5"
+    "react-helmet-async": "^2.0.5",
+    "@paretojs/monitor": "latest"
   },
   "browserslist": [
     "chrome >= 87",

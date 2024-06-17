@@ -25,7 +25,7 @@ const defaultConfig = {
     chunkFilename: "assets/js/[id].chunk.js",
     publicPath: "/",
   },
-  devtool: "eval-cheap-module-source-map",
+  devtool: __DEV__ ? "eval-cheap-module-source-map" : "source-map",
   module: {
     rules: [
       {
@@ -87,17 +87,17 @@ const defaultConfig = {
       }),
     __ANA__ && new BundleAnalyzerPlugin(),
     new rspack.DefinePlugin({
-      'typeof window': JSON.stringify('object')
+      "typeof window": JSON.stringify("object"),
+    }),
+    !__DEV__ &&  new rspack.SourceMapDevToolPlugin({
+      filename: 'sourcemaps/[file].map'
     })
-  ],
+  ].filter(Boolean),
   cache: false,
   experiments: {
     css: false,
   },
   ...spiltChunks,
-  performance: {
-    hints: false
-  }
 };
 
 const clientConfig = pageConfig.configureRspack(defaultConfig, {

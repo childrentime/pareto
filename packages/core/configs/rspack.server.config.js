@@ -30,7 +30,7 @@ const defaultConfig = {
     chunkFilename: "[id].chunk.js",
   },
   target: `node${process.versions.node.split(".").slice(0, 2).join(".")}`,
-  devtool: "eval-cheap-module-source-map",
+  devtool: __DEV__ ? "eval-cheap-module-source-map" : "source-map",
   module: {
     rules: [
       {
@@ -89,15 +89,12 @@ const defaultConfig = {
     new rspack.DefinePlugin({
       'typeof window': JSON.stringify('undefined')
     }),
-  ],
+  ].filter(Boolean),
   cache: false,
   experiments: {
     css: false,
   },
   ...spiltChunks,
-  performance: {
-    hints: false,
-  }
 };
 
 const serverConfig = pageConfig.configureRspack(defaultConfig, {

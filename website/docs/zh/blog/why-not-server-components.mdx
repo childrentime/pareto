@@ -1,0 +1,15 @@
+# 为什么不使用服务器组件
+
+![ReactBenefits](/react-benefits.jpg)
+
+我毫无疑问地认为服务器组件可以带来更好的性能优化，但有三个因素阻止我使用它们。
+
+1. 与Next.js的深度集成使得在Next.js之外使用服务器组件具有挑战性。在Next.js之外，你的选择可能仅限于Waku。
+2. 如图所示，代码复杂性与React架构的复杂性成正比。使用React服务器组件可能会使您的代码更加复杂。
+3. 迁移到服务器组件并不是一个简单的过程。即使从页面路由器过渡到应用路由器也并非易事，因为您可能需要放弃诸如同构全局存储之类的概念，并理解新概念如RSC和服务器操作。此外，许多公司的内部代码库是基于内部webpack SSR基础设施而不是Next.js构建的。
+
+对我个人来说，还有一个比较私人的原因。对于一个内部 `B端` 应用，我并不太在意它的捆绑大小，甚至不在乎它是否使用SSR技术。对于移动React应用来说，在大多数情况下，使用流式渲染就足够了。
+
+## 统计数据
+
+实际上，除了Next.js，许多框架还没有支持服务器组件。当然，t3技术栈是一个例外，因为它们确实跟得上步伐。例如，[Remix](https://remix.run/blog/react-server-components) 和 [ModernJS](https://modernjs.dev/en/guides/get-started/introduction.html) 还没有支持服务器组件。许多UI库也要求您手动用 'use client' 包装所有内容。

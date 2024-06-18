@@ -1,0 +1,15 @@
+# 提前提示（Early Hints）
+
+首先，请阅读关于[`提前提示（early hints）`](https://developer.chrome.com/docs/web-platform/early-hints)的内容。
+
+## Next.js 支持提前提示吗？
+
+不幸的是，Next.js 不支持这个功能。您可以参考这个[讨论](https://github.com/vercel/next.js/discussions/36089)了解更多信息。
+
+事实上，我尝试在 Next.js 的页面路由器中做到这一点，但不幸的是，一旦你在自定义服务器上使用了 `res.flushHeaders()`，Next.js 的渲染函数就不会工作。
+
+## Pareto 支持提前提示吗？
+
+是的，Pareto 内置了这个功能。不管你是否启用了流式渲染，Pareto 都会在请求的一开始就将你的页面的静态资源发送出去。
+
+![提前提示（Early Hints）](/early-hints.png)

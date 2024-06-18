@@ -1,0 +1,15 @@
+# Why not use server components
+
+![ReactBenefits](/react-benefits.jpg)
+
+I have no doubt that server components can bring better performance optimization, but there are three factors that have prevented me from using them.
+
+1. Deep integration with Next.js makes it challenging to use server components outside of Next.js. Outside of Next.js, your options may be limited to Waku.
+2. As mentioned in the diagram, the complexity of the code is directly proportional to the complexity of the React architecture. Using React server components can make your code more complex.
+3. Migrating to server components is not an easy process. Even transitioning from a page router to an app router is not straightforward, as you may need to abandon concepts like isomorphic global stores and understand new concepts like RSC and server actions. Additionally, many companies have internal codebases built on internal webpack SSR infrastructure rather than Next.js.
+
+For me personally, there is also a more personal reason. For an internal `B-end` application, I don't really care about its bundle size, or even whether it uses SSR technology. For a mobile React application, in most cases, using streaming rendering is sufficient.
+
+## Statistics
+
+In fact, besides Next.js, many frameworks have not yet supported server components. Of course, the t3 technology stack is an exception as they are really keeping up with the pace. For example, [Remix](https://remix.run/blog/react-server-components) and [ModernJS](https://modernjs.dev/en/guides/get-started/introduction.html) have not yet supported server components. Many UI libraries also require you to manually wrap everything with 'use client'.

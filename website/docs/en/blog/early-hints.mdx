@@ -1,0 +1,15 @@
+# EarlyHints
+
+First, please read about what [`early hints`](https://developer.chrome.com/docs/web-platform/early-hints) are.
+
+## Does nextjs support it?
+
+Unfortunately, it does not support this feature. You can refer to this [discussion](https://github.com/vercel/next.js/discussions/36089) to see more.
+
+In fact, I tried to achieve this in the page router of Next.js, but unfortunately, once you use `res.flushHeaders()` on a custom server, Next.js rendering functions will not work.
+
+## Does pareto support it?
+
+Yes, Pareto has this feature built-in. Regardless of whether you have enabled streaming rendering, Pareto will send out your page's static resources right at the beginning of the request.
+
+![EarlyHints](/early-hints.png)

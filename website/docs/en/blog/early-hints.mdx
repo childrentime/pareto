@@ -8,6 +8,19 @@ Unfortunately, it does not support this feature. You can refer to this [discussi
 
 In fact, I tried to achieve this in the page router of Next.js, but unfortunately, once you use `res.flushHeaders()` on a custom server, Next.js rendering functions will not work.
 
+The only possible solution might be to use the `app router`, and you need to wrap the `children` property of `layout` with suspense. In this way, Next.js will return the static HTML outer box at the beginning of the request.
+
+```tsx
+// layout.tsx
+export default function Layout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return <Suspense>{children}</Suspense>;
+}
+```
+
 ## Does pareto support it?
 
 Yes, Pareto has this feature built-in. Regardless of whether you have enabled streaming rendering, Pareto will send out your page's static resources right at the beginning of the request.

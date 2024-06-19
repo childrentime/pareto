@@ -8,6 +8,19 @@
 
 事实上，我尝试在 Next.js 的页面路由器中做到这一点，但不幸的是，一旦你在自定义服务器上使用了 `res.flushHeaders()`，Next.js 的渲染函数就不会工作。
 
+唯一可能的解决方案可能是使用 `app router`，并且你需要在 `layout` 的 `children` 属性上使用suspense进行包裹。这样，Next.js 就会在请求开始时返回静态HTML外壳。
+
+```tsx
+// layout.tsx
+export default function Layout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return <Suspense>{children}</Suspense>;
+}
+```
+
 ## Pareto 支持提前提示吗？
 
 是的，Pareto 内置了这个功能。不管你是否启用了流式渲染，Pareto 都会在请求的一开始就将你的页面的静态资源发送出去。

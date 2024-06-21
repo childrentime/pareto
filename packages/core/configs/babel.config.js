@@ -21,6 +21,7 @@ const babelConfig = (isWebTarget) => {
       "@babel/preset-typescript",
     ],
     plugins: [
+      "macros",
       process.env.NODE_ENV !== "production" &&
         isWebTarget &&
         require.resolve("react-refresh/babel"),

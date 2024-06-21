@@ -1,37 +1,10 @@
 import express from "express";
 import { paretoRequestHandler } from "@paretojs/core/node";
-import { sleep } from "./utils";
-import i18n from "./i18n";
-import Backend from 'i18next-fs-backend';
-import fs from 'fs';
-import { I18nextProvider } from 'react-i18next'; 
-import path from 'path';
-const i18nextMiddleware = require('i18next-http-middleware');
-
-const appDirectory = fs.realpathSync(process.cwd());
-const resolveApp = (relativePath: string) => path.resolve(appDirectory, relativePath);
-const appSrc = resolveApp('app');
-
-const initI18n = (path: string) => {
-  return new Promise((resolve, reject) => {
-    i18n
-      .use(Backend)
-      .use(i18nextMiddleware.LanguageDetector)
-      .init({
-        debug: false,
-        preload: ['en', 'de'],
-        ns: ['translations'],
-        defaultNS: 'translations',
-        backend: {
-          loadPath: `${appSrc}/locales/{{lng}}/{{ns}}.json`,
-          addPath: `${appSrc}/locales/{{lng}}/{{ns}}.missing.json`,
-        },
-      }, (err, t) => {
-        if (err) return reject(err);
-        resolve(t);
-      });
-  });
-};
+import { sleep } from "./utils";;
+import accepts from "accepts";
+import { initLinguiServer, loadCatalog } from "./i18n";
+import { I18nProvider } from "@lingui/react";
+import { i18n } from "@lingui/core";
 
 const app = express();
 
@@ -95,6 +68,34 @@ app.use("/api/recommends", async (req, res) => {
   });
 });
 
-app.get("*", paretoRequestHandler({ delay: ABORT_DELAY }));
+app.get("*", async (req, res, next) => {
+  const path = req.path.slice(1);
+  const accept = accepts(req);
+  const locale = accept.language(["en", "zh"]) || "en";
+  const messages = await loadCatalog(path, locale);
+  initLinguiServer(messages, locale);
+
+  // TODO: mobx zutand 以及其他的序列化逻辑都可以这么移动
+  const handler = paretoRequestHandler({
+    delay: ABORT_DELAY,
+    pageWrapper: (Page) => {
+      return (props) => (
+        <I18nProvider i18n={i18n}>
+          <Page {...props} />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+            window.__LOCALE__ = "${locale}";
+            window.__LOCALE_MESSAGE__ = JSON.parse('${JSON.stringify(messages)}');
+          `,
+            }}
+          />
+        </I18nProvider>
+      );
+    },
+  });
+
+  await handler(req, res);
+});
 
 export { app };

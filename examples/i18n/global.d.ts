@@ -4,8 +4,8 @@
 declare global {
   interface Window {
       __INITIAL_DATA__: any;
-      initialI18nStore: any;
-      initialLanguage: any;
+      __LOCALE__: string;
+      __LOCALE_MESSAGE__: any;
   }
 }
 

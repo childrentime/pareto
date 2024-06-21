@@ -25,6 +25,7 @@ export interface ParetoRequestHandler {
     page: ParetoPage | (() => null),
     data: Record<string, any> | undefined
   ) => ParetoPage;
+  extraScripts?: JSX.Element;
 }
 
 export const criticalPageWrapper = (props: {
@@ -161,6 +162,7 @@ export const paretoRequestHandler =
       page: helmetPage,
     });
 
+    console.log('page',CriticalPage,typeof CriticalPage);
     const { pipe, abort } = renderToPipeableStream(
       <>
         <CriticalPage initialData={initialData || {}} />

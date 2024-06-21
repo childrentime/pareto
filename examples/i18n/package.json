@@ -1,0 +1,41 @@
+{
+  "name": "website",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "pareto dev",
+    "build": "NODE_ENV=production pareto build",
+    "ana": "NODE_ENV=production ANALYZE=true  pareto build",
+    "start": "node .pareto/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0"
+  },
+  "dependencies": {
+    "@paretojs/core": "latest",
+    "@paretojs/monitor": "latest",
+    "express": "^4.19.2",
+    "i18next": "^23.11.5",
+    "i18next-browser-languagedetector": "^8.0.0",
+    "i18next-fs-backend": "^2.3.1",
+    "i18next-http-backend": "^2.5.2",
+    "i18next-http-middleware": "^3.6.0",
+    "react": "19.0.0-beta-94eed63c49-20240425",
+    "react-dom": "19.0.0-beta-94eed63c49-20240425",
+    "react-helmet-async": "^2.0.5",
+    "react-i18next": "^14.1.2"
+  },
+  "browserslist": [
+    "chrome >= 87",
+    "edge >= 88",
+    "firefox >= 78",
+    "safari >= 14"
+  ]
+}

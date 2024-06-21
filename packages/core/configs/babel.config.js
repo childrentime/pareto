@@ -22,7 +22,6 @@ const babelConfig = (isWebTarget) => {
     ],
     // TODO: 看一看cra是怎么让用户自定义配置babel的
     plugins: [
-      "macros",
       process.env.NODE_ENV !== "production" &&
         isWebTarget &&
         require.resolve("react-refresh/babel"),

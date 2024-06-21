@@ -18,6 +18,6 @@ msgstr ""
 msgid "Recommends"
 msgstr "推荐"
 
-#: app/home/index.tsx:24
+#: app/home/index.tsx:25
 msgid "Repositories"
 msgstr "仓库"

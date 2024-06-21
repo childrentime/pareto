@@ -1,12 +1,11 @@
 import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
-import superjson from "superjson";
 import { PageContext } from "@paretojs/core/client";
 import { ParetoPage } from "@paretojs/core";
 
 const startApp = async (Page: ParetoPage) => {
   const root = document.getElementById("main") as HTMLElement;
-  const __INITIAL_DATA__ =  superjson.parse(window.__INITIAL_DATA__) as Record<string,any>;
+  const __INITIAL_DATA__ =  window.__INITIAL_DATA__ as Record<string,any>;
   await Page.setUpClient?.();
 
   hydrateRoot(

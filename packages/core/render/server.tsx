@@ -3,7 +3,6 @@ import { pageEntries } from "../configs/entry";
 import { getRuntimeConfig } from "../configs/runtime.config";
 import { renderToPipeableStream, renderToStaticMarkup } from "react-dom/server";
 import { Scripts } from "../stream-helpers";
-import superjson from "superjson";
 import { ParetoPage } from "../types";
 import { Transform } from "stream";
 import { ISOStyle, StyleContext } from "../useStyles";
@@ -167,9 +166,9 @@ export const paretoRequestHandler =
         <CriticalPage initialData={initialData || {}} />
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.__INITIAL_DATA__ = '${superjson.stringify(
+            __html: `window.__INITIAL_DATA__ = JSON.parse('${JSON.stringify(
               initialData?.getState?.() || initialData
-            )}';`,
+            )}');`,
           }}
         />
         <Scripts />

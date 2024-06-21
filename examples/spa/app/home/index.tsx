@@ -1,12 +1,11 @@
 import type { ParetoPage } from "@paretojs/core";
-import { promiseMap,  mockClientPromise } from "@paretojs/core";
+import { promiseMap, mockClientPromise } from "@paretojs/core";
 import { Suspense } from "react";
 import { getRecommends, getRecommendsKey } from "./stream";
-import { fetchJson,Image } from "../../utils";
+import { fetchJson, Image } from "../../utils";
 import styles from "./style.module.scss";
 import { Recommends } from "./recommends";
 import { RecommendsSkeleton } from "./recommends/loading";
-import superjson from "superjson";
 
 interface InitialData {
   repositories: {
@@ -51,10 +50,10 @@ Home.setUpClient = async () => {
   mockClientPromise(getRecommendsKey);
   const url = new URL(window.location.href);
   const __csr = !!url.searchParams.get("__csr");
-  if(__csr){
+  if (__csr) {
     promiseMap.set(getRecommendsKey, getRecommends());
     const repositories = (await fetchJson("/api/repositories")) as InitialData;
-    window.__INITIAL_DATA__ =  superjson.stringify(repositories);
+    window.__INITIAL_DATA__ = repositories;
   }
 };
 

@@ -30,7 +30,6 @@ const config = {
     "react-dom/server": "commonjs react-dom/server",
     "react-helmet-async": "commonjs react-helmet-async",
     "@paretojs/monitor": "commonjs @paretojs/monitor",
-    superjson: "commonjs superjson",
     "express": "commonjs express",
   },
   externalsPresets: {

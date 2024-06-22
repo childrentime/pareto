@@ -1,6 +1,7 @@
 const fs = require("fs-extra");
 const path = require("path");
 const pageConfig = require("./page.config");
+const { transformSepOfPath } = require("../utils/util");
 
 const cwd = process.cwd();
 const PAGE_DIR = path.resolve(cwd, pageConfig.pageDir);
@@ -50,10 +51,10 @@ const getServerEntry = () => {
     runtimeStr.importStr +
     pageStr.exportStr +
     runtimeStr.runStr;
-  
+
   fs.mkdirSync(ENTRY, { recursive: true });
 
-  fs.writeFileSync(SERVER_ENTRY_PATH, entryStr);
+  fs.writeFileSync(SERVER_ENTRY_PATH, transformSepOfPath(entryStr));
 
   return SERVER_ENTRY_PATH;
 };
@@ -73,7 +74,7 @@ const getClientEntries = () => {
         `import page from '${modulePath}';\nimport { startApp } from '${CLIENT_WRAPPER}';\n` +
         `startApp(page)`;
 
-      fs.writeFileSync(pageEntry, entryStr);
+      fs.writeFileSync(pageEntry, transformSepOfPath(entryStr));
       clientEntries[pageName] = [
         path.resolve(CLIENT_ENTRY_PATH, `${pageName}${ext}`),
       ];

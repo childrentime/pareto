@@ -1,1 +1,0 @@
-/*eslint-disable*/import type{Messages}from"@lingui/core";export const messages:Messages=JSON.parse("{\"UjYRl8\":\"Recommends\",\"ooullr\":\"Repositories\"}");

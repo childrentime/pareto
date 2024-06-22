@@ -72,7 +72,7 @@ app.get("*", async (req, res, next) => {
   const path = req.path.slice(1);
   const accept = accepts(req);
   const locale = accept.language(["en", "zh"]) || "en";
-  const messages = await loadCatalog(path, locale);
+  const messages = loadCatalog(path, locale);
   initLinguiServer(messages, locale);
 
   const handler = paretoRequestHandler({

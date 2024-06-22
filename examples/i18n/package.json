@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "extract": "lingui extract",
-    "compile": "lingui compile --typescript",
+    "compile": "lingui compile",
     "dev": "pareto dev",
     "build": "NODE_ENV=production pareto build",
     "ana": "NODE_ENV=production ANALYZE=true  pareto build",

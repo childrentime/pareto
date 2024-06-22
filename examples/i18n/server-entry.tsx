@@ -75,7 +75,6 @@ app.get("*", async (req, res, next) => {
   const messages = await loadCatalog(path, locale);
   initLinguiServer(messages, locale);
 
-  // TODO: mobx zutand 以及其他的序列化逻辑都可以这么移动
   const handler = paretoRequestHandler({
     delay: ABORT_DELAY,
     pageWrapper: (Page) => {

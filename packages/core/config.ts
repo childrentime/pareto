@@ -7,6 +7,7 @@ export type ParetoConfig = {
   }) => RspackConfiguration;
   enableSpa? : boolean;
   enableMonitor? : boolean;
+  distDir?: string;
 };
 
 export type RspackConfiguration = Configuration;

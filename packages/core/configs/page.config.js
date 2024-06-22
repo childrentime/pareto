@@ -1,9 +1,16 @@
-const { CONFIG_PATHS } = require("../constant");
 const fs = require("fs-extra");
+const path = require("path");
+const cwd = process.cwd();
 const jiti = require("jiti")(__filename, {
   debug: process.env.debug,
   cache: false
 });
+const CONFIG_PATHS = [
+  path.resolve(cwd, "pareto.config.js"),
+  path.resolve(cwd, "pareto.config.mjs"),
+  path.resolve(cwd, "pareto.config.ts"),
+  path.resolve(cwd, "pareto.config.mts"),
+];
 
 /**
  * @type {import("../config").ParetoConfig}
@@ -15,6 +22,7 @@ let pageConfig = {
   },
   enableSpa: false,
   enableMonitor: false,
+  distDir: '.pareto',
 };
 
 for (const CONFIG_PATH of CONFIG_PATHS) {

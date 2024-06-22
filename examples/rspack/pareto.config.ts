@@ -13,6 +13,7 @@ const config: ParetoConfig = {
     }
     return config;
   },
+  distDir: "dist",
 };
 
 export default config;

@@ -9,7 +9,7 @@ const { clientConfig } = require("../../configs/rspack.client.config");
 const path = require("path");
 const { createDemandEntryMiddleware } = require("./lazy-compiler");
 const { pageEntries } = require("../../configs/entry");
-const { APP_PATH } = require("../../constant");
+const { APP_PATH, CLIENT_OUTPUT_PATH } = require("../../constant");
 
 const port = process.env.PORT || 4000;
 const cwd = process.cwd();
@@ -42,15 +42,18 @@ const dev = async () => {
   /**
    * @type {import("@rspack/core").Watching}
    */
-  const serverWatcher =  rspack(serverConfig).watch({ aggregateTimeout: 300 }, (errors, stats) => {
-    const error = errors || stats.compilation.errors;
-    if (error && error.length) {
-      console.log(error);
-      throw errors;
-    } else {
-      console.log(stats.toString());
+  const serverWatcher = rspack(serverConfig).watch(
+    { aggregateTimeout: 300 },
+    (errors, stats) => {
+      const error = errors || stats.compilation.errors;
+      if (error && error.length) {
+        console.log(error);
+        throw errors;
+      } else {
+        console.log(stats.toString());
+      }
     }
-  });
+  );
 
   const devMiddleware = webpackDevMiddleware(clientCompiler, {
     publicPath: "/",
@@ -73,7 +76,7 @@ const dev = async () => {
     heartbeat: 2000,
   });
 
-  server.use("/", express.static(path.join(cwd, "./.pareto/client")));
+  server.use("/", express.static(CLIENT_OUTPUT_PATH));
   server.use("/", express.static(path.join(cwd, "./public")));
   server.use(devMiddleware);
   server.use(hotMiddleware);
@@ -81,14 +84,14 @@ const dev = async () => {
     createDemandEntryMiddleware({
       pageEntries,
       clientWatcher: clientCompiler.watching,
-      serverWatcher
+      serverWatcher,
     })
   );
-  server.use('/', (req, res, next) => {
+  server.use("/", (req, res, next) => {
     clearModule(APP_PATH);
     const app = require(APP_PATH).app;
     app.handle(req, res, next);
-  })
+  });
 
   server.listen(port, () => {
     console.log(`server is listening on port: http://localhost:${port}`);

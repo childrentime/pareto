@@ -1,4 +1,4 @@
-import { preload as ReactDomPreload } from "react-dom/";
+import { preload as ReactDomPreload } from "react-dom";
 
 export type ImageProps = {
   preload?: boolean;

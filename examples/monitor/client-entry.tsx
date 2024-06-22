@@ -2,7 +2,6 @@ import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { ParetoPage } from "@paretojs/core";
 import { PageContext } from "@paretojs/core/client";
-import '@paretojs/monitor/main.css'
 
 const startApp = async (Page: ParetoPage) => {
   const root = document.getElementById("main") as HTMLElement;

@@ -16,7 +16,6 @@ interface InitialData {
 }
 
 const Home: ParetoPage<InitialData> = (props) => {
-  console.log('???');
   const { repositories } = props.initialData;
 
   return (

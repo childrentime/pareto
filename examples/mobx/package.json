@@ -22,8 +22,7 @@
     "react-dom": "19.0.0-beta-94eed63c49-20240425",
     "mobx": "^6.12.3",
     "mobx-react": "^9.1.1",
-    "react-helmet-async": "^2.0.5",
-    "@paretojs/monitor": "latest"
+    "react-helmet-async": "^2.0.5"
   },
   "browserslist": [
     "chrome >= 87",

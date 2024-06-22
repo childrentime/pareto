@@ -162,7 +162,6 @@ export const paretoRequestHandler =
       page: helmetPage,
     });
 
-    console.log('page',CriticalPage,typeof CriticalPage);
     const { pipe, abort } = renderToPipeableStream(
       <>
         <CriticalPage initialData={initialData || {}} />

@@ -20,7 +20,6 @@ const babelConfig = (isWebTarget) => {
       ],
       "@babel/preset-typescript",
     ],
-    // TODO: 看一看cra是怎么让用户自定义配置babel的
     plugins: [
       process.env.NODE_ENV !== "production" &&
         isWebTarget &&

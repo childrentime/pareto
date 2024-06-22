@@ -64,13 +64,13 @@
     "@types/webpack-node-externals": "^3.0.4"
   },
   "peerDependencies": {
-    "@paretojs/monitor": "*",
     "react": "19.0.0-beta-94eed63c49-20240425",
     "react-dom": "19.0.0-beta-94eed63c49-20240425",
     "react-helmet-async": "^2.0.0",
     "express": "^4.0.0"
   },
   "dependencies": {
+    "@paretojs/monitor": "1.0.5",
     "@babel/core": "^7.24.4",
     "@babel/plugin-transform-class-static-block": "^7.24.4",
     "@babel/preset-env": "^7.24.4",

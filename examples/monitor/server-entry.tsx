@@ -1,15 +1,19 @@
 import express from "express";
-import { paretoRequestHandler } from "@paretojs/core/node";
+import {
+  paretoRequestHandler,
+  createMonitorMiddleware,
+} from "@paretojs/core/node";
 import { sleep } from "./utils";
-import { addMonitorMiddleware } from "@paretojs/monitor";
 
 const app = express();
 
 const ABORT_DELAY = 5_000;
 
-addMonitorMiddleware(app)({
-  showMonitor: true,
-});
+app.use(
+  createMonitorMiddleware({
+    showMonitor: true,
+  })
+);
 
 app.use("/api/repositories", async (req, res) => {
   await sleep(300);

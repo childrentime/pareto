@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { MonitorMiddlewareOptions } from "./types";
 import htmlescape from "htmlescape";
 
@@ -66,11 +66,9 @@ export class ServerMonitor {
   }
 }
 
-export const addMonitorMiddleware =
-  (app: Express) =>
-  (options: MonitorMiddlewareOptions = {}) => {
-    app.use((req, res, next) => {
-      ServerMonitor.init({ req, res, options });
-      next();
-    });
+export function createMonitorMiddleware(options?: MonitorMiddlewareOptions) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    ServerMonitor.init({ req, res, options });
+    next();
   };
+}

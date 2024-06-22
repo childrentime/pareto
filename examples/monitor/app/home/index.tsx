@@ -6,7 +6,7 @@ import { fetchJson, Image } from "../../utils";
 import styles from "./style.module.scss";
 import { Recommends } from "./recommends";
 import { RecommendsSkeleton } from "./recommends/loading";
-import { report, FirstScreen } from "@paretojs/monitor";
+import { report, FirstScreen } from "@paretojs/core/client";
 
 interface InitialData {
   repositories: {

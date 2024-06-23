@@ -23,7 +23,7 @@ export class VitalsMonitor extends BaseMonitor {
   collectData(collectorMap: Map<MonitorType, BaseMonitor<{}>>): void {
     const perfCollector = collectorMap.get("performance") as PerformanceMonitor;
 
-    const { fetchStart } = perfCollector.value;
+    const { fetchStart = 0 } = perfCollector.value ?? {};
 
     this.fixGlitchesInBatch({ source: this.value, start: fetchStart });
   }
@@ -37,9 +37,11 @@ export class VitalsMonitor extends BaseMonitor {
   checkReady() {
     this.dataSource = {};
     window["__TIME_METRICS__"].forEach(([key, val]) => {
+      // @ts-ignore
       this.dataSource[key] = val;
     });
 
+    // @ts-ignore
     return checkFields.every((key) => this.dataSource[key] !== undefined);
   }
 

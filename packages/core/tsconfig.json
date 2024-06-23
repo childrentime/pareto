@@ -17,7 +17,8 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "outDir": "dist",
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "preserveSymlinks": false
   },
   "ts-node": {
     // It is faster to skip typechecking.

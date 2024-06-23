@@ -1,15 +1,15 @@
 import { PerformanceMonitor } from "./performance-monitor";
 import { BaseMonitor, MonitorType } from "./types";
 
-const sizeToKB = (i) => Math.round(i / 1024);
+const sizeToKB = (i: number) => Math.round(i / 1024);
 
 export class ResourceMonitor extends BaseMonitor<Record<string, number>> {
   collectData(collectorMap: Map<MonitorType, BaseMonitor<{}>>): void {
     const perfCollector = collectorMap.get("performance") as PerformanceMonitor;
 
-    const { fetchStart } = perfCollector.value;
+    const { fetchStart = 0 } = perfCollector.value ?? {};
 
-    this.fixGlitchesInBatch({ source: this.value, start: fetchStart });
+    this.fixGlitchesInBatch({ source: this.value ?? {}, start: fetchStart });
   }
 
   name: MonitorType;

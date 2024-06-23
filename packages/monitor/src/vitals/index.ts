@@ -1,8 +1,8 @@
-import { onCLS, onFCP, onINP, onLCP, onTTFB } from "web-vitals";
+import { Metric, onCLS, onFCP, onINP, onLCP, onTTFB } from "web-vitals";
 import ttiPolyfill from "tti-polyfill";
 
 export function reportWebVitals() {
-  const addToQueue = (metric) => {
+  const addToQueue = (metric: Metric) => {
     if(!window["__WEB_VITALS__"]){
       window["__WEB_VITALS__"] = [];
     }
@@ -20,6 +20,7 @@ export function reportWebVitals() {
       window["__WEB_VITALS__"] = [];
     }
 
+    // @ts-ignore
     window["__WEB_VITALS__"].push(["TTI", ttid]);
 });
 }

@@ -28,7 +28,7 @@ export class PerformanceMonitor extends BaseMonitor<PerformanceNavigationTiming>
   name: MonitorType;
 
   collectData(collectorMap: Map<MonitorType, BaseMonitor<{}>>): void {
-    const { fetchStart } = this.value;
+    const { fetchStart = 0 } = this.value ?? {};
     this.fixGlitchesInBatch({ source: this.records, start: fetchStart });
   }
 
@@ -40,6 +40,7 @@ export class PerformanceMonitor extends BaseMonitor<PerformanceNavigationTiming>
   get records(): Record<string, number> {
     if (this.dataSource) {
       return RECORD_KEYS.reduce((acc, key) => {
+        // @ts-ignore
         acc[key] = this.dataSource[key];
         return acc;
       }, {});
@@ -56,16 +57,22 @@ export class PerformanceMonitor extends BaseMonitor<PerformanceNavigationTiming>
     const dataSource = {} as PerformanceNavigationTiming;
     for (const key in navigationEntry) {
       if (
+        // @ts-ignore
         typeof navigationEntry[key] === "number" &&
         RECORD_KEYS.includes(key)
       ) {
-        dataSource[key] = Math.round(navigationEntry[key] + performance.timeOrigin);
+        // @ts-ignore
+        dataSource[key] = Math.round(
+          // @ts-ignore
+          navigationEntry[key] + performance.timeOrigin
+        );
       }
     }
     this.dataSource = dataSource;
   }
 
   getBoundValue(key?: string): number {
+    // @ts-ignore
     if (["loadEventEnd", "loadEventStart", "domComplete"].includes(key)) {
       return 20000;
     }

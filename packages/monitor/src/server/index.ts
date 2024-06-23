@@ -57,7 +57,11 @@ export class ServerMonitor {
     });
   }
 
-  static init({ req, res, options }) {
+  static init({ req, res, options }: {
+    req: Request;
+    res: Response;
+    options?: MonitorMiddlewareOptions;
+  }) {
     if (req.monitor) {
       throw new Error("[monitor]: server init repeat...");
     }

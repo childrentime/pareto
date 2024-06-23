@@ -10,7 +10,7 @@ export class NodeMonitor extends BaseMonitor<
         "performance"
       ) as PerformanceMonitor;
 
-      const { requestStart } = perfCollector.value;
+      const { requestStart } = perfCollector.value ?? {};
       let { nodeInit, ...others } = this.value;
 
       // fix glitches between server and client
@@ -19,6 +19,7 @@ export class NodeMonitor extends BaseMonitor<
 
         nodeInit = requestStart;
         others = Object.entries(others).reduce((acc, [key, val]) => {
+          // @ts-ignore
           acc[key] = val - gap;
           return acc;
         }, {}) as typeof others;

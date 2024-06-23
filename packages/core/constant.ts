@@ -2,7 +2,7 @@ import path from "path";
 import pageConfig from "./configs/page.config";
 
 const cwd = process.cwd();
-const { distDir } = pageConfig;
+const { distDir = ".pareto" } = pageConfig;
 
 const DIST_PATH = path.resolve(cwd, distDir);
 const APP_PATH = path.resolve(cwd, `${distDir}/server`);

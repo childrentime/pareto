@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { pageEntries } from "../configs/entry";
 import { getRuntimeConfig } from "../configs/runtime.config";
 import { renderToPipeableStream, renderToStaticMarkup } from "react-dom/server";

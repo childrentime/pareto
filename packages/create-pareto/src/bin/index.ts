@@ -91,6 +91,7 @@ async function main() {
             {title: 'tailwindcss-template', value: CHOICES.find(c => c.includes('tailwind'))},
             {title: 'zustand-template', value: CHOICES.find(c => c.includes('zustand'))},
             {title: 'monitor-template', value: CHOICES.find(c => c.includes('monitor'))},
+            {title: 'i18n-template', value: CHOICES.find(c => c.includes('i18n'))},
           ]
         }
       ],

@@ -6,12 +6,6 @@ Pareto 内置了性能指标监控功能。在使用 `create-pareto` 创建项�
 
 如果您想在项目中手动启用此功能，请按照以下步骤操作。
 
-### 安装
-
-```bash
-pnpm i @paretojs/monitor@latest
-```
-
 在项目根目录下创建或更新 `pareto.config.ts`。
 
 ```ts
@@ -27,20 +21,16 @@ export default config;
 修改项目根目录下的 `server-entry.tsx` 文件。
 
 ```tsx
-import { addMonitorMiddleware } from "@paretojs/monitor";
+import { createMonitorMiddleware } from "@paretojs/core/node";
 import express from "express";
 
 const app = express();
-addMonitorMiddleware(app)({
-  // 控制是否在前端展示 Monitor UI
-  showMonitor: true,
-});
-```
-
-修改项目根目录下的 `client-entry.tsx` 文件。
-
-```tsx
-import '@paretojs/monitor/main.css'
+app.use(
+  createMonitorMiddleware({
+    // 控制是否在前端展示UI
+    showMonitor: true,
+  })
+);
 ```
 
 修改您的 `app` 目录中任何路由根文件。

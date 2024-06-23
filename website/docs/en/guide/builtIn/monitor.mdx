@@ -6,12 +6,6 @@ Pareto has built-in monitoring for performance metrics. You can choose a templat
 
 If you want to manually enable this feature in your project, please follow the steps below.
 
-### Install
-
-```bash
-pnpm i @paretojs/monitor@latest
-```
-
 create or update `pareto.config.ts` in the root directory of your project.
 
 ```ts
@@ -27,20 +21,16 @@ export default config;
 modify the `server-entry.tsx` file in the root directory of your project.
 
 ```tsx
-import { addMonitorMiddleware } from "@paretojs/monitor";
+import { createMonitorMiddleware } from "@paretojs/core/node";
 import express from "express";
 
 const app = express();
-addMonitorMiddleware(app)({
-  // control whether show monitor ui in frontend
-  showMonitor: true,
-});
-```
-
-modify the `client-entry.tsx` file in the root directory of your project.
-
-```tsx
-import '@paretojs/monitor/main.css'
+app.use(
+  createMonitorMiddleware({
+    // control whether to display the UI in the front end
+    showMonitor: true,
+  })
+);
 ```
 
 modify any route root file in your `app` dictionary.
@@ -57,9 +47,7 @@ const Home: ParetoPage<InitialData> = (props) => {
 
   return (
     <>
-      <div>
-        ...
-      </div>
+      <div>...</div>
       <FirstScreen />
     </>
   );

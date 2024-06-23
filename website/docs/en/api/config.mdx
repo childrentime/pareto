@@ -4,7 +4,7 @@
 
 Pareto accepts four types of files as configuration files: pareto.config.(js|ts|mjs|mts).
 
-##  pageDir
+## pageDir
 
 - Type: `string`
 - Default: `app`
@@ -22,7 +22,7 @@ const config: ParetoConfig = {
 export default config;
 ```
 
-##  configureRspack
+## configureRspack
 
 - Type: `function`
 - Default: `undefined`
@@ -60,7 +60,7 @@ Enable SPA mode. For example:
 import { ParetoConfig } from "@paretojs/core/config";
 
 const config: ParetoConfig = {
-  enableSpa: true
+  enableSpa: true,
 };
 
 export default config;
@@ -77,8 +77,15 @@ Enable the monitor. For example:
 import { ParetoConfig } from "@paretojs/core/config";
 
 const config: ParetoConfig = {
-  enableMonitor: true
+  enableMonitor: true,
 };
 
 export default config;
 ```
+
+## distDir
+
+- Type: `string`
+- Default: `.pareto`
+
+Specifies the output directory.

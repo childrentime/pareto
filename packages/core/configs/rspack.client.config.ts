@@ -1,21 +1,16 @@
-const AssetsPlugin = require("assets-webpack-plugin");
-const babelConfig = require("./babel.config");
-const { getClientEntries } = require("./entry");
-const rspack = require("@rspack/core");
+import AssetsPlugin from "assets-webpack-plugin";
+import babelConfig from "./babel.config";
+import { getClientEntries } from "./entry";
+import rspack, { Configuration } from "@rspack/core";
+import { generateCssLoaders, spiltChunks } from "./rspack.base";
+import WebpackDemandEntryPlugin from "../cmd/dev/lazy-compiler/plugin";
+import { pageEntries } from "./entry";
+import { CLIENT_OUTPUT_PATH } from "../constant";
+import pageConfig from "./page.config";
+import { __DEV__, __ANA__ } from "../utils/node-env";
+import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 
-const { generateCssLoaders, spiltChunks } = require("./rspack.base");
-const WebpackDemandEntryPlugin = require("../cmd/dev/lazy-compiler/plugin");
-const { pageEntries } = require("./entry");
-const { CLIENT_OUTPUT_PATH } = require("../constant");
-const pageConfig = require("./page.config");
-const { __DEV__, __ANA__ } = require("../utils/node-env");
-const BundleAnalyzerPlugin =
-  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
-
-/**
- * @type {import("webpack").Configuration}
- */
-const defaultConfig = {
+const defaultConfig: Configuration = {
   mode: __DEV__ ? "development" : "production",
   node: false,
   entry: getClientEntries(),
@@ -74,6 +69,7 @@ const defaultConfig = {
   resolve: {
     extensions: [".js", ".jsx", ".json", ".mjs", ".wasm", ".ts", ".tsx"],
   },
+  // @ts-ignore
   plugins: [
     new AssetsPlugin({
       path: CLIENT_OUTPUT_PATH,
@@ -89,9 +85,10 @@ const defaultConfig = {
     new rspack.DefinePlugin({
       "typeof window": JSON.stringify("object"),
     }),
-    !__DEV__ &&  new rspack.SourceMapDevToolPlugin({
-      filename: 'sourcemaps/[file].map'
-    })
+    !__DEV__ &&
+      new rspack.SourceMapDevToolPlugin({
+        filename: "sourcemaps/[file].map",
+      }),
   ].filter(Boolean),
   cache: false,
   experiments: {
@@ -100,7 +97,8 @@ const defaultConfig = {
   ...spiltChunks,
 };
 
-const clientConfig = pageConfig.configureRspack(defaultConfig, {
+const clientConfig: Configuration = pageConfig.configureRspack!(defaultConfig, {
   isServer: false,
 });
-module.exports = { clientConfig };
+
+export { clientConfig };

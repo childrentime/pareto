@@ -1,9 +1,11 @@
-const fs = require("fs-extra");
-const path = require("path");
+import { ParetoConfig } from "../config";
+
+import fs from "fs-extra";
+import path from "path";
 const cwd = process.cwd();
 const jiti = require("jiti")(__filename, {
   debug: process.env.debug,
-  cache: false
+  cache: false,
 });
 const CONFIG_PATHS = [
   path.resolve(cwd, "pareto.config.js"),
@@ -12,17 +14,14 @@ const CONFIG_PATHS = [
   path.resolve(cwd, "pareto.config.mts"),
 ];
 
-/**
- * @type {import("../config").ParetoConfig}
- */
-let pageConfig = {
+let pageConfig: ParetoConfig = {
   pageDir: "app",
   configureRspack(config) {
     return config;
   },
   enableSpa: false,
   enableMonitor: false,
-  distDir: '.pareto',
+  distDir: ".pareto",
 };
 
 for (const CONFIG_PATH of CONFIG_PATHS) {
@@ -33,4 +32,4 @@ for (const CONFIG_PATH of CONFIG_PATHS) {
     break;
   }
 }
-module.exports = pageConfig;
+export default pageConfig;

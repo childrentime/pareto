@@ -1,4 +1,4 @@
-const os = require("os");
+import os from "os";
 
 /**
  * Transform the OS path separator in the content based on the platform, while writing to files.
@@ -7,7 +7,7 @@ const os = require("os");
  * @param {string} content - The content with OS path separators.
  * @return {string} Transformed content with updated path separators.
  */
-function transformSepOfPath(content) {
+function transformSepOfPath(content: string) {
   switch (os.platform()) {
     case "win32":
       return content.replace(/\\/g, "\\\\");
@@ -16,6 +16,6 @@ function transformSepOfPath(content) {
   }
 }
 
-module.exports = {
+export {
   transformSepOfPath,
 };

@@ -424,6 +424,9 @@ importers:
       '@rspack/plugin-react-refresh':
         specifier: 0.7.4
         version: 0.7.4(react-refresh@0.16.0-canary-cb151849e1-20240424)
+      '@types/assets-webpack-plugin':
+        specifier: ^7.1.5
+        version: 7.1.5(esbuild@0.19.12)
       assets-webpack-plugin:
         specifier: ^7.1.1
         version: 7.1.1(webpack@5.91.0)
@@ -3721,6 +3724,19 @@ packages:
     resolution: {integrity: sha512-veQTnWP+1D/xbxVrPC3zHnCZRjSrKfhbMUlEA43iMZLu7EsnTtkJklIuwrCPbOi8YkvDQAiW05VQQFvvz9oieQ==}
     dependencies:
       '@types/estree': 1.0.5
+    dev: false
+
+  /@types/assets-webpack-plugin@7.1.5(esbuild@0.19.12):
+    resolution: {integrity: sha512-HBOilSrtTbT/pZchGv2N02jDgoZR9N6C20qGwHGp8PKtGYk6V3Ga42Eu27VfdKUypy53YtiWgjpM/p6tfQM36A==}
+    dependencies:
+      '@types/node': 16.18.97
+      tapable: 2.2.1
+      webpack: 5.91.0(esbuild@0.19.12)
+    transitivePeerDependencies:
+      - '@swc/core'
+      - esbuild
+      - uglify-js
+      - webpack-cli
     dev: false
 
   /@types/body-parser@1.19.5:

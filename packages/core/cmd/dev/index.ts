@@ -1,15 +1,15 @@
-const express = require("express");
-const rspack = require("@rspack/core");
-const { serverConfig } = require("../../configs/rspack.server.config");
-const clearModule = require("clear-module");
-const webpackDevMiddleware = require("webpack-dev-middleware");
-const webpackHotMiddleware = require("webpack-hot-middleware");
-const ReactRefreshPlugin = require("@rspack/plugin-react-refresh");
-const { clientConfig } = require("../../configs/rspack.client.config");
-const path = require("path");
-const { createDemandEntryMiddleware } = require("./lazy-compiler");
-const { pageEntries } = require("../../configs/entry");
-const { APP_PATH, CLIENT_OUTPUT_PATH } = require("../../constant");
+import express from "express";
+import { rspack } from "@rspack/core";
+import { serverConfig } from "../../configs/rspack.server.config";
+import clearModule from "clear-module";
+import webpackDevMiddleware from "webpack-dev-middleware";
+import webpackHotMiddleware from "webpack-hot-middleware";
+import ReactRefreshPlugin from "@rspack/plugin-react-refresh";
+import { clientConfig } from "../../configs/rspack.client.config";
+import path from "path";
+import { createDemandEntryMiddleware } from "./lazy-compiler";
+import { pageEntries } from "../../configs/entry";
+import { APP_PATH, CLIENT_OUTPUT_PATH } from "../../constant";
 
 const port = process.env.PORT || 4000;
 const cwd = process.cwd();
@@ -28,33 +28,28 @@ const dev = async () => {
     console.info("unhandledRejection:", e);
   });
 
-  clientConfig.plugins.push(new rspack.HotModuleReplacementPlugin());
-  Object.keys(clientConfig.entry).forEach(function (name) {
+  clientConfig.plugins?.push(new rspack.HotModuleReplacementPlugin());
+  Object.keys(clientConfig.entry ?? {}).forEach(function (name) {
+    // @ts-ignore
     clientConfig.entry[name].unshift(hotMiddlewareScript);
   });
-  clientConfig.plugins.push(new ReactRefreshPlugin());
+  clientConfig.plugins?.push(new ReactRefreshPlugin());
 
-  /**
-   * @type {import("@rspack/core").Compiler}
-   */
   const clientCompiler = rspack(clientConfig);
 
-  /**
-   * @type {import("@rspack/core").Watching}
-   */
   const serverWatcher = rspack(serverConfig).watch(
     { aggregateTimeout: 300 },
     (errors, stats) => {
-      const error = errors || stats.compilation.errors;
-      if (error && error.length) {
-        console.log(error);
+      if (errors) {
+        console.log(errors);
         throw errors;
       } else {
-        console.log(stats.toString());
+        console.log(stats?.toString());
       }
     }
   );
 
+  // @ts-ignore
   const devMiddleware = webpackDevMiddleware(clientCompiler, {
     publicPath: "/",
     writeToDisk(filePath) {
@@ -69,6 +64,7 @@ const dev = async () => {
     },
   });
 
+  // @ts-ignore
   const hotMiddleware = webpackHotMiddleware(clientCompiler, {
     log: (message) => {
       console.log("HMR LOGGER: ", message);
@@ -83,7 +79,7 @@ const dev = async () => {
   server.use(
     createDemandEntryMiddleware({
       pageEntries,
-      clientWatcher: clientCompiler.watching,
+      clientWatcher: clientCompiler.watching!,
       serverWatcher,
     })
   );
@@ -98,6 +94,4 @@ const dev = async () => {
   });
 };
 
-module.exports = {
-  dev,
-};
+export { dev };

@@ -6,12 +6,9 @@
     "dist",
     "env.d.ts",
     "config.ts",
-    "cmd",
-    "configs",
+    "dist-bin",
     "bin",
-    "constant.js",
-    "useStyles",
-    "utils"
+    "useStyles"
   ],
   "type": "commonjs",
   "exports": {
@@ -47,6 +44,8 @@
   },
   "scripts": {
     "build": "rm -rf dist && NODE_ENV=production node rspack.config.js && tsc",
+    "build:bin": "tsup",
+    "dev:bin": "tsup --watch",
     "dev": "rm -rf dist && node rspack.config.js && tsc -w",
     "release:prepare": "bump",
     "publish:ci": "tsx scripts/publish.ts"
@@ -64,10 +63,10 @@
     "@types/webpack-node-externals": "^3.0.4"
   },
   "peerDependencies": {
+    "express": "^4.0.0",
     "react": "19.0.0-beta-94eed63c49-20240425",
     "react-dom": "19.0.0-beta-94eed63c49-20240425",
-    "react-helmet-async": "^2.0.0",
-    "express": "^4.0.0"
+    "react-helmet-async": "^2.0.0"
   },
   "dependencies": {
     "@paretojs/monitor": "1.0.6",
@@ -79,6 +78,7 @@
     "@rspack/cli": "^0.7.4",
     "@rspack/core": "0.7.4",
     "@rspack/plugin-react-refresh": "0.7.4",
+    "@types/assets-webpack-plugin": "^7.1.5",
     "assets-webpack-plugin": "^7.1.1",
     "autoprefixer": "^10.4.19",
     "babel-loader": "^9.1.3",

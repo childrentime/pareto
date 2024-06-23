@@ -9,7 +9,7 @@ const config = {
   entry: {
     main: "./main.ts",
     client: "./client.ts",
-    node: "./node.ts",
+    node: "./node.ts"
   },
   optimization: {
     minimize: false,
@@ -20,7 +20,7 @@ const config = {
     libraryTarget: "commonjs",
   },
   resolve: {
-    extensions: [".ts", ".js", ".tsx"],
+    extensions: [".ts", ".js", ".tsx","json"],
   },
   externals: {
     react: "commonjs react",

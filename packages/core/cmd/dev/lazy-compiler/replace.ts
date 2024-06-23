@@ -1,16 +1,14 @@
-const fs = require("fs-extra");
-const { SERVER_ENTRY_PATH } = require("../../../constant");
+import fs from "fs-extra";
+import { SERVER_ENTRY_PATH } from "../../../constant";
 
-const escape = (path) =>
+const escape = (path: string) =>
   path.replace(/\\/g, "\\\\").replace(/\//g, "\\/").replace(/\./g, "\\.");
 
-// import 改为 const
-const clearEntryContent = (filePath) => {
+// import change to  const
+const clearEntryContent = (filePath: string) => {
   const entryContent = fs.readFileSync(SERVER_ENTRY_PATH).toString();
   const reg = new RegExp(
-    "(?:^|\n)(import\\s+(\\w+)\\s+from\\s+'" +
-      escape(filePath) +
-      "';)",
+    "(?:^|\n)(import\\s+(\\w+)\\s+from\\s+'" + escape(filePath) + "';)",
     "g"
   );
   fs.writeFileSync(
@@ -21,15 +19,11 @@ const clearEntryContent = (filePath) => {
   );
 };
 
-
-// import 注释恢复 删除const
-const recoverEntryContent = (filePath) => {
+// import recoverEntryContent from  const
+const recoverEntryContent = (filePath: string) => {
   const entryContent = fs.readFileSync(SERVER_ENTRY_PATH).toString();
-  // 匹配import语句中的别名
   const reg = new RegExp(
-    "\\/\\/\\s+import\\s+(\\w+)\\s+from\\s+'" +
-      escape(filePath) +
-      "';"
+    "\\/\\/\\s+import\\s+(\\w+)\\s+from\\s+'" + escape(filePath) + "';"
   );
   let moduleName;
   const newContent = entryContent
@@ -37,8 +31,8 @@ const recoverEntryContent = (filePath) => {
       moduleName = name;
       return all.replace(/^\/\/\s+/, "");
     })
-    .replace(new RegExp(`const ${moduleName} = \\{\\};`, 'g'), "");
+    .replace(new RegExp(`const ${moduleName} = \\{\\};`, "g"), "");
   fs.writeFileSync(SERVER_ENTRY_PATH, newContent);
 };
 
-module.exports = { clearEntryContent, recoverEntryContent };
+export { clearEntryContent, recoverEntryContent };

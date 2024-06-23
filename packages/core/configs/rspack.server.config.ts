@@ -1,35 +1,32 @@
-const path = require("path");
-const babelConfig = require("./babel.config");
-const { getServerEntry } = require("./entry");
-const rspack = require("@rspack/core");
+import { Configuration } from "@rspack/core";
+
+import path from "path";
+import babelConfig from "./babel.config";
+import { getServerEntry } from "./entry";
+import rspack from "@rspack/core";
+import { generateCssLoaders, spiltChunks } from "./rspack.base";
+import { APP_PATH } from "../constant";
+import WebpackDemandEntryPlugin from "../cmd/dev/lazy-compiler/plugin";
+import { pageEntries } from "./entry";
+import pageConfig from "./page.config";
+import { __DEV__ } from "../utils/node-env";
+import nodeExternals from "webpack-node-externals";
 
 const cwd = process.cwd();
-const { generateCssLoaders, spiltChunks } = require("./rspack.base");
-
-const { APP_PATH } = require("../constant");
-const WebpackDemandEntryPlugin = require("../cmd/dev/lazy-compiler/plugin");
-const { pageEntries } = require("./entry");
-const pageConfig = require("./page.config");
-const { __DEV__ } = require("../utils/node-env");
-const nodeExternals = require("webpack-node-externals");
-
-/**
- * @type {import("webpack").Configuration}
- */
-const defaultConfig = {
+const defaultConfig: Configuration = {
   mode: __DEV__ ? "development" : "production",
   node: false,
   entry: {
     index: [getServerEntry(), path.resolve(cwd, "./server-entry.tsx")],
   },
-  target: "node",
+  target: 'node',
+  // @ts-ignore
   externals: [nodeExternals()],
   output: {
     path: APP_PATH,
     libraryTarget: "commonjs2",
     chunkFilename: "[id].chunk.js",
   },
-  target: `node${process.versions.node.split(".").slice(0, 2).join(".")}`,
   devtool: __DEV__ ? "eval-cheap-module-source-map" : "source-map",
   module: {
     rules: [
@@ -80,6 +77,7 @@ const defaultConfig = {
   resolve: {
     extensions: [".js", ".jsx", ".json", ".mjs", ".wasm", ".ts", ".tsx"],
   },
+  // @ts-ignore
   plugins: [
     new rspack.ProgressPlugin({ prefix: "server" }),
     __DEV__ &&
@@ -97,8 +95,8 @@ const defaultConfig = {
   ...spiltChunks,
 };
 
-const serverConfig = pageConfig.configureRspack(defaultConfig, {
+const serverConfig: Configuration = pageConfig.configureRspack!(defaultConfig, {
   isServer: true,
 });
 
-module.exports = { serverConfig };
+export { serverConfig };

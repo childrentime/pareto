@@ -1,4 +1,4 @@
-const babelConfig = (isWebTarget) => {
+const babelConfig = (isWebTarget?: boolean) => {
   return {
     presets: [
       [
@@ -28,4 +28,4 @@ const babelConfig = (isWebTarget) => {
   };
 };
 
-module.exports = babelConfig;
+export default babelConfig;

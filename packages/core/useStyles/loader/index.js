@@ -20,7 +20,7 @@ module.exports.pitch = function pitch(request) {
 
   const insertCss = require.resolve('./insertCss.js');
   const filePath = this.resourcePath;
-  const hash = createHash(filePath); 
+  const hash = createHash(filePath);
 
   return `
     var refs = 0;

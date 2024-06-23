@@ -8,8 +8,10 @@ import { Transform } from "stream";
 import { ISOStyle, StyleContext } from "../useStyles";
 import { HelmetProvider } from "react-helmet-async";
 import { IS_REACT_19 } from "../utils/env";
-import { enableSpa, enableMonitor } from "../configs/page.config";
+import pageConfig from "../configs/page.config";
 import { PageStart, FirstPaint } from "@paretojs/monitor";
+
+const { enableSpa, enableMonitor } = pageConfig;
 
 const PS = enableMonitor ? PageStart : () => null;
 const FP = enableMonitor ? FirstPaint : () => null;

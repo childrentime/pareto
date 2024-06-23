@@ -1,26 +1,24 @@
-const fs = require("fs-extra");
-const path = require("path");
-const pageConfig = require("./page.config");
-const { transformSepOfPath } = require("../utils/util");
-
-const cwd = process.cwd();
-const PAGE_DIR = path.resolve(cwd, pageConfig.pageDir);
-
-const {
+import fs from "fs-extra";
+import path from "path";
+import pageConfig from "./page.config";
+import { transformSepOfPath } from "../utils/util";
+import {
   ENTRY,
   SERVER_ENTRY_PATH,
   CLIENT_ENTRY_PATH,
   CLIENT_WRAPPER,
-} = require("../constant");
+} from "../constant";
 
-/**
- * @type {record<string,string>}
- */
-const pageEntries = fs.readdirSync(PAGE_DIR).reduce((entry, filename) => {
-  const pageEntry = path.resolve(PAGE_DIR, filename, "index.tsx");
-  entry[filename] = pageEntry;
-  return entry;
-}, {});
+const cwd = process.cwd();
+const PAGE_DIR = path.resolve(cwd, pageConfig.pageDir ?? "pages");
+
+const pageEntries: Record<string, string> = fs
+  .readdirSync(PAGE_DIR)
+  .reduce((entry, filename) => {
+    const pageEntry = path.resolve(PAGE_DIR, filename, "index.tsx");
+    entry[filename] = pageEntry;
+    return entry;
+  }, {} as Record<string, string>);
 
 const getServerEntry = () => {
   const getPagesStr = () => {
@@ -81,12 +79,8 @@ const getClientEntries = () => {
 
       return clientEntries;
     },
-    {}
+    {} as Record<string, string[]>
   );
 };
 
-module.exports = {
-  getServerEntry,
-  getClientEntries,
-  pageEntries,
-};
+export { getServerEntry, getClientEntries, pageEntries };

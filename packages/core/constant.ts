@@ -1,6 +1,7 @@
-const path = require("path");
+import path from "path";
+import pageConfig from "./configs/page.config";
+
 const cwd = process.cwd();
-const pageConfig = require("./configs/page.config");
 const { distDir } = pageConfig;
 
 const DIST_PATH = path.resolve(cwd, distDir);
@@ -12,7 +13,7 @@ const CLIENT_WRAPPER = path.resolve(cwd, "./client-entry.tsx");
 const CLIENT_OUTPUT_PATH = path.resolve(cwd, `${distDir}/client`);
 const ASSETS_PATH = path.resolve(CLIENT_OUTPUT_PATH, "webpack-assets.json");
 
-module.exports = {
+export {
   DIST_PATH,
   APP_PATH,
   ENTRY,

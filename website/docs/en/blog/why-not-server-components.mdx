@@ -1,5 +1,7 @@
 # Why not use server components
 
+## Issues
+
 ![ReactBenefits](/react-benefits.jpg)
 
 I have no doubt that server components can bring better performance optimization, but there are three factors that have prevented me from using them.
@@ -10,6 +12,12 @@ I have no doubt that server components can bring better performance optimization
 
 For me personally, there is also a more personal reason. For an internal `B-end` application, I don't really care about its bundle size, or even whether it uses SSR technology. For a mobile React application, in most cases, using streaming rendering is sufficient.
 
-## Statistics
+## June 23, 2024 Update
 
-In fact, besides Next.js, many frameworks have not yet supported server components. Of course, the t3 technology stack is an exception as they are really keeping up with the pace. For example, [Remix](https://remix.run/blog/react-server-components) and [ModernJS](https://modernjs.dev/en/guides/get-started/introduction.html) have not yet supported server components. Many UI libraries also require you to manually wrap everything with 'use client'.
+### Skew Protection Issue
+
+On [Twitter](https://twitter.com/youyuxi/status/1804331313421521101), [@youyuxi](https://twitter.com/youyuxi) pointed out another issue with React Server Components:
+if you're performing a version update while a user is submitting a form,
+without Vercel's version skew protection, the JavaScript they fetch might be incorrect.
+This could lead to errors in user submissions. Therefore, this can be a significant hassle for
+self-deployed users.

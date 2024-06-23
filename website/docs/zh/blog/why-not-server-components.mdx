@@ -1,5 +1,7 @@
 # 为什么不使用服务器组件
 
+## 问题
+
 ![ReactBenefits](/react-benefits.jpg)
 
 我毫无疑问地认为服务器组件可以带来更好的性能优化，但有三个因素阻止我使用它们。
@@ -10,6 +12,10 @@
 
 对我个人来说，还有一个比较私人的原因。对于一个内部 `B端` 应用，我并不太在意它的捆绑大小，甚至不在乎它是否使用SSR技术。对于移动React应用来说，在大多数情况下，使用流式渲染就足够了。
 
-## 统计数据
+## 2024年6月23日更新
 
-实际上，除了Next.js，许多框架还没有支持服务器组件。当然，t3技术栈是一个例外，因为它们确实跟得上步伐。例如，[Remix](https://remix.run/blog/react-server-components) 和 [ModernJS](https://modernjs.dev/en/guides/get-started/introduction.html) 还没有支持服务器组件。许多UI库也要求您手动用 'use client' 包装所有内容。
+### 版本偏移保护问题
+
+在[推特](https://twitter.com/youyuxi/status/1804331313421521101)上，[@youyuxi](https://twitter.com/youyuxi)指出了React服务器组件的另一个问题：
+如果您在用户提交表单时进行版本更新，而没有使用Vercel的版本偏移保护，他们获取的JavaScript可能是不正确的。
+这可能导致用户提交时出现错误。因此，对于自行部署的用户来说，这可能是一个重大的麻烦。

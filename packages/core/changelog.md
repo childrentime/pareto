@@ -6,3 +6,4 @@
 
 - move `@paretojs/monitor` to `@paretojs/core` deps
 - remove `superjson` deps
+

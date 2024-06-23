@@ -1,6 +1,6 @@
 {
   "name": "@paretojs/core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "files": [
     "dist",
@@ -70,7 +70,7 @@
     "express": "^4.0.0"
   },
   "dependencies": {
-    "@paretojs/monitor": "1.0.5",
+    "@paretojs/monitor": "1.0.6",
     "@babel/core": "^7.24.4",
     "@babel/plugin-transform-class-static-block": "^7.24.4",
     "@babel/preset-env": "^7.24.4",

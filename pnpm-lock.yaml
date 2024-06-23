@@ -413,7 +413,7 @@ importers:
         specifier: ^7.24.1
         version: 7.24.1(@babel/core@7.24.4)
       '@paretojs/monitor':
-        specifier: 1.0.5
+        specifier: 1.0.6
         version: link:../monitor
       '@rspack/cli':
         specifier: ^0.7.4

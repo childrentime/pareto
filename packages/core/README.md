@@ -1,6 +1,6 @@
 # Pareto
 
-[中文版](./README-zh.md)
+[中文版](https://github.com/childrentime/pareto/blob/main/README-zh.md)
 
 Pareto is an SSR (Server Side Rendering) framework centered on stream rendering. Its goal is not to be a full-stack framework like `next.js` or `remix`, but to enhance regular SSR applications.
 

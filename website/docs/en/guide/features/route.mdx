@@ -6,7 +6,7 @@ Pareto uses file system routing, and the file path of the page is simply mapped 
 
 ```bash
 app
-├── home 
+├── home
 │   └── index.tsx #routed to /home
 └── user
     └── index.tsx #routed to /user
@@ -17,11 +17,11 @@ app
 If you don't want to use the 'app' folder as your routing folder, you can also customize the name through configuration.
 
 ```ts
-import { ParetoConfig } from "@pareto/core/config";
+import { ParetoConfig } from '@pareto/core/config'
 
 const config: ParetoConfig = {
-  pageDir: "pages",
-};
+  pageDir: 'pages',
+}
 
-export default config;
+export default config
 ```

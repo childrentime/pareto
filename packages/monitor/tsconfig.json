@@ -20,5 +20,5 @@
     "noImplicitAny": true,
     "preserveSymlinks": false
   },
-  "exclude": ["dist","scripts"]
+  "exclude": ["dist", "scripts"]
 }

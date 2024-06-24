@@ -1,7 +1,4 @@
-const __DEV__ = process.env.NODE_ENV !== "production";
-const __ANA__ = process.env.ANALYZE === "true";
+const __DEV__ = process.env.NODE_ENV !== 'production'
+const __ANA__ = process.env.ANALYZE === 'true'
 
-export {
-  __DEV__,
-  __ANA__,
-};
+export { __ANA__, __DEV__ }

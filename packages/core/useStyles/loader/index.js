@@ -1,15 +1,16 @@
-const crypto = require('crypto');
+/* eslint-disable */
+const crypto = require('crypto')
 
 function createHash(source) {
-  const hash = crypto.createHash('md5');
-  hash.update(source);
-  return hash.digest('hex');
+  const hash = crypto.createHash('md5')
+  hash.update(source)
+  return hash.digest('hex')
 }
 
 function stringifyRequest(loaderContext, request) {
   return JSON.stringify(
-    loaderContext.utils.contextify(loaderContext.context, request)
-  );
+    loaderContext.utils.contextify(loaderContext.context, request),
+  )
 }
 
 module.exports = function loader() {}
@@ -18,9 +19,9 @@ module.exports.pitch = function pitch(request) {
     this.cacheable()
   }
 
-  const insertCss = require.resolve('./insertCss.js');
-  const filePath = this.resourcePath;
-  const hash = createHash(filePath);
+  const insertCss = require.resolve('./insertCss.js')
+  const filePath = this.resourcePath
+  const hash = createHash(filePath)
 
   return `
     var refs = 0;

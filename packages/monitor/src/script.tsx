@@ -35,7 +35,6 @@ const firstPaint = `
     });
   })(window);`
 
-
 const firstScreen = `
   (function (window, document) {
       const tm = (window.__TIME_METRICS__ = window.__TIME_METRICS__ || []);
@@ -51,7 +50,7 @@ export const PageStart = () => (
       __html: pageStart,
     }}
   />
-);
+)
 
 export const FirstPaint = () => (
   <script
@@ -59,8 +58,7 @@ export const FirstPaint = () => (
       __html: firstPaint,
     }}
   />
-);
-
+)
 
 export const FirstScreen = () => (
   <script
@@ -68,4 +66,4 @@ export const FirstScreen = () => (
       __html: firstScreen,
     }}
   />
-);
+)

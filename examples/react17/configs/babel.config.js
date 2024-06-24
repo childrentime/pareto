@@ -1,31 +1,31 @@
-const babelConfig = (isWebTarget) => {
+const babelConfig = isWebTarget => {
   return {
     presets: [
       [
-        "@babel/preset-env",
+        '@babel/preset-env',
         {
-          useBuiltIns: "usage",
-          modules: "commonjs",
+          useBuiltIns: 'usage',
+          modules: 'commonjs',
           corejs: 2,
           targets: {
-            node: "current",
+            node: 'current',
           },
         },
       ],
       [
-        "@babel/preset-react",
+        '@babel/preset-react',
         {
-          runtime: "automatic",
+          runtime: 'automatic',
         },
       ],
-      "@babel/preset-typescript",
+      '@babel/preset-typescript',
     ],
     plugins: [
-      process.env.NODE_ENV !== "production" &&
+      process.env.NODE_ENV !== 'production' &&
         isWebTarget &&
-        require.resolve("react-refresh/babel"),
+        require.resolve('react-refresh/babel'),
     ].filter(Boolean),
-  };
-};
+  }
+}
 
-module.exports = babelConfig;
+module.exports = babelConfig

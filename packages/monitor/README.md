@@ -11,21 +11,21 @@ A Visual Performance Panel
 #### Setup
 
 ```ts
-import { addMonitorMiddleware } from "@paretojs/monitor";
-import express from "express";
+import { addMonitorMiddleware } from '@paretojs/monitor'
+import express from 'express'
 
-const app = express();
+const app = express()
 
 addMonitorMiddleware(app)({
   // control whether show monitor ui in frontend
   showMonitor: true,
-});
+})
 ```
 
 #### Mark
 
 ```tsx
-req.monitor.mark("renderTopChunk");
+req.monitor.mark('renderTopChunk')
 ```
 
 #### Inject to window
@@ -42,21 +42,21 @@ req.monitor.mark("renderTopChunk");
 #### Usage
 
 ```tsx
-import { report, FirstScreen } from "@paretojs/monitor";
-import { useEffect } from "react";
+import { report, FirstScreen } from '@paretojs/monitor'
+import { useEffect } from 'react'
 
 const App = () => {
   useEffect(() => {
-    report().then(console.log);
-  }, []);
+    report().then(console.log)
+  }, [])
 
   return (
     <>
       <div>app</div>
       <FirstScreen />
     </>
-  );
-};
+  )
+}
 ```
 
 ## Report
@@ -72,36 +72,36 @@ The Time to Interactive (TTI) collected by the `web-vitals` package is much long
 ```tsx
 const App = () => {
   useEffect(() => {
-    report().then((data) => {
+    report().then(data => {
       // your report function
-      sendToAnalytics(data);
-    });
+      sendToAnalytics(data)
+    })
 
-    addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") {
-        sendToAnalytics(window["__WEB_VITALS__"]);
+    addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        sendToAnalytics(window['__WEB_VITALS__'])
       }
-    });
+    })
 
     // NOTE: Safari does not reliably fire the `visibilitychange` event when the
     // page is being unloaded. If Safari support is needed, you should also flush
     // the queue in the `pagehide` event.
-    addEventListener("pagehide", () => {
-      sendToAnalytics(window["__WEB_VITALS__"]);
-    });
+    addEventListener('pagehide', () => {
+      sendToAnalytics(window['__WEB_VITALS__'])
+    })
 
     return () => {
       // remove listeners....
-    };
-  }, []);
+    }
+  }, [])
 
   return (
     <>
       <div>app</div>
       <FirstScreen />
     </>
-  );
-};
+  )
+}
 ```
 
 ## Metrics Description

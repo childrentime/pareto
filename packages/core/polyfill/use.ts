@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react'
 
 /**
  * @description copy from swr
@@ -9,12 +9,12 @@ export const use =
   // and emitting an error.
   // We assume that this is only for the `use(thenable)` case, not `use(context)`.
   // https://github.com/facebook/react/blob/aed00dacfb79d17c53218404c52b1c7aa59c4a89/packages/react-server/src/ReactFizzThenable.js#L45
-  (<T, _>(
+  ((<T, _>(
     thenable: Promise<T> & {
       status?: 'pending' | 'fulfilled' | 'rejected'
       value?: T
       reason?: unknown
-    }
+    },
   ): T => {
     switch (thenable.status) {
       case 'pending':
@@ -33,8 +33,8 @@ export const use =
           e => {
             thenable.status = 'rejected'
             thenable.reason = e
-          }
+          },
         )
         throw thenable
     }
-  }) as typeof React.use
+  }) as typeof React.use)

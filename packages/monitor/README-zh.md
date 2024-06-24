@@ -11,21 +11,21 @@
 #### 设置
 
 ```ts
-import { addMonitorMiddleware } from "@paretojs/monitor";
-import express from "express";
+import { addMonitorMiddleware } from '@paretojs/monitor'
+import express from 'express'
 
-const app = express();
+const app = express()
 
 addMonitorMiddleware(app)({
   // 控制是否在前端展示 Monitor UI
   showMonitor: true,
-});
+})
 ```
 
 #### 标记
 
 ```tsx
-req.monitor.mark("renderTopChunk");
+req.monitor.mark('renderTopChunk')
 ```
 
 #### 注入到窗口
@@ -42,21 +42,21 @@ req.monitor.mark("renderTopChunk");
 #### 使用
 
 ```tsx
-import { report, FirstScreen } from "@paretojs/monitor";
-import { useEffect } from "react";
+import { report, FirstScreen } from '@paretojs/monitor'
+import { useEffect } from 'react'
 
 const App = () => {
   useEffect(() => {
-    report().then(console.log);
-  }, []);
+    report().then(console.log)
+  }, [])
 
   return (
     <>
       <div>app</div>
       <FirstScreen />
     </>
-  );
-};
+  )
+}
 ```
 
 ## 报告
@@ -72,34 +72,34 @@ const App = () => {
 ```tsx
 const App = () => {
   useEffect(() => {
-    report().then((data) => {
+    report().then(data => {
       // 你的报告函数
-      sendToAnalytics(data);
-    });
+      sendToAnalytics(data)
+    })
 
-    addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") {
-        sendToAnalytics(window["__WEB_VITALS__"]);
+    addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        sendToAnalytics(window['__WEB_VITALS__'])
       }
-    });
+    })
 
     // 注意：Safari 在页面被卸载时并不可靠地触发 `visibilitychange` 事件。如果需要支持 Safari，你也应该在 `pagehide` 事件中清空队列。
-    addEventListener("pagehide", () => {
-      sendToAnalytics(window["__WEB_VITALS__"]);
-    });
+    addEventListener('pagehide', () => {
+      sendToAnalytics(window['__WEB_VITALS__'])
+    })
 
     return () => {
       // 移除监听器...
-    };
-  }, []);
+    }
+  }, [])
 
   return (
     <>
       <div>app</div>
       <FirstScreen />
     </>
-  );
-};
+  )
+}
 ```
 
 ## 指标描述

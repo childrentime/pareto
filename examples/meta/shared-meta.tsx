@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import { Helmet } from 'react-helmet-async'
 
 const Meta = () => {
   return (
@@ -9,7 +9,7 @@ const Meta = () => {
       <link rel="canonical" href="https://www.tacobell.com" />
       <meta property="og:title" content="A very important title" />
     </Helmet>
-  );
-};
+  )
+}
 
-export default Meta;
+export default Meta

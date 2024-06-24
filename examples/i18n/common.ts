@@ -1,1 +1,1 @@
-export const i18Namespace = 'translations';
+export const i18Namespace = 'translations'

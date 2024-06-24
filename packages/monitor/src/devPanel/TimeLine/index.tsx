@@ -1,23 +1,23 @@
-import { useState } from "react";
-import cx from "classnames";
-import { TimeLines } from "../types";
-import styles from "./style.module.scss";
-import Logo from "../Logo";
+import cx from 'classnames'
+import { useState } from 'react'
+import Logo from '../Logo'
+import type { TimeLines } from '../types'
+import styles from './style.module.scss'
 
 const TimeLine = ({ source }: { source: TimeLines[] }) => {
-  const [showPanel, setShowPanel] = useState(false);
+  const [showPanel, setShowPanel] = useState(false)
 
-  let startTime = Infinity;
-  let endTime = 0;
+  let startTime = Infinity
+  let endTime = 0
 
-  source.forEach((item) => {
-    item.spans.forEach((span) => {
-      startTime = Math.min(startTime, span.start);
-      endTime = Math.max(endTime, span.end);
-    });
-  });
+  source.forEach(item => {
+    item.spans.forEach(span => {
+      startTime = Math.min(startTime, span.start)
+      endTime = Math.max(endTime, span.end)
+    })
+  })
 
-  const totalTime = endTime - startTime;
+  const totalTime = endTime - startTime
 
   return (
     <>
@@ -28,12 +28,12 @@ const TimeLine = ({ source }: { source: TimeLines[] }) => {
         })}
       >
         {source.map((item, index) => {
-          const { title, spans } = item;
+          const { title, spans } = item
           return (
             <div key={index}>
               <p className={styles.timelineMonitorTitle}>{title}</p>
               <div className={styles.barChart}>
-                {spans.map((item) => (
+                {spans.map(item => (
                   <div key={item.name} className={styles.barChartItem}>
                     <div className={styles.barLabel}>
                       {item.name}
@@ -57,11 +57,11 @@ const TimeLine = ({ source }: { source: TimeLines[] }) => {
                 ))}
               </div>
             </div>
-          );
+          )
         })}
       </div>
     </>
-  );
-};
+  )
+}
 
-export default TimeLine;
+export default TimeLine

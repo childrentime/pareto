@@ -1,11 +1,11 @@
-import { Suspense } from "react";
-import { promiseMap } from "./server.promise";
-import { STREAMING_SERIALIZATION_EVENT } from "./constant";
-import { use } from "../polyfill";
+import { Suspense } from 'react'
+import { use } from '../polyfill'
+import { STREAMING_SERIALIZATION_EVENT } from './constant'
+import { promiseMap } from './server.promise'
 
-export function Scripts() {;
-  const promises = [...promiseMap.values()];
-  const keys = [...promiseMap.keys()];
+export function Scripts() {
+  const promises = [...promiseMap.values()]
+  const keys = [...promiseMap.keys()]
 
   return (
     <>
@@ -15,13 +15,13 @@ export function Scripts() {;
         </Suspense>
       ))}
     </>
-  );
+  )
 }
 
 export function Script(props: { promise: Promise<any>; path: string }) {
-  const { promise, path } = props;
-  const data = use(promise);
-  const jsonData = JSON.stringify([path,data]);
+  const { promise, path } = props
+  const data = use(promise)
+  const jsonData = JSON.stringify([path, data])
 
   return (
     <script
@@ -38,5 +38,5 @@ export function Script(props: { promise: Promise<any>; path: string }) {
             `,
       }}
     />
-  );
+  )
 }

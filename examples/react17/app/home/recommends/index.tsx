@@ -1,24 +1,27 @@
-import styles from "./style.module.scss";
+import styles from './style.module.scss'
 
 interface RecommendData {
   feeds?: {
-    name: string;
-    avatar: string;
-    time: string;
-    action: string;
-    repositoryName: string;
-    repositoryAvatar: string;
-    desc: string;
-  }[];
+    name: string
+    avatar: string
+    time: string
+    action: string
+    repositoryName: string
+    repositoryAvatar: string
+    desc: string
+  }[]
 }
 
 export function Recommends(props: RecommendData) {
-  const { feeds = [] } = props;
+  const { feeds = [] } = props
 
   return (
-    <div className={styles.container} onClick={() => {
-      console.log('clicked')
-    }}>
+    <div
+      className={styles.container}
+      onClick={() => {
+        console.log('clicked')
+      }}
+    >
       <div className={styles.title}>Recommends</div>
       <div className={styles.list}>
         {feeds.map((item, index) => (
@@ -45,5 +48,5 @@ export function Recommends(props: RecommendData) {
         ))}
       </div>
     </div>
-  );
+  )
 }

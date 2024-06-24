@@ -6,7 +6,7 @@ So you can use all the features available in the react-helmet-async library.
 ## Examples
 
 ```tsx
-import { Helmet } from "react-helmet-async";
+import { Helmet } from 'react-helmet-async'
 
 const App = () => {
   return (
@@ -16,8 +16,8 @@ const App = () => {
       </Helmet>
       <div>hello world</div>
     </>
-  );
-};
+  )
+}
 ```
 
 That's it!. The title tag will be automatically moved to the head tag during server-side rendering.
@@ -29,7 +29,7 @@ You can define a `shared-meta.tsx` file and import it separately in `client-entr
 
 ```tsx
 // shared-meta.tsx
-import { Helmet } from "react-helmet-async";
+import { Helmet } from 'react-helmet-async'
 const Meta = () => {
   return (
     <Helmet>
@@ -39,9 +39,9 @@ const Meta = () => {
       <link rel="canonical" href="https://www.tacobell.com" />
       <meta property="og:title" content="A very important title" />
     </Helmet>
-  );
-};
-export default Meta;
+  )
+}
+export default Meta
 
 // client-entry.tsx
 hydrateRoot(
@@ -51,28 +51,28 @@ hydrateRoot(
       <Meta />
       <Page initialData={__INITIAL_DATA__} />
     </PageContext>
-  </StrictMode>
-);
+  </StrictMode>,
+)
 // server-entry.tsx
 app.get(
-  "*",
+  '*',
   paretoRequestHandler({
     delay: ABORT_DELAY,
-    pageWrapper: (Page) => {
-      return (props) => (
+    pageWrapper: Page => {
+      return props => (
         <>
           <Meta />
           <Page {...props} />
         </>
-      );
+      )
     },
-  })
-);
+  }),
+)
 ```
 
 ## Pitfall
 
 :::note
-Do not use `Helmet` in streamed components, it will not take effect, 
+Do not use `Helmet` in streamed components, it will not take effect,
 because streamed components are not rendered immediately.
 :::

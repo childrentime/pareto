@@ -24,24 +24,24 @@ pnpm i babel-plugin-macros @lingui/core @lingui/react accepts
 ```js
 /** @type {import('@lingui/conf').LinguiConfig} */
 module.exports = {
-  locales: ["en", "zh"],
-  sourceLocale: "en",
+  locales: ['en', 'zh'],
+  sourceLocale: 'en',
   catalogs: [
     {
-      path: "<rootDir>/app/{name}/locales/{locale}/messages",
-      include: ["<rootDir>/app/{name}/"],
+      path: '<rootDir>/app/{name}/locales/{locale}/messages',
+      include: ['<rootDir>/app/{name}/'],
     },
   ],
-  format: "po",
-};
+  format: 'po',
+}
 ```
 
 在项目的根目录创建 `babel.config.js`。
 
 ```js
 module.exports = {
-  plugins: ["macros"],
-};
+  plugins: ['macros'],
+}
 ```
 
 更新你的 `package.json` 文件。
@@ -72,65 +72,65 @@ module.exports = {
 
 declare global {
   interface Window {
-    __INITIAL_DATA__: any;
-    __LOCALE__: string;
-    __LOCALE_MESSAGE__: any;
+    __INITIAL_DATA__: any
+    __LOCALE__: string
+    __LOCALE_MESSAGE__: any
   }
 }
 
-export {};
+export {}
 ```
 
 在项目的根目录创建 `i18n.ts`。
 
 ```ts
-import { i18n, Messages } from "@lingui/core";
+import { i18n, Messages } from '@lingui/core'
 
 export function loadCatalog(page: string, locale: string) {
   /* 在生产环境中，当需要加载消息时，
    ** 可以在 pnpm build 后使用脚本将 locales 文件夹的内容移动到 .pareto 文件夹，并在此处修改导入路径。
    */
-  const data = require(`./app/${page}/locales/${locale}/messages`);
-  return data.messages;
+  const data = require(`./app/${page}/locales/${locale}/messages`)
+  return data.messages
 }
 
 export function initLinguiServer(messages: Messages, locale: string) {
   if (locale !== i18n.locale) {
-    i18n.loadAndActivate({ locale, messages });
+    i18n.loadAndActivate({ locale, messages })
   }
 }
 
 export function initLinguiClient() {
-  const locale = window.__LOCALE__;
-  const messages = window.__LOCALE_MESSAGE__;
+  const locale = window.__LOCALE__
+  const messages = window.__LOCALE_MESSAGE__
 
-  i18n.load(locale, messages);
-  i18n.activate(locale);
+  i18n.load(locale, messages)
+  i18n.activate(locale)
 }
 ```
 
 在项目的根目录修改 `server-entry.tsx` 文件。
 
 ```tsx
-import accepts from "accepts";
-import { initLinguiServer, loadCatalog } from "./i18n";
-import { I18nProvider } from "@lingui/react";
-import { i18n } from "@lingui/core";
+import accepts from 'accepts'
+import { initLinguiServer, loadCatalog } from './i18n'
+import { I18nProvider } from '@lingui/react'
+import { i18n } from '@lingui/core'
 
-const app = express();
-const ABORT_DELAY = 5_000;
+const app = express()
+const ABORT_DELAY = 5_000
 
-app.get("*", async (req, res, next) => {
-  const path = req.path.slice(1);
-  const accept = accepts(req);
-  const locale = accept.language(["en", "zh"]) || "en";
-  const messages = loadCatalog(path, locale);
-  initLinguiServer(messages, locale);
+app.get('*', async (req, res, next) => {
+  const path = req.path.slice(1)
+  const accept = accepts(req)
+  const locale = accept.language(['en', 'zh']) || 'en'
+  const messages = loadCatalog(path, locale)
+  initLinguiServer(messages, locale)
 
   const handler = paretoRequestHandler({
     delay: ABORT_DELAY,
-    pageWrapper: (Page) => {
-      return (props) => (
+    pageWrapper: Page => {
+      return props => (
         <I18nProvider i18n={i18n}>
           <Page {...props} />
           <script
@@ -138,33 +138,33 @@ app.get("*", async (req, res, next) => {
               __html: `
             window.__LOCALE__ = "${locale}";
             window.__LOCALE_MESSAGE__ = JSON.parse('${JSON.stringify(
-              messages
+              messages,
             )}');
           `,
             }}
           />
         </I18nProvider>
-      );
+      )
     },
-  });
+  })
 
-  await handler(req, res);
-});
+  await handler(req, res)
+})
 ```
 
 在项目的根目录修改 `client-entry.tsx` 文件。
 
 ```tsx
-import { I18nProvider } from "@lingui/react";
-import { i18n } from "@lingui/core";
-import { initLinguiClient } from "./i18n";
+import { I18nProvider } from '@lingui/react'
+import { i18n } from '@lingui/core'
+import { initLinguiClient } from './i18n'
 
 const startApp = async (Page: ParetoPage) => {
-  const root = document.getElementById("main") as HTMLElement;
-  const __INITIAL_DATA__ = window.__INITIAL_DATA__ as Record<string, any>;
-  initLinguiClient();
+  const root = document.getElementById('main') as HTMLElement
+  const __INITIAL_DATA__ = window.__INITIAL_DATA__ as Record<string, any>
+  initLinguiClient()
 
-  await Page.setUpClient?.();
+  await Page.setUpClient?.()
 
   hydrateRoot(
     root,
@@ -174,8 +174,7 @@ const startApp = async (Page: ParetoPage) => {
           <Page initialData={__INITIAL_DATA__} />
         </I18nProvider>
       </PageContext>
-    </StrictMode>
-  );
-};
+    </StrictMode>,
+  )
+}
 ```
-

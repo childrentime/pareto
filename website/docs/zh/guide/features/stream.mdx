@@ -21,8 +21,8 @@ Pareto提供了对流式渲染的一流支持。
 
 ```ts
 // data.ts
-export const getRecommendsKey = "getRecommends";
-export const getRecommends = () => fetch("/api/recommends");
+export const getRecommendsKey = 'getRecommends'
+export const getRecommends = () => fetch('/api/recommends')
 ```
 
 ### 设置服务器端Promise
@@ -32,11 +32,11 @@ Pareto导出一个promiseMap对象来维护与键值对应的每个请求的Prom
 ```tsx
 Home.getServerSideProps = async () => {
   // 我们不需要等待流请求
-  promiseMap.set(getRecommendsKey, getRecommends());
+  promiseMap.set(getRecommendsKey, getRecommends())
   // 需要等待的请求
-  const repositories = await fetch("/api/repositories");
-  return repositories;
-};
+  const repositories = await fetch('/api/repositories')
+  return repositories
+}
 ```
 
 ### 设置客户端Promise
@@ -46,8 +46,8 @@ Home.getServerSideProps = async () => {
 ```tsx
 Home.setUpClient = async () => {
   // 模拟客户端Promise，只有在服务器端流数据准备就绪时才会被解析
-  mockClientPromise(getRecommendsKey);
-};
+  mockClientPromise(getRecommendsKey)
+}
 ```
 
 ### 使用Promise
@@ -60,9 +60,9 @@ Home.setUpClient = async () => {
 
 ```tsx
 // React19
-import { use } from "react";
+import { use } from 'react'
 // React18
-import { use } from "@paretojs/core";
+import { use } from '@paretojs/core'
 
 const Home = () => {
   return (
@@ -72,11 +72,11 @@ const Home = () => {
         <Recommends />
       </Suspense>
     </div>
-  );
-};
+  )
+}
 
 const Recommends = () => {
-  const { feeds } = use(promiseMap.get(getRecommendsKey)!);
+  const { feeds } = use(promiseMap.get(getRecommendsKey)!)
 
   return (
     <div className={styles.container}>
@@ -87,6 +87,6 @@ const Recommends = () => {
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 ```

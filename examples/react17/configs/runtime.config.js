@@ -1,10 +1,7 @@
+let config = { pages: {}, assets: {} }
 
+export const getRuntimeConfig = () => config
 
-
-let config = { pages: {},assets: {} };
-
-export const getRuntimeConfig = () => config;
-
-export const setRuntimeConfig = (value) => {
-  config = value;
-};
+export const setRuntimeConfig = value => {
+  config = value
+}

@@ -9,49 +9,49 @@ If you want to manually enable this feature in your project, please follow the s
 create or update `pareto.config.ts` in the root directory of your project.
 
 ```ts
-import { ParetoConfig } from "@paretojs/core/config";
+import { ParetoConfig } from '@paretojs/core/config'
 
 const config: ParetoConfig = {
   enableMonitor: true,
-};
+}
 
-export default config;
+export default config
 ```
 
 modify the `server-entry.tsx` file in the root directory of your project.
 
 ```tsx
-import { createMonitorMiddleware } from "@paretojs/core/node";
-import express from "express";
+import { createMonitorMiddleware } from '@paretojs/core/node'
+import express from 'express'
 
-const app = express();
+const app = express()
 app.use(
   createMonitorMiddleware({
     // control whether to display the UI in the front end
     showMonitor: true,
-  })
-);
+  }),
+)
 ```
 
 modify any route root file in your `app` dictionary.
 
 ```tsx
-import { report, FirstScreen } from "@paretojs/monitor";
+import { report, FirstScreen } from '@paretojs/monitor'
 
-const Home: ParetoPage<InitialData> = (props) => {
-  const { repositories } = props.initialData;
+const Home: ParetoPage<InitialData> = props => {
+  const { repositories } = props.initialData
 
   useEffect(() => {
-    report().then(console.log);
-  }, []);
+    report().then(console.log)
+  }, [])
 
   return (
     <>
       <div>...</div>
       <FirstScreen />
     </>
-  );
-};
+  )
+}
 ```
 
 ## Result

@@ -1,3 +1,3 @@
 module.exports = {
-  "plugins": ["macros"]
+  plugins: ['macros'],
 }

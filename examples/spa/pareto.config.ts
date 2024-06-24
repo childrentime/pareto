@@ -1,7 +1,7 @@
-import { ParetoConfig } from "@paretojs/core/config";
+import type { ParetoConfig } from '@paretojs/core/config'
 
 const config: ParetoConfig = {
-  enableSpa: true
-};
+  enableSpa: true,
+}
 
-export default config;
+export default config

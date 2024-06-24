@@ -1,53 +1,53 @@
-const rspack = require("@rspack/core");
+const rspack = require('@rspack/core')
 
-const __DEV__ = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
+const __DEV__ = !process.env.NODE_ENV || process.env.NODE_ENV === 'development'
 
 const sassLoader = {
-  loader: require.resolve("sass-loader"),
-};
+  loader: require.resolve('sass-loader'),
+}
 
-const cssLoader = (modules) => {
+const cssLoader = modules => {
   return {
-    loader: require.resolve("css-loader"),
+    loader: require.resolve('css-loader'),
     options: {
       importLoaders: 2,
       modules: modules
         ? {
             localIdentName: __DEV__
-              ? "[local]-[hash:base64:5]"
-              : "[hash:base64:8]",
+              ? '[local]-[hash:base64:5]'
+              : '[hash:base64:8]',
             namedExport: false,
-            mode: "local",
+            mode: 'local',
           }
-        : "global",
+        : 'global',
       sourceMap: true,
       esModule: false,
     },
-  };
-};
+  }
+}
 
 const postCssLoader = {
-  loader: require.resolve("postcss-loader"),
-};
+  loader: require.resolve('postcss-loader'),
+}
 
 const generateCssLoaders = (
   { useModules, useSass } = {
     useModules: false,
     useStyle: false,
     useSass: false,
-  }
+  },
 ) => {
   let loaders = [
     rspack.CssExtractRspackPlugin.loader,
     cssLoader(useModules),
     postCssLoader,
-  ];
+  ]
 
   if (useSass) {
-    loaders.push(sassLoader);
+    loaders.push(sassLoader)
   }
 
-  return loaders;
-};
+  return loaders
+}
 
-exports.generateCssLoaders = generateCssLoaders;
+exports.generateCssLoaders = generateCssLoaders

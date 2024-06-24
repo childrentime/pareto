@@ -7,17 +7,17 @@ Pareto support custom `rspack` and `babel` configuration.
 create `rspack.config.ts` in the root directory of your project.
 
 ```ts
-import { rspack } from "@rspack/core";
-import { ParetoConfig } from "@paretojs/core/config";
+import { rspack } from '@rspack/core'
+import { ParetoConfig } from '@paretojs/core/config'
 
 const config: ParetoConfig = {
   configureRspack(config, { isServer }) {
     // ... custom your rspack configuration
-    return config;
+    return config
   },
-};
+}
 
-export default config;
+export default config
 ```
 
 ## `babel` configuration
@@ -26,8 +26,8 @@ create `babel.config.js` in the root directory of your project.
 
 ```js
 module.exports = {
-  plugins: ["macros"],
-};
+  plugins: ['macros'],
+}
 ```
 
 babel will auto merge your babel configuration with pareto built-in configuration.

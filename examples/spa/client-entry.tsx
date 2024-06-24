@@ -1,15 +1,15 @@
-import { StrictMode } from "react";
-import { hydrateRoot, createRoot } from "react-dom/client";
-import { ParetoPage } from "@paretojs/core";
-import { PageContext } from "@paretojs/core/client";
+import type { ParetoPage } from '@paretojs/core'
+import { PageContext } from '@paretojs/core/client'
+import { StrictMode } from 'react'
+import { createRoot, hydrateRoot } from 'react-dom/client'
 
-const url = new URL(window.location.href);
-const __csr = !!url.searchParams.get("__csr");
+const url = new URL(window.location.href)
+const __csr = !!url.searchParams.get('__csr')
 
 const startApp = async (Page: ParetoPage) => {
-  const root = document.getElementById("main") as HTMLElement;
-  await Page.setUpClient?.();
-  const __INITIAL_DATA__ =  window.__INITIAL_DATA__ as Record<string,any>;
+  const root = document.getElementById('main')!
+  await Page.setUpClient?.()
+  const __INITIAL_DATA__ = window.__INITIAL_DATA__ as Record<string, any>
 
   if (__csr) {
     createRoot(root).render(
@@ -17,9 +17,9 @@ const startApp = async (Page: ParetoPage) => {
         <PageContext>
           <Page initialData={__INITIAL_DATA__} />
         </PageContext>
-      </StrictMode>
-    );
-    return;
+      </StrictMode>,
+    )
+    return
   }
 
   hydrateRoot(
@@ -28,7 +28,7 @@ const startApp = async (Page: ParetoPage) => {
       <PageContext>
         <Page initialData={__INITIAL_DATA__} />
       </PageContext>
-    </StrictMode>
-  );
-};
-export { startApp };
+    </StrictMode>,
+  )
+}
+export { startApp }

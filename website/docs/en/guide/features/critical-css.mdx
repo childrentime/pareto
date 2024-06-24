@@ -42,11 +42,11 @@ For example, in the case above, for people who are on the control side of the A/
 We have built an internal wrapper around [isomorphic-style-loader](https://github.com/kriasoft/isomorphic-style-loader). Now, you can use the `useStyles` hook to collect the CSS needed during the rendering process.
 
 ```tsx
-import styles from './style.iso.scss';
-import { useStyles } from "@pareto/core";
+import styles from './style.iso.scss'
+import { useStyles } from '@pareto/core'
 
 const Component = () => {
-  useStyles(styles);
+  useStyles(styles)
 
   return (
     <div className={styles.container}>
@@ -64,13 +64,9 @@ Critical CSS can be used with stream rendering, but it's important to note that 
 
 ```tsx
 export function Recommends() {
-  useStyles(styles); // Recommend: always place useStyles in top;
-  const { feeds } = use(promiseMap.get(getRecommendsKey)!);
+  useStyles(styles) // Recommend: always place useStyles in top;
+  const { feeds } = use(promiseMap.get(getRecommendsKey)!)
 
-  return (
-    <div className={styles.container}>
-      ...
-    </div>
-  );
+  return <div className={styles.container}>...</div>
 }
 ```

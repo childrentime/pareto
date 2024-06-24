@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Isomorphic CSS style loader for Webpack
  *
@@ -24,7 +25,7 @@ function b64EncodeUnicode(str) {
  * if they are no longer referenced by UI components.
  */
 function removeCss(ids) {
-  ids.forEach((id) => {
+  ids.forEach(id => {
     if (--inserted[id] <= 0) {
       const elem = document.getElementById(id)
       if (elem) {
@@ -46,7 +47,7 @@ function insertCss(styles, { replace = false, prepend = false } = {}) {
   const ids = []
   for (let i = 0; i < styles.length; i++) {
     const [moduleId, css, media, sourceMap] = styles[i]
-    const id = moduleId;
+    const id = moduleId
 
     ids.push(id)
 

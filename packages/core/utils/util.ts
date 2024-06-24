@@ -1,4 +1,4 @@
-import os from "os";
+import os from 'os'
 
 /**
  * Transform the OS path separator in the content based on the platform, while writing to files.
@@ -9,13 +9,11 @@ import os from "os";
  */
 function transformSepOfPath(content: string) {
   switch (os.platform()) {
-    case "win32":
-      return content.replace(/\\/g, "\\\\");
+    case 'win32':
+      return content.replace(/\\/g, '\\\\')
     default:
-      return content;
+      return content
   }
 }
 
-export {
-  transformSepOfPath,
-};
+export { transformSepOfPath }

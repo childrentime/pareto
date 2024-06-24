@@ -1,82 +1,84 @@
-import { BaseMonitor, MonitorType } from "./types";
+import type { MonitorType } from './types'
+import { BaseMonitor } from './types'
 
 const RECORD_KEYS = [
-  "navigationStart",
-  "redirectStart",
-  "redirectEnd",
-  "fetchStart",
-  "domainLookupStart",
-  "domainLookupEnd",
-  "connectStart",
-  "secureConnectionStart",
-  "connectEnd",
-  "requestStart",
-  "responseStart",
-  "unloadEventStart",
-  "unloadEventEnd",
-  "responseEnd",
-  "domLoading",
-  "domInteractive",
-  "domContentLoadedEventStart",
-  "domContentLoadedEventEnd",
-  "domComplete",
-  "loadEventStart",
-  "loadEventEnd",
-];
+  'redirectStart',
+  'redirectEnd',
+  'fetchStart',
+  'domainLookupStart',
+  'domainLookupEnd',
+  'connectStart',
+  'secureConnectionStart',
+  'connectEnd',
+  'requestStart',
+  'responseStart',
+  'unloadEventStart',
+  'unloadEventEnd',
+  'responseEnd',
+  'domInteractive',
+  'domContentLoadedEventStart',
+  'domContentLoadedEventEnd',
+  'domComplete',
+  'loadEventStart',
+  'loadEventEnd',
+] as const
+
+type RecordKeys = (typeof RECORD_KEYS)[number]
 
 export class PerformanceMonitor extends BaseMonitor<PerformanceNavigationTiming> {
-  name: MonitorType;
+  name: MonitorType
 
-  collectData(collectorMap: Map<MonitorType, BaseMonitor<{}>>): void {
-    const { fetchStart = 0 } = this.value ?? {};
-    this.fixGlitchesInBatch({ source: this.records, start: fetchStart });
+  collectData(_collectorMap: Map<MonitorType, BaseMonitor<object>>): void {
+    const { fetchStart = 0 } = this.value ?? {}
+    this.fixGlitchesInBatch({ source: this.records, start: fetchStart })
   }
 
   constructor() {
-    super();
-    this.name = "performance";
+    super()
+    this.name = 'performance'
   }
 
   get records(): Record<string, number> {
     if (this.dataSource) {
-      return RECORD_KEYS.reduce((acc, key) => {
-        // @ts-ignore
-        acc[key] = this.dataSource[key];
-        return acc;
-      }, {});
+      return RECORD_KEYS.reduce(
+        (acc, key) => {
+          acc[key] = this.dataSource?.[key] ?? 0
+          return acc
+        },
+        {} as Record<string, number>,
+      )
     }
 
-    return {};
+    return {}
   }
 
   init(): void {
-    const navigationEntry = performance.getEntriesByType(
-      "navigation"
-    )[0] as PerformanceNavigationTiming;
+    const navigationEntry = performance.getEntriesByType('navigation')[0]
 
-    const dataSource = {} as PerformanceNavigationTiming;
+    const dataSource = {} as PerformanceNavigationTiming
     for (const key in navigationEntry) {
       if (
-        // @ts-ignore
-        typeof navigationEntry[key] === "number" &&
-        RECORD_KEYS.includes(key)
+        typeof navigationEntry[key as RecordKeys] === 'number' &&
+        RECORD_KEYS.includes(key as RecordKeys)
       ) {
         // @ts-ignore
         dataSource[key] = Math.round(
-          // @ts-ignore
-          navigationEntry[key] + performance.timeOrigin
-        );
+          navigationEntry[key as RecordKeys] + performance.timeOrigin,
+        )
       }
     }
-    this.dataSource = dataSource;
+    this.dataSource = dataSource
   }
 
   getBoundValue(key?: string): number {
-    // @ts-ignore
-    if (["loadEventEnd", "loadEventStart", "domComplete"].includes(key)) {
-      return 20000;
+    if (
+      (['loadEventEnd', 'loadEventStart', 'domComplete'] as string[]).includes(
+        (key = ''),
+      )
+    ) {
+      return 20000
     }
 
-    return super.getBoundValue(key);
+    return super.getBoundValue(key)
   }
 }

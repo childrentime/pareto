@@ -1,27 +1,27 @@
 # Why Pareto
 
-In the course of my work, there's a problem that often troubles me: Our team doesn't use frameworks like `next.js` or 
-`remix`. Instead, we have our own application built with webpack+react SSR. For these applications, integrating React's 
-streaming rendering is very challenging. The first issue, I believe, lies with React's official team, as there isn't a 
-clear best practice on how to implement streaming rendering. The second point is, when enhancing SSR applications with 
-streaming rendering, the handling of styles and resources, along with the synchronization of potential server-side global 
+In the course of my work, there's a problem that often troubles me: Our team doesn't use frameworks like `next.js` or
+`remix`. Instead, we have our own application built with webpack+react SSR. For these applications, integrating React's
+streaming rendering is very challenging. The first issue, I believe, lies with React's official team, as there isn't a
+clear best practice on how to implement streaming rendering. The second point is, when enhancing SSR applications with
+streaming rendering, the handling of styles and resources, along with the synchronization of potential server-side global
 stores and client-side global stores, is indeed very complex.
 
 ## Why I think streaming is important
 
 Because it is a game-changer that can bring a **better user experience**.
 
-Streaming rendering can significantly reduce your TTFB (Time to First Byte), FCP (First Contentful Paint), and 
+Streaming rendering can significantly reduce your TTFB (Time to First Byte), FCP (First Contentful Paint), and
 TTI (Time to Interactive). How is this achieved? Let's revisit the article at https://github.com/reactwg/react-18/discussions/37.
 
-Firstly, because we've enabled streaming rendering, we can send out the static resources required by the page, 
-such as `js`, `css`, `image`, `font`, the instant a request arrives. 
-Therefore, the browser can preload these resources while your server is still making API calls. 
+Firstly, because we've enabled streaming rendering, we can send out the static resources required by the page,
+such as `js`, `css`, `image`, `font`, the instant a request arrives.
+Therefore, the browser can preload these resources while your server is still making API calls.
 We've decoupled static resources from backend API calls, reducing our TTFB to a single round-trip time (RTT).
 
-Secondly, for those APIs that take a longer time to respond, we no longer need to wait for them to complete before 
-returning the page content. Instead, we can return the content from the faster APIs first, while also sending a 
-skeleton. When the slower APIs have returned, we replace the skeleton with the actual content. 
+Secondly, for those APIs that take a longer time to respond, we no longer need to wait for them to complete before
+returning the page content. Instead, we can return the content from the faster APIs first, while also sending a
+skeleton. When the slower APIs have returned, we replace the skeleton with the actual content.
 This approach breaks the bottleneck effect, significantly improving the FCP.
 
 We borrow two images from the eBay article to more intuitively illustrate this point.

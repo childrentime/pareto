@@ -6,14 +6,14 @@ Pareto的服务器入口点默认是一个Express服务器，因此您可以使�
 
 ```tsx
 // server-entry.tsx
-import morgan from "morgan";
-import express from "express";
-import { paretoRequestHandler } from "@paretojs/core/node";
+import morgan from 'morgan'
+import express from 'express'
+import { paretoRequestHandler } from '@paretojs/core/node'
 
-const app = express();
+const app = express()
 
 app.use(morgan('combined'))
-app.get("*", paretoRequestHandler());
+app.get('*', paretoRequestHandler())
 
-export { app };
+export { app }
 ```

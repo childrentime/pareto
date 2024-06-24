@@ -13,13 +13,13 @@ Specifies the application root directory. For example:
 
 ```tsx
 // pareto.config.ts
-import { ParetoConfig } from "@paretojs/core/config";
+import { ParetoConfig } from '@paretojs/core/config'
 
 const config: ParetoConfig = {
-  pageDir: "pages",
-};
+  pageDir: 'pages',
+}
 
-export default config;
+export default config
 ```
 
 ## configureRspack
@@ -30,23 +30,23 @@ export default config;
 The configureRspack function supports customizing the functionality of Rspack. For example:
 
 ```tsx
-import { rspack } from "@rspack/core";
-import { ParetoConfig } from "@paretojs/core/config";
+import { rspack } from '@rspack/core'
+import { ParetoConfig } from '@paretojs/core/config'
 
 const config: ParetoConfig = {
   configureRspack(config, { isServer }) {
     if (isServer) {
       config.plugins!.push(
         new rspack.DefinePlugin({
-          "process.env.password": JSON.stringify("password"),
-        })
-      );
+          'process.env.password': JSON.stringify('password'),
+        }),
+      )
     }
-    return config;
+    return config
   },
-};
+}
 
-export default config;
+export default config
 ```
 
 ## enableSpa
@@ -57,13 +57,13 @@ export default config;
 Enable SPA mode. For example:
 
 ```tsx
-import { ParetoConfig } from "@paretojs/core/config";
+import { ParetoConfig } from '@paretojs/core/config'
 
 const config: ParetoConfig = {
   enableSpa: true,
-};
+}
 
-export default config;
+export default config
 ```
 
 ## enableMonitor
@@ -74,13 +74,13 @@ export default config;
 Enable the monitor. For example:
 
 ```tsx
-import { ParetoConfig } from "@paretojs/core/config";
+import { ParetoConfig } from '@paretojs/core/config'
 
 const config: ParetoConfig = {
   enableMonitor: true,
-};
+}
 
-export default config;
+export default config
 ```
 
 ## distDir

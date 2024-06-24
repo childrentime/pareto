@@ -1,39 +1,39 @@
-const AssetsPlugin = require("assets-webpack-plugin");
-const babelConfig = require("./babel.config");
-const { getClientEntries } = require("./entry");
-const rspack = require("@rspack/core");
+const AssetsPlugin = require('assets-webpack-plugin')
+const babelConfig = require('./babel.config')
+const { getClientEntries } = require('./entry')
+const rspack = require('@rspack/core')
 
-const { generateCssLoaders } = require("./rspack.base");
-const { pageEntries } = require("./entry");
-const { CLIENT_OUTPUT_PATH } = require("../constant");
-const pageConfig = require("./page.config");
+const { generateCssLoaders } = require('./rspack.base')
+const { pageEntries } = require('./entry')
+const { CLIENT_OUTPUT_PATH } = require('../constant')
+const pageConfig = require('./page.config')
 
 /**
  * @type {import("webpack").Configuration}
  */
 const defaultConfig = {
-  mode: process.env.NODE_ENV || "development",
+  mode: process.env.NODE_ENV || 'development',
   node: false,
   entry: getClientEntries(),
   output: {
     path: CLIENT_OUTPUT_PATH,
-    filename: "assets/js/[name].bundle.js",
-    chunkFilename: "assets/js/[id].chunk.js",
-    publicPath: "/",
+    filename: 'assets/js/[name].bundle.js',
+    chunkFilename: 'assets/js/[id].chunk.js',
+    publicPath: '/',
   },
-  devtool: "eval-cheap-module-source-map",
+  devtool: 'eval-cheap-module-source-map',
   module: {
     rules: [
       {
         test: /\.svg$/,
-        type: "asset",
+        type: 'asset',
       },
       {
         test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
         use: [
           {
-            loader: require.resolve("babel-loader"),
+            loader: require.resolve('babel-loader'),
             options: babelConfig(true),
           },
         ],
@@ -68,23 +68,23 @@ const defaultConfig = {
     ],
   },
   resolve: {
-    extensions: [".js", ".jsx", ".json", ".mjs", ".wasm", ".ts", ".tsx"],
+    extensions: ['.js', '.jsx', '.json', '.mjs', '.wasm', '.ts', '.tsx'],
   },
   plugins: [
     new AssetsPlugin({
       path: CLIENT_OUTPUT_PATH,
       entrypoints: true,
     }),
-    new rspack.ProgressPlugin({ prefix: "client" }),
+    new rspack.ProgressPlugin({ prefix: 'client' }),
     new rspack.CssExtractRspackPlugin({}),
   ],
   cache: true,
   experiments: {
     css: false,
   },
-};
+}
 
 const clientConfig = pageConfig.configureRspack(defaultConfig, {
   isServer: false,
-});
-module.exports = { clientConfig };
+})
+module.exports = { clientConfig }

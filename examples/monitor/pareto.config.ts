@@ -1,7 +1,7 @@
-import { ParetoConfig } from "@paretojs/core/config";
+import type { ParetoConfig } from '@paretojs/core/config'
 
 const config: ParetoConfig = {
-  enableMonitor: true
-};
+  enableMonitor: true,
+}
 
-export default config;
+export default config

@@ -42,11 +42,11 @@ const ABTestComponent = () => {
 我们在 [isomorphic-style-loader](https://github.com/kriasoft/isomorphic-style-loader) 周围构建了一个内部包装器。现在，您可以使用 `useStyles` 钩子在渲染过程中收集所需的 CSS。
 
 ```tsx
-import styles from './style.iso.scss';
-import { useStyles } from "@pareto/core";
+import styles from './style.iso.scss'
+import { useStyles } from '@pareto/core'
 
 const Component = () => {
-  useStyles(styles);
+  useStyles(styles)
 
   return (
     <div className={styles.container}>
@@ -64,13 +64,9 @@ const Component = () => {
 
 ```tsx
 export function Recommends() {
-  useStyles(styles); // 建议：始终将 useStyles 放在顶部;
-  const { feeds } = use(promiseMap.get(getRecommendsKey)!);
+  useStyles(styles) // 建议：始终将 useStyles 放在顶部;
+  const { feeds } = use(promiseMap.get(getRecommendsKey)!)
 
-  return (
-    <div className={styles.container}>
-      ...
-    </div>
-  );
+  return <div className={styles.container}>...</div>
 }
 ```

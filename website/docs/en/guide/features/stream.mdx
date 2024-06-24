@@ -20,8 +20,8 @@ Based on experience, we only need to stream the requests of modules with slow in
 
 ```ts
 // data.ts
-export const getRecommendsKey = "getRecommends";
-export const getRecommends = () => fetch("/api/recommends");
+export const getRecommendsKey = 'getRecommends'
+export const getRecommends = () => fetch('/api/recommends')
 ```
 
 ### Setup server side promise
@@ -31,11 +31,11 @@ Pareto exports a promiseMap object to maintain the promise status of each reques
 ```tsx
 Home.getServerSideProps = async () => {
   // we don't need wait for stream request
-  promiseMap.set(getRecommendsKey, getRecommends());
+  promiseMap.set(getRecommendsKey, getRecommends())
   // request that need wait
-  const repositories = await fetch("/api/repositories");
-  return repositories;
-};
+  const repositories = await fetch('/api/repositories')
+  return repositories
+}
 ```
 
 ### Setup client side promise
@@ -45,8 +45,8 @@ A well-known joke is: React needs to maintain consistency between the first rend
 ```tsx
 Home.setUpClient = async () => {
   // mock client promise, it only will be resolved when server stream data is ready
-  mockClientPromise(getRecommendsKey);
-};
+  mockClientPromise(getRecommendsKey)
+}
 ```
 
 ### Consume Promise
@@ -59,9 +59,9 @@ The `use` hook was only introduced in React 19, so for React 18, you need to use
 
 ```tsx
 // React19
-import { use } from "react";
+import { use } from 'react'
 // React18
-import { use } from "@paretojs/core";
+import { use } from '@paretojs/core'
 
 const Home = () => {
   return (
@@ -71,11 +71,11 @@ const Home = () => {
         <Recommends />
       </Suspense>
     </div>
-  );
-};
+  )
+}
 
 const Recommends = () => {
-  const { feeds } = use(promiseMap.get(getRecommendsKey)!);
+  const { feeds } = use(promiseMap.get(getRecommendsKey)!)
 
   return (
     <div className={styles.container}>
@@ -86,6 +86,6 @@ const Recommends = () => {
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 ```

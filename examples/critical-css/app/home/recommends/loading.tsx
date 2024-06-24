@@ -1,9 +1,9 @@
-import { useStyles } from "@paretojs/core";
-import styles from "./style.iso.scss";
+import { useStyles } from '@paretojs/core'
+import styles from './style.iso.scss'
 
 export const RecommendsSkeleton = () => {
-  useStyles(styles);
-  const feeds = Array.from({ length: 5 }).fill(0);
+  useStyles(styles)
+  const feeds = Array.from({ length: 5 }).fill(0)
 
   return (
     <div className={styles.container}>
@@ -16,11 +16,11 @@ export const RecommendsSkeleton = () => {
             style={{
               width: 315,
               height: 100,
-              flexShrink: 0
+              flexShrink: 0,
             }}
           ></div>
         ))}
       </div>
     </div>
-  );
-};
+  )
+}

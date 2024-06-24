@@ -7,17 +7,17 @@ Pareto 支持自定义 `rspack` 和 `babel` 配置。
 在项目的根目录下创建 `rspack.config.ts` 文件。
 
 ```ts
-import { rspack } from "@rspack/core";
-import { ParetoConfig } from "@paretojs/core/config";
+import { rspack } from '@rspack/core'
+import { ParetoConfig } from '@paretojs/core/config'
 
 const config: ParetoConfig = {
   configureRspack(config, { isServer }) {
     // ... 自定义您的 rspack 配置
-    return config;
+    return config
   },
-};
+}
 
-export default config;
+export default config
 ```
 
 ## `babel` 配置
@@ -26,8 +26,8 @@ export default config;
 
 ```js
 module.exports = {
-  plugins: ["macros"],
-};
+  plugins: ['macros'],
+}
 ```
 
 babel 将自动将您的 babel 配置与 Pareto 内置配置合并。

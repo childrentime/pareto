@@ -2,24 +2,24 @@
 
 ## Position
 
-Pareto is a React SSR framework based on rspack, dedicated to making your use of streaming rendering simple. It doesn't have many complex encapsulations, 
+Pareto is a React SSR framework based on rspack, dedicated to making your use of streaming rendering simple. It doesn't have many complex encapsulations,
 essentially it's just a simple wrapper for React SSR applications.
 
 ## Project Background
 
-Pareto is designed as a streamlined `MPA` architecture, 
-so it might be more suitable for those who need to develop embedded web pages in mobile webviews. 
-We considered many performance optimization factors from the beginning of the design, and combined it with 
+Pareto is designed as a streamlined `MPA` architecture,
+so it might be more suitable for those who need to develop embedded web pages in mobile webviews.
+We considered many performance optimization factors from the beginning of the design, and combined it with
 streaming rendering. For example:
 
-1. Critical CSS: Pareto has built-in support for critical CSS, which is much faster than using external CSS. 
-For more details, you can refer to https://web.dev/articles/extract-critical-css?hl=zh-cn
-2. `react-helmet-async`: Pareto has built-in support for metadata, which will be sent to the browser at the beginning 
-of the request.
-3. SPA: Pareto has built-in support for SPA mode. When your server traffic is too large, you can 
-choose to switch to SPA mode to increase capacity.
-4. Custom Streaming Rendering Architecture:  unlike `Next.js` or `Remix`, we start sending static resources 
-immediately at the beginning of the request. This helps improve performance metrics.
+1. Critical CSS: Pareto has built-in support for critical CSS, which is much faster than using external CSS.
+   For more details, you can refer to https://web.dev/articles/extract-critical-css?hl=zh-cn
+2. `react-helmet-async`: Pareto has built-in support for metadata, which will be sent to the browser at the beginning
+   of the request.
+3. SPA: Pareto has built-in support for SPA mode. When your server traffic is too large, you can
+   choose to switch to SPA mode to increase capacity.
+4. Custom Streaming Rendering Architecture: unlike `Next.js` or `Remix`, we start sending static resources
+   immediately at the beginning of the request. This helps improve performance metrics.
 
 ## Supported React version
 
@@ -29,17 +29,17 @@ Pareto directly supports react19 and above
 
 ### React18
 
-Pareto also supports React 18, but since use hook is not exposed in React 18, 
+Pareto also supports React 18, but since use hook is not exposed in React 18,
 you need to use the use function exported from Pareto when you enable the streaming rendering feature.
 
 ```tsx
-import { use } from "@paretojs/core";
+import { use } from '@paretojs/core'
 ```
 
 ### React17 & React16.8
 
-Pareto does not directly support React 17, as making it compatible is quite complex. 
-However, streaming rendering can be enabled in any version after React 16.8. 
-I've provided an [rough example](https://github.com/childrentime/pareto/tree/main/examples/react17) here that accomplishes this. 
-If you're using a version lower than React 18, 
+Pareto does not directly support React 17, as making it compatible is quite complex.
+However, streaming rendering can be enabled in any version after React 16.8.
+I've provided an [rough example](https://github.com/childrentime/pareto/tree/main/examples/react17) here that accomplishes this.
+If you're using a version lower than React 18,
 you might consider referring to this example to integrate streaming rendering into your project.

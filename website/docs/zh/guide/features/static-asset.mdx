@@ -12,19 +12,19 @@ Pareto 提供了一个 `getAsset` 方法，用于添加一些与页面相关的�
 const Home: ParetoPage = () => {
   return (
     <div>
-    <h1>Home</h1>
+      <h1>Home</h1>
     </div>
-  );
-};
+  )
+}
 
 Home.getAssets = () => {
   return [
     {
-      type: "image",
-      url: "https://example.com/image.jpg",
+      type: 'image',
+      url: 'https://example.com/image.jpg',
     },
-  ];
-};
+  ]
+}
 ```
 
 从 getAssets 返回的数据将被转换为 link 标签并插入页面中。与 `react-async-helmet` 中的元数据不同之处在于，它的分发时机会更早。

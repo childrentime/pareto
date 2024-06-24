@@ -9,11 +9,11 @@ paretoRequestHandler 是用于处理页面的服务器端函数。它在 `server
 
 ```tsx
 // server-entry.tsx
-import express from "express";
-import { paretoRequestHandler } from "@paretojs/core/node";
+import express from 'express'
+import { paretoRequestHandler } from '@paretojs/core/node'
 
-const app = express();
-app.get("*", paretoRequestHandler({}));
+const app = express()
+app.get('*', paretoRequestHandler({}))
 ```
 
 ### paretoRequestHandler 选项
@@ -28,7 +28,7 @@ pageWrapper 是一个函数，允许您自定义和增强页面。例如，要�
 
 ```tsx
 // shared-meta.tsx
-import { Helmet } from "react-helmet-async";
+import { Helmet } from 'react-helmet-async'
 
 const Meta = () => {
   return (
@@ -39,29 +39,29 @@ const Meta = () => {
       <link rel="canonical" href="https://www.tacobell.com" />
       <meta property="og:title" content="一个非常重要的标题" />
     </Helmet>
-  );
-};
+  )
+}
 
-export default Meta;
+export default Meta
 
 // server-entry.tsx
-import express from "express";
-import { paretoRequestHandler } from "@paretojs/core/node";
+import express from 'express'
+import { paretoRequestHandler } from '@paretojs/core/node'
 
-const app = express();
+const app = express()
 app.get(
-  "*",
+  '*',
   paretoRequestHandler({
-    pageWrapper: (Page) => {
-      return (props) => (
+    pageWrapper: Page => {
+      return props => (
         <>
           <Meta />
           <Page {...props} />
         </>
-      );
+      )
     },
-  })
-);
+  }),
+)
 ```
 
 pageWrapper 函数的第一个参数是呈现的页面，第二个参数是呈现页面的 getServerSideProps 返回的对象。当您使用第三方状态管理库时，第二个参数非常有用。

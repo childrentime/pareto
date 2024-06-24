@@ -1,8 +1,5 @@
-import { fetchJson } from "../../utils";
+import { fetchJson } from '../../utils'
 
-export const getRecommendsKey = "getRecommends";
+export const getRecommendsKey = 'getRecommends'
 
-export const getRecommends = () => fetchJson("/api/recommends");
-
-
-
+export const getRecommends = () => fetchJson('/api/recommends')

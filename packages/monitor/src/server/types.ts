@@ -1,6 +1,3 @@
-
-
-
 export interface MonitorMiddlewareOptions {
-  showMonitor?: boolean;
+  showMonitor?: boolean
 }

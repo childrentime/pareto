@@ -3,10 +3,10 @@
 
 declare global {
   interface Window {
-      __INITIAL_DATA__: any;
-      __LOCALE__: string;
-      __LOCALE_MESSAGE__: any;
+    __INITIAL_DATA__: any
+    __LOCALE__: string
+    __LOCALE_MESSAGE__: any
   }
 }
 
-export {};
+export {}

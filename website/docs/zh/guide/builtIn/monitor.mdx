@@ -9,51 +9,49 @@ Pareto 内置了性能指标监控功能。在使用 `create-pareto` 创建项�
 在项目根目录下创建或更新 `pareto.config.ts`。
 
 ```ts
-import { ParetoConfig } from "@paretojs/core/config";
+import { ParetoConfig } from '@paretojs/core/config'
 
 const config: ParetoConfig = {
   enableMonitor: true,
-};
+}
 
-export default config;
+export default config
 ```
 
 修改项目根目录下的 `server-entry.tsx` 文件。
 
 ```tsx
-import { createMonitorMiddleware } from "@paretojs/core/node";
-import express from "express";
+import { createMonitorMiddleware } from '@paretojs/core/node'
+import express from 'express'
 
-const app = express();
+const app = express()
 app.use(
   createMonitorMiddleware({
     // 控制是否在前端展示UI
     showMonitor: true,
-  })
-);
+  }),
+)
 ```
 
 修改您的 `app` 目录中任何路由根文件。
 
 ```tsx
-import { report, FirstScreen } from "@paretojs/monitor";
+import { report, FirstScreen } from '@paretojs/monitor'
 
-const Home: ParetoPage<InitialData> = (props) => {
-  const { repositories } = props.initialData;
+const Home: ParetoPage<InitialData> = props => {
+  const { repositories } = props.initialData
 
   useEffect(() => {
-    report().then(console.log);
-  }, []);
+    report().then(console.log)
+  }, [])
 
   return (
     <>
-      <div>
-        ...
-      </div>
+      <div>...</div>
       <FirstScreen />
     </>
-  );
-};
+  )
+}
 ```
 
 ## 结果

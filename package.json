@@ -5,16 +5,46 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "pnpm --filter @paretojs/core build || true"
+    "postinstall": "pnpm --filter @paretojs/core build || true",
+    "lint": "eslint . --quiet  --cache",
+    "lint:fix": "eslint . --fix --quiet --cache",
+    "format": "prettier --cache --check . --ignore-path .gitignore",
+    "format:fix": "prettier --cache --write . --ignore-path .gitignore",
+    "prepare": "husky"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@jsdevtools/version-bump-prompt": "^6.1.0",
+    "@types/eslint": "^8.56.6",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
     "consola": "^3.2.3",
+    "eslint": "^8.57.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "globals": "^15.6.0",
+    "husky": "^9.0.11",
+    "prettier": "^3.2.5",
+    "prettier-plugin-organize-imports": "^3.2.4",
     "ts-node": "^10.9.2",
     "tsup": "^8.0.2",
     "tsx": "^4.11.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "@commitlint/cli": "^19.2.1",
+    "@commitlint/config-conventional": "^19.1.0",
+    "commitlint": "^19.2.1",
+    "lint-staged": "^15.2.7"
+  },
+  "lint-staged": {
+    "*.{js,json}": [
+      "prettier --write"
+    ],
+    "*.ts?(x)": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }

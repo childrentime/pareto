@@ -1,19 +1,19 @@
-import { rspack } from "@rspack/core";
-import { ParetoConfig } from "@paretojs/core/config";
+import type { ParetoConfig } from '@paretojs/core/config'
+import { rspack } from '@rspack/core'
 
 const config: ParetoConfig = {
-  pageDir: "pages",
+  pageDir: 'pages',
   configureRspack(config, { isServer }) {
     if (isServer) {
       config.plugins!.push(
         new rspack.DefinePlugin({
-          "process.env.password": JSON.stringify("password"),
-        })
-      );
+          'process.env.password': JSON.stringify('password'),
+        }),
+      )
     }
-    return config;
+    return config
   },
-  distDir: "dist",
-};
+  distDir: 'dist',
+}
 
-export default config;
+export default config

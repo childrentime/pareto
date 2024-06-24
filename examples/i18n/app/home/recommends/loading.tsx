@@ -1,13 +1,13 @@
-import styles from "./style.module.scss";
-import { Trans } from "@lingui/macro";
+import { Trans } from '@lingui/macro'
+import styles from './style.module.scss'
 
 export const RecommendsSkeleton = () => {
-  const feeds = Array.from({ length: 5 }).fill(0);
+  const feeds = Array.from({ length: 5 }).fill(0)
 
   return (
     <div className={styles.container}>
       <div className={styles.title}>
-        {" "}
+        {' '}
         <Trans>Recommends</Trans>
       </div>
       <div className={styles.list}>
@@ -24,5 +24,5 @@ export const RecommendsSkeleton = () => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}

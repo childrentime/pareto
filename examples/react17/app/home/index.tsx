@@ -1,28 +1,27 @@
-
-import { getRecommends, getRecommendsKey } from "./stream";
-import { fetchJson } from "../../utils";
-import styles from "./style.module.scss";
-import { Recommends } from "./recommends";
-import { RecommendsSkeleton } from "./recommends/loading";
-import { ParetoPage } from "../../types";
-import { mockClientPromise, promiseMap } from "../../stream-helpers";
-import { Suspense } from "../../polyfill";
+import { Suspense } from '../../polyfill'
+import { mockClientPromise, promiseMap } from '../../stream-helpers'
+import type { ParetoPage } from '../../types'
+import { fetchJson } from '../../utils'
+import { Recommends } from './recommends'
+import { RecommendsSkeleton } from './recommends/loading'
+import { getRecommends, getRecommendsKey } from './stream'
+import styles from './style.module.scss'
 
 interface InitialData {
   repositories: {
-    name: string;
-    avatar: string;
-  }[];
+    name: string
+    avatar: string
+  }[]
 }
 
-const Home: ParetoPage<InitialData> = (props) => {
-  const { repositories } = props.initialData;
+const Home: ParetoPage<InitialData> = props => {
+  const { repositories } = props.initialData
 
   return (
     <div className={styles.container}>
       <div className={styles.title}>Repositories</div>
       <div className={styles.repos}>
-        {repositories.map((repo) => (
+        {repositories.map(repo => (
           <div key={repo.name} className={styles.repo}>
             <div>
               <img src={repo.avatar} />
@@ -32,24 +31,24 @@ const Home: ParetoPage<InitialData> = (props) => {
         ))}
       </div>
       {/* @ts-ignore */}
-      <Suspense fallback={<RecommendsSkeleton/>} streamKey={getRecommendsKey}>
+      <Suspense fallback={<RecommendsSkeleton />} streamKey={getRecommendsKey}>
         <Recommends />
       </Suspense>
     </div>
-  );
-};
+  )
+}
 
 Home.getServerSideProps = async () => {
   // stream ssr & init server promise
-  promiseMap.set(getRecommendsKey, getRecommends());
+  promiseMap.set(getRecommendsKey, getRecommends())
   // ssr
-  const repositories = (await fetchJson("/api/repositories")) as InitialData;
-  return repositories;
-};
+  const repositories = (await fetchJson('/api/repositories')) as InitialData
+  return repositories
+}
 
 Home.setUpClient = async () => {
   // mock client promise, it only will be resolved when server data is ready
-  mockClientPromise(getRecommendsKey);
-};
+  mockClientPromise(getRecommendsKey)
+}
 
-export default Home;
+export default Home

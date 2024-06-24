@@ -1,44 +1,43 @@
-import { Configuration } from "@rspack/core";
+import type { Configuration } from '@rspack/core'
 
-import path from "path";
-import babelConfig from "./babel.config";
-import { getServerEntry } from "./entry";
-import rspack from "@rspack/core";
-import { generateCssLoaders, spiltChunks } from "./rspack.base";
-import { APP_PATH } from "../constant";
-import WebpackDemandEntryPlugin from "../cmd/dev/lazy-compiler/plugin";
-import { pageEntries } from "./entry";
-import pageConfig from "./page.config";
-import { __DEV__ } from "../utils/node-env";
-import nodeExternals from "webpack-node-externals";
+import rspack from '@rspack/core'
+import path from 'path'
+import nodeExternals from 'webpack-node-externals'
+import WebpackDemandEntryPlugin from '../cmd/dev/lazy-compiler/plugin'
+import { APP_PATH } from '../constant'
+import { __DEV__ } from '../utils/node-env'
+import babelConfig from './babel.config'
+import { getServerEntry, pageEntries } from './entry'
+import pageConfig from './page.config'
+import { generateCssLoaders, spiltChunks } from './rspack.base'
 
-const cwd = process.cwd();
+const cwd = process.cwd()
 const defaultConfig: Configuration = {
-  mode: __DEV__ ? "development" : "production",
+  mode: __DEV__ ? 'development' : 'production',
   node: false,
   entry: {
-    index: [getServerEntry(), path.resolve(cwd, "./server-entry.tsx")],
+    index: [getServerEntry(), path.resolve(cwd, './server-entry.tsx')],
   },
   target: 'node',
   // @ts-ignore
   externals: [nodeExternals()],
   output: {
     path: APP_PATH,
-    libraryTarget: "commonjs2",
-    chunkFilename: "[id].chunk.js",
+    libraryTarget: 'commonjs2',
+    chunkFilename: '[id].chunk.js',
   },
-  devtool: __DEV__ ? "eval-cheap-module-source-map" : "source-map",
+  devtool: __DEV__ ? 'eval-cheap-module-source-map' : 'source-map',
   module: {
     rules: [
       {
         test: /\.svg$/,
-        type: "asset",
+        type: 'asset',
       },
       {
         test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
         use: {
-          loader: require.resolve("babel-loader"),
+          loader: require.resolve('babel-loader'),
           options: babelConfig(false),
         },
       },
@@ -75,17 +74,17 @@ const defaultConfig: Configuration = {
     minimize: false,
   },
   resolve: {
-    extensions: [".js", ".jsx", ".json", ".mjs", ".wasm", ".ts", ".tsx"],
+    extensions: ['.js', '.jsx', '.json', '.mjs', '.wasm', '.ts', '.tsx'],
   },
   // @ts-ignore
   plugins: [
-    new rspack.ProgressPlugin({ prefix: "server" }),
+    new rspack.ProgressPlugin({ prefix: 'server' }),
     __DEV__ &&
       new WebpackDemandEntryPlugin({
         pageEntries,
       }),
     new rspack.DefinePlugin({
-      'typeof window': JSON.stringify('undefined')
+      'typeof window': JSON.stringify('undefined'),
     }),
   ].filter(Boolean),
   cache: false,
@@ -93,10 +92,10 @@ const defaultConfig: Configuration = {
     css: false,
   },
   ...spiltChunks,
-};
+}
 
 const serverConfig: Configuration = pageConfig.configureRspack!(defaultConfig, {
   isServer: true,
-});
+})
 
-export { serverConfig };
+export { serverConfig }

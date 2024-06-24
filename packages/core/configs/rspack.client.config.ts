@@ -1,38 +1,38 @@
-import AssetsPlugin from "assets-webpack-plugin";
-import babelConfig from "./babel.config";
-import { getClientEntries } from "./entry";
-import rspack, { Configuration } from "@rspack/core";
-import { generateCssLoaders, spiltChunks } from "./rspack.base";
-import WebpackDemandEntryPlugin from "../cmd/dev/lazy-compiler/plugin";
-import { pageEntries } from "./entry";
-import { CLIENT_OUTPUT_PATH } from "../constant";
-import pageConfig from "./page.config";
-import { __DEV__, __ANA__ } from "../utils/node-env";
-import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
+import type { Configuration } from '@rspack/core'
+import rspack from '@rspack/core'
+import AssetsPlugin from 'assets-webpack-plugin'
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
+import WebpackDemandEntryPlugin from '../cmd/dev/lazy-compiler/plugin'
+import { CLIENT_OUTPUT_PATH } from '../constant'
+import { __ANA__, __DEV__ } from '../utils/node-env'
+import babelConfig from './babel.config'
+import { getClientEntries, pageEntries } from './entry'
+import pageConfig from './page.config'
+import { generateCssLoaders, spiltChunks } from './rspack.base'
 
 const defaultConfig: Configuration = {
-  mode: __DEV__ ? "development" : "production",
+  mode: __DEV__ ? 'development' : 'production',
   node: false,
   entry: getClientEntries(),
   output: {
     path: CLIENT_OUTPUT_PATH,
-    filename: "assets/js/[name].bundle.js",
-    chunkFilename: "assets/js/[id].chunk.js",
-    publicPath: "/",
+    filename: 'assets/js/[name].bundle.js',
+    chunkFilename: 'assets/js/[id].chunk.js',
+    publicPath: '/',
   },
-  devtool: __DEV__ ? "eval-cheap-module-source-map" : "source-map",
+  devtool: __DEV__ ? 'eval-cheap-module-source-map' : 'source-map',
   module: {
     rules: [
       {
         test: /\.svg$/,
-        type: "asset",
+        type: 'asset',
       },
       {
         test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
         use: [
           {
-            loader: require.resolve("babel-loader"),
+            loader: require.resolve('babel-loader'),
             options: babelConfig(true),
           },
         ],
@@ -67,7 +67,7 @@ const defaultConfig: Configuration = {
     ],
   },
   resolve: {
-    extensions: [".js", ".jsx", ".json", ".mjs", ".wasm", ".ts", ".tsx"],
+    extensions: ['.js', '.jsx', '.json', '.mjs', '.wasm', '.ts', '.tsx'],
   },
   // @ts-ignore
   plugins: [
@@ -75,7 +75,7 @@ const defaultConfig: Configuration = {
       path: CLIENT_OUTPUT_PATH,
       entrypoints: true,
     }),
-    new rspack.ProgressPlugin({ prefix: "client" }),
+    new rspack.ProgressPlugin({ prefix: 'client' }),
     new rspack.CssExtractRspackPlugin({}),
     __DEV__ &&
       new WebpackDemandEntryPlugin({
@@ -83,11 +83,11 @@ const defaultConfig: Configuration = {
       }),
     __ANA__ && new BundleAnalyzerPlugin(),
     new rspack.DefinePlugin({
-      "typeof window": JSON.stringify("object"),
+      'typeof window': JSON.stringify('object'),
     }),
     !__DEV__ &&
       new rspack.SourceMapDevToolPlugin({
-        filename: "sourcemaps/[file].map",
+        filename: 'sourcemaps/[file].map',
       }),
   ].filter(Boolean),
   cache: false,
@@ -95,10 +95,10 @@ const defaultConfig: Configuration = {
     css: false,
   },
   ...spiltChunks,
-};
+}
 
 const clientConfig: Configuration = pageConfig.configureRspack!(defaultConfig, {
   isServer: false,
-});
+})
 
-export { clientConfig };
+export { clientConfig }

@@ -1,23 +1,23 @@
-import {  promiseMap } from "@paretojs/core";
-import { use } from "react";
-import { getRecommendsKey } from "../stream";
-import styles from "./style.module.scss";
-import { Image } from "../../../utils";
+import { promiseMap } from '@paretojs/core'
+import { use } from 'react'
+import { Image } from '../../../utils'
+import { getRecommendsKey } from '../stream'
+import styles from './style.module.scss'
 
 interface RecommendData {
   feeds: {
-    name: string;
-    avatar: string;
-    time: string;
-    action: string;
-    repositoryName: string;
-    repositoryAvatar: string;
-    desc: string;
-  }[];
+    name: string
+    avatar: string
+    time: string
+    action: string
+    repositoryName: string
+    repositoryAvatar: string
+    desc: string
+  }[]
 }
 
 export function Recommends() {
-  const { feeds }: RecommendData = use(promiseMap.get(getRecommendsKey)!);
+  const { feeds }: RecommendData = use(promiseMap.get(getRecommendsKey)!)
 
   return (
     <div className={styles.container}>
@@ -47,5 +47,5 @@ export function Recommends() {
         ))}
       </div>
     </div>
-  );
+  )
 }

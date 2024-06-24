@@ -14,17 +14,17 @@ const Home: ParetoPage = () => {
     <div>
       <h1>Home</h1>
     </div>
-  );
-};
+  )
+}
 
 Home.getAssets = () => {
   return [
     {
-      type: "image",
-      url: "https://example.com/image.jpg",
+      type: 'image',
+      url: 'https://example.com/image.jpg',
     },
-  ];
-};
+  ]
+}
 ```
 
 The data returned from getAssets will be converted into link tags and inserted into the page. The difference between this and the metadata from `react-async-helmet` is that its dispatch timing will be earlier.

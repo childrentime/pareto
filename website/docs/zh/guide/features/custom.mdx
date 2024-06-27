@@ -1,0 +1,85 @@
+# 自定义页面
+
+有时候，你需要自定义一些页面，比如自定义 404 页面。Pareto 提供了一种简单的方式来实现这个目的。
+
+## 自定义 404 页面
+
+1. 在 `app` 文件夹下创建一个新的路由，例如 `app/notFound/index.tsx`:
+
+```tsx
+import './style.scss'
+
+const NotFound: React.FC = () => {
+  return (
+    <div className="not-found-container">
+      <div className="error-code">404</div>
+      <div className="error-message">Oops! Page not found.</div>
+      <div className="back-link">
+        <a href="/home">Back to Home</a>
+      </div>
+    </div>
+  );
+};
+
+export default NotFound;
+```
+
+2. 创建一个新的样式文件 `app/notFound/style.scss`:
+
+```scss
+.not-found-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.error-code {
+  font-size: 8rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.error-message {
+  margin-top: 20px;
+  font-size: 1.5rem;
+  color: #666;
+}
+
+.back-link {
+  margin-top: 30px;
+}
+
+.back-link a {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+  color: #0056b3;
+}
+```
+
+3. 修改在根目录下的 `server-entry.tsx` 文件:
+
+```tsx
+import { pageRoutes, paretoRequestHandler } from '@paretojs/core/node'
+
+app.get('*', async (req, res) => {
+  const route = req.path.slice(1)
+  if(!pageRoutes.includes(route)) {
+    res.redirect('/notFound');
+    return
+  }
+  const handler = paretoRequestHandler({
+    delay: ABORT_DELAY,
+  })
+
+  await handler(req, res)
+})
+```

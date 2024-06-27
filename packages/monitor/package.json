@@ -1,6 +1,6 @@
 {
   "name": "@paretojs/monitor",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "",
   "exports": {
     "./package.json": "./package.json",
@@ -13,12 +13,9 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/main.js"
       }
-    },
-    "./main.css": "./dist/main.css"
+    }
   },
-  "sideEffects": [
-    "dist/main.css"
-  ],
+  "sideEffects": false,
   "files": [
     "dist",
     "global.d.ts"

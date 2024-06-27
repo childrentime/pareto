@@ -174,7 +174,7 @@ export const paretoRequestHandler =
           dangerouslySetInnerHTML={{
             __html: `window.__INITIAL_DATA__ = JSON.parse('${JSON.stringify(
               // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-              initialData?.getState?.() || initialData,
+              initialData?.getState?.() ?? initialData ?? {},
             )}');`,
           }}
         />

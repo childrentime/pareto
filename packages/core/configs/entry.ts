@@ -12,7 +12,9 @@ import pageConfig from './page.config'
 const cwd = process.cwd()
 const PAGE_DIR = path.resolve(cwd, pageConfig.pageDir ?? 'pages')
 
-const pageEntries: Record<string, string> = fs.readdirSync(PAGE_DIR).reduce(
+const pageRoutes = fs.readdirSync(PAGE_DIR)
+
+const pageEntries: Record<string, string> = pageRoutes.reduce(
   (entry, filename) => {
     const pageEntry = path.resolve(PAGE_DIR, filename, 'index.tsx')
     entry[filename] = pageEntry
@@ -84,4 +86,4 @@ const getClientEntries = () => {
   )
 }
 
-export { getClientEntries, getServerEntry, pageEntries }
+export { getClientEntries, getServerEntry, pageEntries, pageRoutes }

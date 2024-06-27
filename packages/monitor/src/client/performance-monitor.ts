@@ -53,7 +53,9 @@ export class PerformanceMonitor extends BaseMonitor<PerformanceNavigationTiming>
   }
 
   init(): void {
-    const navigationEntry = performance.getEntriesByType('navigation')[0]
+    // @ts-ignore
+    const navigationEntry: PerformanceNavigationTiming =
+      performance.getEntriesByType('navigation')[0]
 
     const dataSource = {} as PerformanceNavigationTiming
     for (const key in navigationEntry) {

@@ -1,0 +1,36 @@
+.not-found-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.error-code {
+  font-size: 8rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.error-message {
+  margin-top: 20px;
+  font-size: 1.5rem;
+  color: #666;
+}
+
+.back-link {
+  margin-top: 30px;
+}
+
+.back-link a {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+  color: #0056b3;
+}

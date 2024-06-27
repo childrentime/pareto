@@ -15,3 +15,9 @@ Integrating stream rendering into an SSR application is a complex process, and u
 For articles about stream rendering, you can refer to <https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming#what-is-streaming> and <https://github.com/reactwg/react-18/discussions/22>.
 
 In essence, stream rendering enhances your FCP (First Contentful Paint) and TTFB (Time to First Byte) metrics compared to traditional SSR. This enhancement is notable as it eliminates the need to stall for all concurrent server responses. Instead, we can selectively "stream" the response with the lengthiest processing time.
+
+## Sponsor Me
+
+If my work has helped you, consider buying me a cup of coffee. Thank you very much🥰!.
+
+[Buy me a coffee](https://www.buymeacoffee.com/lianwenwu)

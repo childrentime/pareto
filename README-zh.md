@@ -22,6 +22,6 @@ Pareto 是一个以流式渲染为核心的 SSR（服务器端渲染）框架。
 如果我的工作对你有帮助，考虑给我买杯咖啡吧，非常感谢！
 
 <p float="left">
-  <img src="https://raw.githubusercontent.com/childrentime/reactuse/main/pay/wechat.jpg" alt="Wechat Pay" width="200" />
-  <img src="https://raw.githubusercontent.com/childrentime/reactuse/main/pay/ali.jpg" alt="Ali Pay" width="200" />
+  <img src="https://d21002cb.images-f3o.pages.dev/images/wechat.jpg" alt="Wechat Pay" width="200" />
+  <img src="https://d21002cb.images-f3o.pages.dev/images/ali.jpg" alt="Ali Pay" width="200" />
 </p>

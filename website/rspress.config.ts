@@ -19,6 +19,9 @@ export default defineConfig({
         content: 'https://github.com/childrentime/pareto',
       },
     ],
+    footer: {
+      message: `© ${new Date().getFullYear()} Paretojs Inc. 备案号鄂ICP备2023017842号: https://beian.miit.gov.cn/`,
+    },
   },
   lang: 'en',
   locales: [

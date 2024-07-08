@@ -1,7 +1,27 @@
 {
   "name": "@paretojs/core",
-  "version": "1.0.3",
-  "description": "",
+  "version": "1.0.4",
+  "homepage": "https://paretojs.tech/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/childrentime/pareto.git",
+    "directory": "packages/core"
+  },
+  "keywords": [
+    "react",
+    "meta",
+    "ssr",
+    "server side rendering",
+    "streamed ssr",
+    "streamed server side rendering",
+    "node.js",
+    "express",
+    "react server"
+  ],
+  "description": "lightweight streamed ssr framework",
+  "bugs": {
+    "url": "https://github.com/childrentime/pareto/issues"
+  },
   "files": [
     "dist",
     "env.d.ts",

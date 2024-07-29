@@ -20,7 +20,7 @@ export default defineConfig({
       },
     ],
     footer: {
-      message: `© ${new Date().getFullYear()} Paretojs Inc. 备案号鄂ICP备2023017842号: https://beian.miit.gov.cn/`,
+      message: `© ${new Date().getFullYear()} Paretojs Inc. <a href="https://beian.miit.gov.cn/" target="_blank">备案号鄂ICP备2023017842号</a>`,
     },
   },
   lang: 'en',

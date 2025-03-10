@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express'
+import type { JSX } from 'react'
 
 interface Asset {
   type: string

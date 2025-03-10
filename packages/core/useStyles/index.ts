@@ -24,7 +24,7 @@ const StyleContext = createContext<{
   insertCss: null,
 })
 
-// @ts-ignore
+// @ts-expect-error ignore
 const isBrowser = (() => this && typeof this.window === 'object')()
 
 function useStyles(...styles: any[]) {
@@ -36,7 +36,9 @@ function useStyles(...styles: any[]) {
   const runEffect = () => {
     const removeCss = insertCss(styles as unknown as ISOStyle[])
     return () => {
-      removeCss && setTimeout(removeCss, 0)
+      if (removeCss) {
+        setTimeout(removeCss, 0)
+      }
     }
   }
   if (isBrowser) {

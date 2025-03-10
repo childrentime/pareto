@@ -1,5 +1,6 @@
 import { FirstPaint, PageStart } from '@paretojs/monitor'
 import type { Request, Response } from 'express'
+import type { JSX } from 'react'
 import { renderToPipeableStream, renderToStaticMarkup } from 'react-dom/server'
 import { HelmetProvider } from 'react-helmet-async'
 import { Transform } from 'stream'
@@ -48,7 +49,6 @@ export const criticalPageWrapper = (props: {
 
   return {
     page: props => (
-      // @ts-ignore react19
       <StyleProvider value={{ insertCss }}>
         <Page {...props} />
       </StyleProvider>
@@ -81,7 +81,7 @@ export const paretoRequestHandler =
     const __csr = req.query.__csr
     const isCsr = !!__csr && enableSpa
     const path = req.path.slice(1)
-    // eslint-disable-next-line @typescript-eslint/unbound-method
+
     const mark = enableMonitor ? req.monitor.mark : noop
 
     if (!pageEntries[path]) {
@@ -104,7 +104,7 @@ export const paretoRequestHandler =
       return <link rel="stylesheet" href={css} type="text/css" key={css} />
     })
 
-    const pageAssets = !isCsr ? (Page as ParetoPage).getAssets?.() ?? [] : []
+    const pageAssets = !isCsr ? ((Page as ParetoPage).getAssets?.() ?? []) : []
 
     const renderHeader = () => {
       return renderToStaticMarkup(

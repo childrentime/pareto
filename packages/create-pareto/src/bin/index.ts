@@ -177,9 +177,9 @@ async function main() {
 
   // -----------------------------------------------------------------------------------
   const manager = process.env.npm_config_user_agent ?? ''
-  const packageManager = /pnpm/.test(manager)
+  const packageManager = manager.includes('pnpm')
     ? 'pnpm'
-    : /yarn/.test(manager)
+    : manager.includes('yarn')
       ? 'yarn'
       : 'npm'
 

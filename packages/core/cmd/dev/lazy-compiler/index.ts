@@ -78,6 +78,7 @@ const createDemandEntryMiddleware = ({
       await compiledPromise[name]
 
       next()
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       next()
     }

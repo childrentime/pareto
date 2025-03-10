@@ -1,3 +1,4 @@
+import type { Configuration } from '@rspack/core'
 import rspack from '@rspack/core'
 import { __DEV__ } from '../utils/node-env'
 
@@ -59,7 +60,7 @@ const generateCssLoaders = (
   return loaders
 }
 
-const spiltChunks: rspack.Configuration = {
+const spiltChunks: Configuration = {
   optimization: __DEV__
     ? {}
     : {

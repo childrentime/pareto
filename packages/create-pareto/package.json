@@ -1,6 +1,6 @@
 {
   "name": "create-pareto",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "type": "module",
   "description": "pareto template generator",
   "author": "childrentime",
@@ -15,7 +15,7 @@
     "templates"
   ],
   "scripts": {
-    "templates": "rsync -av --progress ../../examples/ templates --exclude node_modules --exclude .pareto",
+    "templates": "tsx scripts/template.ts",
     "build": "tsup src/bin/index.ts",
     "start": "pnpm build && node index.js",
     "release:prepare": "bump",
@@ -30,7 +30,9 @@
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^16",
-    "@types/prompts": "^2.4.9"
+    "@types/prompts": "^2.4.9",
+    "js-yaml": "^4.1.0"
   }
 }

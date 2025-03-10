@@ -10,7 +10,7 @@ execSync('npm run templates', { stdio: 'inherit' })
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-let command = 'npm publish --access public'
+let command = 'pnpm publish --access public --no-git-checks'
 
 if (version.includes('beta')) {
   command += ' --tag beta'

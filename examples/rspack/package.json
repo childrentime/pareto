@@ -28,5 +28,10 @@
     "edge >= 88",
     "firefox >= 78",
     "safari >= 14"
-  ]
+  ],
+  "overrides": {
+    "react-helmet-async": {
+      "react": "^16.8.0 || ^17 || ^18 || ^19"
+    }
+  }
 }

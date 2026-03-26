@@ -1,0 +1,55 @@
+---
+title: Blog
+description: News, releases, and technical deep-dives from the Pareto team.
+template: splash
+---
+
+<div class="blog-list">
+
+<article class="blog-entry">
+
+### [Pareto 3.0](/blog/pareto-3/)
+
+Pareto 3.0 is here — rebuilt on Vite 7, upgraded to React 19, with a streamlined API and better developer experience.
+
+<span class="blog-date">March 26, 2026</span>
+
+</article>
+
+</div>
+
+<style>{`
+  .blog-list {
+    max-width: 42rem;
+    padding: 3rem 0;
+  }
+  .blog-entry {
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--pareto-divider, #292524);
+  }
+  .blog-entry:first-child {
+    padding-top: 0;
+  }
+  .blog-entry h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .blog-entry h3 a {
+    color: var(--sl-color-white);
+    text-decoration: none;
+  }
+  .blog-entry h3 a:hover {
+    color: var(--sl-color-accent);
+  }
+  .blog-entry p {
+    color: var(--sl-color-gray-3);
+    line-height: 1.6;
+    margin: 0 0 0.75rem;
+  }
+  .blog-date {
+    font-size: 0.8125rem;
+    color: var(--sl-color-gray-3);
+  }
+`}</style>

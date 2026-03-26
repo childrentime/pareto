@@ -11,7 +11,7 @@ const shouldRenderSearch =
 	config.pagefind || config.components.Search !== '@astrojs/starlight/components/Search.astro';
 
 const { locale } = Astro.locals.starlightRoute;
-const blogHref = locale === 'zh' ? '/zh/blog/pareto-3/' : '/blog/pareto-3/';
+const blogHref = locale === 'zh' ? '/zh/blog/' : '/blog/';
 ---
 
 <div class="header">

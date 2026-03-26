@@ -1,6 +1,6 @@
 {
   "name": "@paretojs/core",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "homepage": "https://paretojs.tech/",
   "repository": {
     "type": "git",
@@ -21,7 +21,9 @@
     "url": "https://github.com/childrentime/pareto/issues"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE.txt"
   ],
   "type": "commonjs",
   "exports": {

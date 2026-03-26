@@ -6,8 +6,6 @@ import path from 'node:path'
 import * as process from 'node:process'
 import prompts from 'prompts'
 
-// check if the package name is valid
-// unValid package name: MyProject | @my-scope/ | -my-project
 function isValidPackageName(projectName: string): boolean {
   return /^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/.test(
     projectName,
@@ -25,13 +23,7 @@ function toValidPackageName(projectName: string) {
 
 function canSafelyOverwrite(dir: string): boolean {
   const directoryExists = existsSync(dir)
-
-  if (!directoryExists) {
-    return true
-  }
-
-  // the file exists, but is it empty?
-  // when it's empty, we can safely overwrite it.
+  if (!directoryExists) return true
   return readdirSync(dir).length === 0
 }
 
@@ -39,14 +31,11 @@ async function main() {
   let targetDir = ''
   const defaultProjectName = 'pareto-project'
 
-  // from ./dist
   const templateRoot = path.join(__dirname, '../templates')
-  const CHOICES = readdirSync(templateRoot)
 
   let result: {
     packageName: string
     shouldOverwrite: string
-    chooseProject: string
   }
 
   try {
@@ -83,41 +72,6 @@ async function main() {
           validate: (dir: string) =>
             isValidPackageName(dir) || 'Invalid package.json name',
         },
-        {
-          name: 'chooseProject',
-          type: 'select',
-          message: 'Choose a project template',
-          choices: [
-            {
-              title: 'base-template',
-              value: CHOICES.find(c => c.includes('base')),
-            },
-            {
-              title: 'mobx-template',
-              value: CHOICES.find(c => c.includes('mobx')),
-            },
-            {
-              title: 'spa-template',
-              value: CHOICES.find(c => c.includes('spa')),
-            },
-            {
-              title: 'tailwindcss-template',
-              value: CHOICES.find(c => c.includes('tailwind')),
-            },
-            {
-              title: 'zustand-template',
-              value: CHOICES.find(c => c.includes('zustand')),
-            },
-            {
-              title: 'monitor-template',
-              value: CHOICES.find(c => c.includes('monitor')),
-            },
-            {
-              title: 'i18n-template',
-              value: CHOICES.find(c => c.includes('i18n')),
-            },
-          ],
-        },
       ],
       {
         onCancel: () => {
@@ -132,16 +86,12 @@ async function main() {
     process.exit(1)
   }
 
-  const { packageName, shouldOverwrite, chooseProject } = result
-
+  const { packageName, shouldOverwrite } = result
   const root = path.resolve(targetDir)
 
-  // shouldOverwrite === undefined means folder doesn't exist.
-  // shouldOverwrite === true means folder exists, and it can be safely overwritten.
   if (shouldOverwrite) {
     await fse.emptyDir(root)
   } else if (!existsSync(root)) {
-    // if the folder doesn't exist, create it
     await fsPromises.mkdir(root, { recursive: true })
   }
 
@@ -152,8 +102,7 @@ async function main() {
 
   console.log('Setting up project ...')
 
-  // -----------------------------------------------------------------------------------
-  const templateDir = path.join(templateRoot, chooseProject)
+  const templateDir = path.join(templateRoot, 'app')
   const packageJsonPath = path.join(root, 'package.json')
   const templatePackageJsonPath = path.join(templateDir, 'package.json')
 
@@ -175,7 +124,6 @@ async function main() {
     ),
   )
 
-  // -----------------------------------------------------------------------------------
   const manager = process.env.npm_config_user_agent ?? ''
   const packageManager = manager.includes('pnpm')
     ? 'pnpm'

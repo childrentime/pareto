@@ -1,0 +1,39 @@
+---
+import { Code } from 'astro:components';
+
+const exampleCode = `import { defer } from '@paretojs/core'
+import { Await, useLoaderData } from '@paretojs/core/client'
+import { Suspense } from 'react'
+
+export const loader = async () => {
+  return defer({
+    posts: fetchPosts(),
+  })
+}
+
+export default function Home() {
+  const { posts } = useLoaderData()
+
+  return (
+    <Suspense fallback={<PostsSkeleton />}>
+      <Await resolve={posts}>
+        {(data) => <PostList posts={data} />}
+      </Await>
+    </Suspense>
+  )
+}`;
+---
+
+<section class="code-section">
+  <h2 class="landing-heading">Simple by design</h2>
+  <p class="landing-subtitle">A streaming page with data loading — in 20 lines. No magic, no hidden abstractions.</p>
+  <div class="code-frame">
+    <div class="code-frame-tab">
+      <span class="code-frame-dot" aria-hidden="true"></span>
+      <span class="code-frame-dot" aria-hidden="true"></span>
+      <span class="code-frame-dot" aria-hidden="true"></span>
+      <span style="margin-left: 0.5rem;">app/home/page.tsx</span>
+    </div>
+    <Code code={exampleCode} lang="tsx" theme="github-dark-dimmed" />
+  </div>
+</section>

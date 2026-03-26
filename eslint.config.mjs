@@ -74,6 +74,9 @@ export default [
       '**/build/**',
       '**/coverage/**',
       '**/dist-bin/**',
+      '**/__tests__/**',
+      '**/e2e/**',
+      '**/playwright.config.*',
     ]
   },
   {

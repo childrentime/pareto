@@ -3,3 +3,8 @@ dist
 .pareto
 templates
 dist-bin
+
+# Environment variables
+.env
+.env.local
+.env.*.local

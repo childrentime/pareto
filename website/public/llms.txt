@@ -1,0 +1,31 @@
+# Pareto
+
+> Lightweight React SSR framework with streaming, file-based routing, and built-in state management.
+
+Pareto is an open-source React server-side rendering framework built on Vite 7. It provides SSR with streaming via defer() and Suspense, file-based routing (page.tsx, layout.tsx, error.tsx, head.tsx conventions), built-in state management powered by Immer, SSG support, error boundaries, redirect/404 handling, resource routes for JSON APIs, and per-route head management.
+
+## Key APIs
+
+- `useLoaderData()` — Access data from the route's loader function
+- `defer({ sync, async: promise })` — Return deferred data for streaming
+- `<Await resolve={promise} fallback={<Skeleton />}>` — Render streamed data
+- `defineStore((set) => ({ ... }))` — Create reactive stores with Immer mutations
+- `throw redirect('/path')` — Redirect in loaders
+- `throw notFound()` — Trigger 404 in loaders
+- `export const config = { render: 'static' }` — Mark page for SSG
+
+## File Conventions
+
+- `page.tsx` — Route component
+- `layout.tsx` — Wrapping layout (nests)
+- `error.tsx` — Error boundary (bubbles up)
+- `head.tsx` — Per-route title and meta tags
+- `not-found.tsx` — 404 page
+- `route.ts` — Resource route (JSON API, no HTML)
+- `loading.tsx` — Loading skeleton fallback
+
+## Links
+
+- Documentation: https://paretojs.dev
+- GitHub: https://github.com/childrentime/pareto
+- npm: https://www.npmjs.com/package/@paretojs/core

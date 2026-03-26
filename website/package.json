@@ -1,16 +1,18 @@
 {
-  "name": "rspress-doc-template",
-  "version": "1.0.0",
-  "private": true,
+  "name": "website-new",
+  "type": "module",
+  "version": "0.0.1",
   "scripts": {
-    "dev": "rspress dev",
-    "build": "rspress build",
-    "preview": "rspress preview"
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
   },
   "dependencies": {
-    "rspress": "^1.26.3"
-  },
-  "devDependencies": {
-    "@types/node": "^16"
+    "@astrojs/starlight": "^0.38.2",
+    "@fontsource-variable/dm-sans": "^5.2.8",
+    "astro": "^6.0.1",
+    "sharp": "^0.34.2"
   }
 }

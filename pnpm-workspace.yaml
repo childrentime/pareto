@@ -1,6 +1,6 @@
 packages:
   - 'packages/*'
-  - 'examples/*'
+  - 'examples'
   - 'benchmarks/*'
   - 'website'
   - '!examples/react18'

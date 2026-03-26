@@ -1,0 +1,139 @@
+---
+const PAGE_TITLE_ID = '_top';
+const { data } = Astro.locals.starlightRoute.entry;
+const { title = data.title, tagline, actions = [] } = data.hero || {};
+---
+
+<div class="hero">
+  <div class="hero-inner">
+    <span class="hero-badge">
+      <span class="hero-badge-dot" aria-hidden="true"></span>
+      React SSR Framework
+    </span>
+    <h1 id={PAGE_TITLE_ID} data-page-title set:html={title} />
+    {tagline && <p class="hero-tagline" set:html={tagline} />}
+    {actions.length > 0 && (
+      <div class="hero-actions">
+        {actions.map(({ link: href, text, variant }) => (
+          <a href={href} class:list={['hero-btn', variant || 'primary']}>
+            {text}
+            {variant === 'minimal' && <span class="hero-arrow" aria-hidden="true">&rarr;</span>}
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</div>
+
+<style>
+  .hero {
+    padding: 6rem 0 5rem;
+  }
+
+  .hero-inner {
+    max-width: var(--sl-content-width);
+  }
+
+  /* Badge */
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--pareto-orange);
+    margin-bottom: 2rem;
+    padding: 0.375rem 0.875rem 0.375rem 0.625rem;
+    background: var(--pareto-orange-subtle);
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--pareto-orange) 20%, transparent);
+  }
+
+  .hero-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--pareto-orange);
+    flex-shrink: 0;
+  }
+
+  /* Title */
+  h1 {
+    font-family: var(--sl-font-display, Georgia, serif);
+    font-style: italic;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    line-height: 0.95;
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    color: var(--sl-color-white);
+    margin: 0 0 2rem;
+    max-width: 16ch;
+  }
+
+  /* Tagline */
+  .hero-tagline {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--sl-color-gray-3);
+    max-width: 40rem;
+    margin: 0 0 2.5rem;
+  }
+
+  /* Actions */
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+  }
+
+  /* Primary button */
+  .hero-btn.primary {
+    padding: 0.75rem 1.5rem;
+    background: var(--sl-color-white);
+    color: var(--sl-color-black);
+  }
+
+  .hero-btn.primary:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
+  }
+
+  /* Secondary / minimal button */
+  .hero-btn.minimal {
+    padding: 0.75rem 0;
+    color: var(--sl-color-gray-2);
+  }
+
+  .hero-btn.minimal:hover {
+    color: var(--sl-color-white);
+  }
+
+  .hero-arrow {
+    transition: transform 0.2s ease;
+  }
+
+  .hero-btn.minimal:hover .hero-arrow {
+    transform: translateX(4px);
+  }
+
+  /* Responsive */
+  @media (min-width: 50rem) {
+    .hero {
+      padding: 8rem 0 6rem;
+    }
+  }
+</style>

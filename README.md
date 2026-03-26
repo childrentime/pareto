@@ -1,23 +1,99 @@
 # Pareto
 
-[中文版](./README-zh.md)
+Lightweight React SSR framework with streaming, file-based routing, and built-in state management.
 
-Pareto is an SSR (Server Side Rendering) framework centered on stream rendering. Its goal is not to be a full-stack framework like `next.js` or `remix`, but to enhance regular SSR applications.
+## Quick Start
 
-You can use `pareto` directly to create a new application, or you can refer to this [template](./examples/base/) to support stream rendering for your own SSR application.
+```bash
+npx create-pareto my-app
+cd my-app
+npm install
+npm run dev
+```
 
-## Purpose
+Or with pnpm:
 
-Integrating stream rendering into an SSR application is a complex process, and unfortunately, there are no good practices to tell us how to integrate stream rendering. For instance, `next.js` simply binds `server component` and stream rendering together, while `remix` also requires using its custom `defer` and `loader` logic.
+```bash
+pnpm create pareto my-app
+```
 
-### About Stream Rendering
+## Features
 
-For articles about stream rendering, you can refer to <https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming#what-is-streaming> and <https://github.com/reactwg/react-18/discussions/22>.
+- **SSR & Streaming** — Server-render pages instantly. Use `defer()` to stream slow data through Suspense boundaries.
+- **File-Based Routing** — `page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `head.tsx`, `not-found.tsx` conventions.
+- **SSG** — Export `config = { render: 'static' }` to pre-render pages at build time.
+- **State Management** — Reactive stores powered by Immer. `defineStore()` with server/client serialization.
+- **Error Boundaries** — `error.tsx` catches loader and render errors automatically.
+- **Redirect & 404** — `throw redirect('/login')` and `throw notFound()` in loaders.
+- **Resource Routes** — `route.ts` files return JSON directly (no HTML).
+- **Head Management** — Per-route `<title>` and meta tags via `head.tsx`. Nested heads merge automatically.
 
-In essence, stream rendering enhances your FCP (First Contentful Paint) and TTFB (Time to First Byte) metrics compared to traditional SSR. This enhancement is notable as it eliminates the need to stall for all concurrent server responses. Instead, we can selectively "stream" the response with the lengthiest processing time.
+## Project Structure
 
-## Sponsor Me
+```
+app/
+  layout.tsx          # Root layout (wraps all pages)
+  page.tsx            # Homepage (/)
+  head.tsx            # Root head tags
+  error.tsx           # Global error boundary
+  not-found.tsx       # 404 page
+  stream/
+    page.tsx          # /stream
+    head.tsx
+  store/
+    page.tsx          # /store
+  api/time/
+    route.ts          # /api/time (JSON endpoint)
+```
 
-If my work has helped you, consider buying me a cup of coffee. Thank you very much🥰!.
+## Loader & Streaming
 
-[Buy me a coffee](https://www.buymeacoffee.com/lianwenwu)
+```tsx
+import { defer, useLoaderData, Await } from '@paretojs/core'
+
+export function loader() {
+  const stats = await db.getStats()
+  return defer({
+    stats,                        // available immediately
+    feed: db.getFeed(),           // streams later
+    comments: db.getComments(),   // streams later
+  })
+}
+
+export default function Page() {
+  const { stats, feed } = useLoaderData()
+  return (
+    <div>
+      <h1>{stats.total} items</h1>
+      <Await resolve={feed} fallback={<Skeleton />}>
+        {(data) => <Feed items={data} />}
+      </Await>
+    </div>
+  )
+}
+```
+
+## State Management
+
+```tsx
+import { defineStore } from '@paretojs/core/store'
+
+const counterStore = defineStore((set) => ({
+  count: 0,
+  increment: () => set((draft) => { draft.count++ }),
+}))
+
+// Use anywhere — supports direct destructuring
+const { count, increment } = counterStore.useStore()
+```
+
+## Build & Deploy
+
+```bash
+pareto build    # Build for production
+pareto start    # Start production server
+```
+
+## License
+
+MIT

@@ -5,7 +5,6 @@ import { load } from 'js-yaml'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-// Get current file directory
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -22,14 +21,26 @@ interface PackageJson {
   [key: string]: any
 }
 
-// First, run the rsync command
-console.log('Running rsync to copy examples to templates...')
+// Copy the v3 example app into templates/app
+console.log('Copying example app to templates/app...')
+
+const templatesDir = path.resolve(__dirname, '..', 'templates')
+const appTemplateDir = path.join(templatesDir, 'app')
+
+// Clean and recreate
+if (fs.existsSync(templatesDir)) {
+  fs.rmSync(templatesDir, { recursive: true })
+}
+fs.mkdirSync(appTemplateDir, { recursive: true })
+
+// rsync the example app (excluding node_modules, .pareto, test-results, e2e)
 execSync(
-  'rsync -av --progress ../../examples/ templates --exclude node_modules --exclude .pareto',
-  { stdio: 'inherit' },
+  'rsync -av --progress ../../examples/ templates/app ' +
+    '--exclude node_modules --exclude .pareto --exclude test-results --exclude e2e ' +
+    '--exclude playwright.config.ts --exclude "*.spec.ts" --exclude skills-lock.json --exclude public',
+  { stdio: 'inherit', cwd: path.resolve(__dirname, '..') },
 )
 
-// Read catalog configuration from pnpm-workspace.yaml
 function readCatalogVersions(): CatalogConfig {
   try {
     const rootDir = path.resolve(__dirname, '../../..')
@@ -44,17 +55,12 @@ function readCatalogVersions(): CatalogConfig {
       catalog?: CatalogConfig
     }
     if (!workspaceYaml || !workspaceYaml.catalog) {
-      console.warn(
-        'Warning: catalog configuration not found in pnpm-workspace.yaml',
-      )
+      console.warn('Warning: catalog configuration not found in pnpm-workspace.yaml')
       return {}
     }
 
-    console.log(
-      'Read the following catalog configuration from pnpm-workspace.yaml:',
-    )
+    console.log('Read catalog configuration from pnpm-workspace.yaml:')
     console.log(workspaceYaml.catalog)
-
     return workspaceYaml.catalog || {}
   } catch (error) {
     console.error('Error reading catalog configuration:', error)
@@ -62,7 +68,6 @@ function readCatalogVersions(): CatalogConfig {
   }
 }
 
-// Read version information from all workspace packages
 function readWorkspacePackageVersions(): CatalogConfig {
   try {
     const rootDir = path.resolve(__dirname, '../../..')
@@ -76,12 +81,9 @@ function readWorkspacePackageVersions(): CatalogConfig {
     console.log('Reading package versions from packages directory...')
     const packageVersions: CatalogConfig = {}
 
-    // Read package.json from all subdirectories in the packages directory
     const packages = fs.readdirSync(packagesDir)
-
     packages.forEach(pkg => {
       const packageJsonPath = path.join(packagesDir, pkg, 'package.json')
-
       if (fs.existsSync(packageJsonPath)) {
         try {
           const packageJson = JSON.parse(
@@ -93,10 +95,7 @@ function readWorkspacePackageVersions(): CatalogConfig {
           }
         } catch (err) {
           if (err instanceof Error) {
-            console.warn(
-              `  - Error processing ${packageJsonPath}:`,
-              err.message,
-            )
+            console.warn(`  - Error processing ${packageJsonPath}:`, err.message)
           }
         }
       }
@@ -109,7 +108,6 @@ function readWorkspacePackageVersions(): CatalogConfig {
   }
 }
 
-// Process package.json files
 function processPackageJson(
   filePath: string,
   catalogVersions: CatalogConfig,
@@ -118,98 +116,68 @@ function processPackageJson(
   console.log(`Processing ${filePath}...`)
 
   try {
-    // Read the file
     const packageJson = JSON.parse(
       fs.readFileSync(filePath, 'utf8'),
     ) as PackageJson
     let modified = false
 
-    // Process dependencies
-    ;['dependencies', 'devDependencies', 'peerDependencies'].forEach(
-      depType => {
-        const deps = packageJson[depType as keyof PackageJson] as
-          | Record<string, string>
-          | undefined
+    ;['dependencies', 'devDependencies', 'peerDependencies'].forEach(depType => {
+      const deps = packageJson[depType as keyof PackageJson] as
+        | Record<string, string>
+        | undefined
 
-        if (deps) {
-          Object.keys(deps).forEach(dep => {
-            const version = deps[dep]
+      if (deps) {
+        Object.keys(deps).forEach(dep => {
+          const version = deps[dep]
 
-            // Replace catalog: dependencies
-            if (version === 'catalog:') {
-              // Check if defined in catalog
-              if (catalogVersions[dep]) {
-                deps[dep] = catalogVersions[dep]
-                console.log(
-                  `  - Replaced ${dep}: ${version} with ${catalogVersions[dep]} (from catalog)`,
-                )
-                modified = true
-              } else {
-                // If not defined in catalog, try to get latest version from npm
-                try {
-                  const latestVersion = execSync(`npm view ${dep} version`, {
-                    encoding: 'utf8',
-                  }).trim()
-                  deps[dep] = `^${latestVersion}`
-                  console.log(
-                    `  - Replaced ${dep}: ${version} with ^${latestVersion} (from npm, not defined in catalog)`,
-                  )
-                } catch (error) {
-                  // If npm view fails, use 'latest'
-                  deps[dep] = 'latest'
-                  console.log(
-                    `  - Replaced ${dep}: ${version} with latest (fallback, not defined in catalog)`,
-                  )
-                }
-                modified = true
+          if (version === 'catalog:') {
+            if (catalogVersions[dep]) {
+              deps[dep] = catalogVersions[dep]
+              console.log(`  - Replaced ${dep}: ${version} with ${catalogVersions[dep]} (from catalog)`)
+            } else {
+              try {
+                const latestVersion = execSync(`npm view ${dep} version`, { encoding: 'utf8' }).trim()
+                deps[dep] = `^${latestVersion}`
+                console.log(`  - Replaced ${dep}: ${version} with ^${latestVersion} (from npm)`)
+              } catch {
+                deps[dep] = 'latest'
+                console.log(`  - Replaced ${dep}: ${version} with latest (fallback)`)
               }
             }
-
-            // Replace workspace:* dependencies
-            else if (version === 'workspace:*') {
-              // Check if defined in workspace packages
-              if (packageVersions[dep]) {
-                deps[dep] = `^${packageVersions[dep]}`
-                console.log(
-                  `  - Replaced ${dep}: ${version} with ^${packageVersions[dep]} (from workspace package)`,
-                )
-                modified = true
-              } else {
-                // If not defined in workspace packages, try to get latest version from npm
-                try {
-                  const latestVersion = execSync(`npm view ${dep} version`, {
-                    encoding: 'utf8',
-                  }).trim()
-                  deps[dep] = `^${latestVersion}`
-                  console.log(
-                    `  - Replaced ${dep}: ${version} with ^${latestVersion} (from npm, not found in workspace)`,
-                  )
-                } catch (error) {
-                  // If npm view fails, use 'latest'
-                  deps[dep] = 'latest'
-                  console.log(
-                    `  - Replaced ${dep}: ${version} with latest (fallback, not found in workspace)`,
-                  )
-                }
-                modified = true
+            modified = true
+          } else if (version === 'workspace:*') {
+            if (packageVersions[dep]) {
+              deps[dep] = `^${packageVersions[dep]}`
+              console.log(`  - Replaced ${dep}: ${version} with ^${packageVersions[dep]} (from workspace)`)
+            } else {
+              try {
+                const latestVersion = execSync(`npm view ${dep} version`, { encoding: 'utf8' }).trim()
+                deps[dep] = `^${latestVersion}`
+                console.log(`  - Replaced ${dep}: ${version} with ^${latestVersion} (from npm)`)
+              } catch {
+                deps[dep] = 'latest'
+                console.log(`  - Replaced ${dep}: ${version} with latest (fallback)`)
               }
             }
+            modified = true
+          } else if (version.startsWith('workspace:')) {
+            const actualVersion = version.replace('workspace:', '')
+            deps[dep] = actualVersion
+            console.log(`  - Replaced ${dep}: ${version} with ${actualVersion}`)
+            modified = true
+          }
+        })
+      }
+    })
 
-            // Replace other workspace: prefixed dependencies
-            else if (version.startsWith('workspace:')) {
-              const actualVersion = version.replace('workspace:', '')
-              deps[dep] = actualVersion
-              console.log(
-                `  - Replaced ${dep}: ${version} with ${actualVersion}`,
-              )
-              modified = true
-            }
-          })
-        }
-      },
-    )
+    // Remove e2e / playwright devDependencies and scripts from template
+    if (packageJson.devDependencies) {
+      delete packageJson.devDependencies['@playwright/test']
+    }
+    if (packageJson.scripts) {
+      delete (packageJson.scripts as Record<string, string>)['test:e2e']
+    }
 
-    // Write the file back if modified
     if (modified) {
       fs.writeFileSync(filePath, JSON.stringify(packageJson, null, 2) + '\n')
       console.log(`  - Updated ${filePath}`)
@@ -221,7 +189,6 @@ function processPackageJson(
   }
 }
 
-// Find all package.json files in the templates directory
 function findPackageJsonFiles(dir: string): string[] {
   const results: string[] = []
   const list = fs.readdirSync(dir)
@@ -229,9 +196,7 @@ function findPackageJsonFiles(dir: string): string[] {
   list.forEach(file => {
     const filePath = path.join(dir, file)
     const stat = fs.statSync(filePath)
-
     if (stat.isDirectory()) {
-      // Recursively search directories
       results.push(...findPackageJsonFiles(filePath))
     } else if (file === 'package.json') {
       results.push(filePath)
@@ -241,7 +206,6 @@ function findPackageJsonFiles(dir: string): string[] {
   return results
 }
 
-// Main execution flow
 ;(async function main() {
   console.log('Reading catalog version configuration...')
   const catalogVersions = readCatalogVersions()
@@ -250,8 +214,7 @@ function findPackageJsonFiles(dir: string): string[] {
   const packageVersions = readWorkspacePackageVersions()
 
   console.log('Finding and processing package.json files...')
-  const templateDir = path.join(process.cwd(), 'templates')
-  const packageJsonFiles = findPackageJsonFiles(templateDir)
+  const packageJsonFiles = findPackageJsonFiles(templatesDir)
 
   console.log(`Found ${packageJsonFiles.length} package.json files to process`)
   packageJsonFiles.forEach(file =>

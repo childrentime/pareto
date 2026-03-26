@@ -1,0 +1,43 @@
+---
+title: 轻量级 React SSR
+description: SSR、流式渲染、基于文件的路由、状态管理 — 构建快速 React 应用所需的一切，没有多余的东西。
+template: splash
+hero:
+  tagline: SSR、流式渲染、基于文件的路由和内置状态管理。由 Vite 7 驱动。构建快速 React 应用所需的一切，没有多余的东西。
+  actions:
+    - text: 快速开始
+      link: /zh/guides/quick-start/
+      icon: right-arrow
+    - text: 在 GitHub 上查看
+      link: https://github.com/childrentime/pareto
+      icon: external
+      variant: minimal
+---
+
+## 为什么选择 Pareto
+
+如果你使用过 Next.js 或 Remix，你已经熟悉这些模式了。Pareto 使用相同的约定，但去除了复杂性。
+
+### 无 Server Components
+
+只有普通的 React 组件加上数据 loader。没有服务端和客户端之间的心智模型割裂。
+
+### 无框架锁定
+
+标准的 Express 服务器，标准的 Vite 构建。你的代码保持可移植性。
+
+### 开箱即用的流式渲染
+
+`defer()` 和 `<Await>` 通过 Suspense 边界实现渐进式数据加载 — 不再有全页面的加载动画。
+
+### 内置状态管理
+
+`defineStore()` 配合 Immer 变更和自动的服务端/客户端序列化。无需额外依赖。
+
+### 基于文件的路由
+
+`page.tsx`、`layout.tsx`、`head.tsx`、`loader.ts` — 你已经熟悉的约定。
+
+### 静态站点生成
+
+在任意页面导出 `config = { render: 'static' }`。零配置的静态生成。

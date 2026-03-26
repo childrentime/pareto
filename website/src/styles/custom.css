@@ -1,0 +1,382 @@
+/* ==========================================================================
+   Pareto — Premium documentation theme
+   Warm stone palette · Burnt orange accent · Editorial typography
+   ========================================================================== */
+
+/* ---------- 1. DARK MODE TOKENS ---------- */
+:root,
+::backdrop {
+  /* Gray scale: warm stone */
+  --sl-color-white: #fafaf9;
+  --sl-color-gray-1: #e7e5e4;
+  --sl-color-gray-2: #a8a29e;
+  --sl-color-gray-3: #78716c;
+  --sl-color-gray-4: #44403c;
+  --sl-color-gray-5: #292524;
+  --sl-color-gray-6: #1c1917;
+  --sl-color-black: #0c0a09;
+
+  /* Accent: burnt orange */
+  --sl-color-accent-low: #431407;
+  --sl-color-accent: #fb923c;
+  --sl-color-accent-high: #fff7ed;
+
+  /* Typography */
+  --sl-font: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --sl-font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --sl-line-height-headings: 1.1;
+
+  /* Custom tokens */
+  --pareto-orange: #fb923c;
+  --pareto-orange-subtle: #fb923c1a;
+  --pareto-card-bg: #1c1917;
+  --pareto-card-border: #292524;
+  --pareto-card-hover: #292524;
+  --pareto-code-bg: #1c1917;
+  --pareto-divider: #292524;
+}
+
+/* ---------- 2. LIGHT MODE TOKENS ---------- */
+:root[data-theme='light'],
+[data-theme='light'] ::backdrop {
+  --sl-color-white: #1c1917;
+  --sl-color-gray-1: #292524;
+  --sl-color-gray-2: #44403c;
+  --sl-color-gray-3: #78716c;
+  --sl-color-gray-4: #a8a29e;
+  --sl-color-gray-5: #d6d3d1;
+  --sl-color-gray-6: #f5f5f4;
+  --sl-color-gray-7: #fafaf9;
+  --sl-color-black: #ffffff;
+
+  --sl-color-accent-low: #fff7ed;
+  --sl-color-accent: #ea580c;
+  --sl-color-accent-high: #431407;
+
+  --pareto-orange: #ea580c;
+  --pareto-orange-subtle: #ea580c12;
+  --pareto-card-bg: #ffffff;
+  --pareto-card-border: #e7e5e4;
+  --pareto-card-hover: #fafaf9;
+  --pareto-code-bg: #fafaf9;
+  --pareto-divider: #e7e5e4;
+}
+
+/* ---------- 3. GLOBAL TYPOGRAPHY ---------- */
+.sl-markdown-content :is(h1, h2, h3, h4) {
+  letter-spacing: -0.025em;
+}
+
+.sl-markdown-content h2 {
+  margin-top: 2.5rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--pareto-divider);
+}
+
+.sl-markdown-content h2:first-child {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.sl-markdown-content {
+  line-height: 1.75;
+}
+
+/* ---------- 4. LINKS & BUTTONS ---------- */
+.sl-markdown-content a:not([class]) {
+  color: var(--sl-color-accent);
+  text-decoration: underline;
+  text-decoration-color: var(--sl-color-accent);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 0.2s, color 0.2s;
+}
+
+.sl-markdown-content a:not([class]):hover {
+  text-decoration-thickness: 2px;
+}
+
+a[class*='sl-link-button'] {
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+/* ---------- 5. CODE BLOCKS ---------- */
+.sl-markdown-content pre,
+.expressive-code pre {
+  border: 1px solid var(--pareto-card-border) !important;
+  border-radius: 0.75rem !important;
+}
+
+.sl-markdown-content :not(pre) > code {
+  background: var(--pareto-orange-subtle);
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.375rem;
+  font-size: 0.875em;
+  color: var(--pareto-orange);
+}
+
+/* Expressive code frame border radius */
+.expressive-code .frame {
+  border-radius: 0.75rem !important;
+  overflow: hidden;
+}
+
+/* ---------- 6. SIDEBAR & NAVIGATION ---------- */
+nav.sidebar a {
+  border-radius: 0.375rem;
+  transition: all 0.15s;
+}
+
+nav.sidebar a[aria-current='page'] {
+  font-weight: 600;
+}
+
+/* Sidebar group labels */
+.sidebar-content .top-level > li > details > summary span {
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--sl-color-gray-3);
+}
+
+/* ---------- 7. HEADER ---------- */
+header.header {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Site title uses display font */
+.site-title span:last-child,
+.site-title::after {
+  font-family: var(--sl-font-display) !important;
+  font-style: italic;
+  font-size: 1.25rem !important;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- 8. TABLES ---------- */
+.sl-markdown-content table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9375rem;
+}
+
+.sl-markdown-content th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sl-color-gray-3);
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid var(--pareto-divider);
+}
+
+.sl-markdown-content td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--pareto-divider);
+}
+
+/* ---------- 9. CALLOUTS / ASIDES ---------- */
+.starlight-aside {
+  border-radius: 0.75rem;
+  border-width: 1px;
+  border-left-width: 3px;
+}
+
+/* ---------- 10. SPLASH PAGE - LANDING SECTIONS ---------- */
+
+/* Features grid */
+.features-section {
+  padding: 5rem 0 4rem;
+  border-top: 1px solid var(--pareto-divider);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--pareto-card-border);
+  border: 1px solid var(--pareto-card-border);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+@media (max-width: 50rem) {
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 50rem) and (max-width: 72rem) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.feature-card {
+  padding: 1.75rem;
+  background: var(--pareto-card-bg);
+  transition: background 0.2s;
+}
+
+.feature-card:hover {
+  background: var(--pareto-card-hover);
+}
+
+/* Code showcase section */
+.code-section {
+  padding: 5rem 0 4rem;
+  border-top: 1px solid var(--pareto-divider);
+}
+
+.code-frame {
+  border: 1px solid var(--pareto-card-border);
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #22201e;
+}
+
+.code-frame-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: #1a1816;
+  border-bottom: 1px solid #2e2b28;
+  font-size: 0.8125rem;
+  color: #a8a29e;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+.code-frame-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #44403c;
+}
+
+.code-frame pre {
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: #22201e !important;
+  padding: 1.5rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.7 !important;
+  overflow-x: auto;
+}
+
+:root[data-theme='light'] .code-frame {
+  border-color: var(--pareto-card-border);
+}
+
+/* CTA section */
+.cta-section {
+  padding: 5rem 0 3rem;
+  border-top: 1px solid var(--pareto-divider);
+}
+
+.cta-section h2 {
+  font-family: var(--sl-font-display);
+  font-style: italic;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--sl-color-white);
+  margin: 0 0 1rem;
+  line-height: 1.1;
+  border: none;
+  padding: 0;
+}
+
+.cta-section p {
+  color: var(--sl-color-gray-3);
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+  max-width: 32rem;
+}
+
+.cta-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.cta-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--sl-color-white);
+  color: var(--sl-color-black);
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.cta-btn-primary:hover {
+  opacity: 0.85;
+}
+
+.cta-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--sl-color-gray-2);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.cta-btn-secondary:hover {
+  color: var(--sl-color-white);
+}
+
+/* Section headings for landing page */
+.landing-heading {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--sl-color-white);
+  margin: 0 0 0.75rem;
+  line-height: 1.15;
+}
+
+.landing-subtitle {
+  color: var(--sl-color-gray-3);
+  font-size: 1.125rem;
+  margin: 0 0 3rem;
+  max-width: 40rem;
+  line-height: 1.6;
+}
+
+/* ---------- 11. FOCUS & ACCESSIBILITY ---------- */
+:focus-visible {
+  outline: 2px solid var(--sl-color-accent);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/* ---------- 12. SMOOTH SCROLLING ---------- */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}

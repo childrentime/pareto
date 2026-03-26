@@ -1,0 +1,85 @@
+---
+const features = [
+  {
+    label: 'Streaming',
+    title: 'Progressive loading, out of the box',
+    description: '<code>defer()</code> and <code>&lt;Await&gt;</code> stream data through React Suspense boundaries. No full-page spinners.',
+  },
+  {
+    label: 'Routing',
+    title: 'File-based, convention-driven',
+    description: '<code>page.tsx</code>, <code>layout.tsx</code>, <code>head.tsx</code>, <code>loader.ts</code> — patterns you already know.',
+  },
+  {
+    label: 'State',
+    title: 'Built-in store with SSR sync',
+    description: '<code>defineStore()</code> with Immer mutations and automatic server/client serialization. Zero extra deps.',
+  },
+  {
+    label: 'No RSC',
+    title: 'Regular React components',
+    description: 'Standard components with data loaders. No mental model split between server and client.',
+  },
+  {
+    label: 'Portable',
+    title: 'Standard Express + Vite',
+    description: 'No framework lock-in. Your server is Express, your build is Vite. Everything stays portable.',
+  },
+  {
+    label: 'SSG',
+    title: 'Static generation, per route',
+    description: 'Export <code>config = { render: \'static\' }</code> on any page. Zero-config static generation.',
+  },
+];
+---
+
+<section class="features-section">
+  <h2 class="landing-heading">Everything you need.<br/>Nothing you don't.</h2>
+  <p class="landing-subtitle">Familiar patterns from Next.js and Remix, without the complexity. A focused SSR framework that stays out of your way.</p>
+  <div class="features-grid">
+    {features.map((f) => (
+      <div class="feature-card">
+        <span class="feature-label">{f.label}</span>
+        <h3 class="feature-title">{f.title}</h3>
+        <p class="feature-desc" set:html={f.description} />
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .feature-label {
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--pareto-orange);
+    margin-bottom: 0.75rem;
+  }
+
+  .feature-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--sl-color-white);
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+  }
+
+  .feature-desc {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--sl-color-gray-3);
+    margin: 0;
+  }
+
+  .feature-desc :global(code) {
+    font-size: 0.8125rem;
+    background: var(--pareto-orange-subtle);
+    padding: 0.1rem 0.325rem;
+    border-radius: 0.25rem;
+    color: var(--pareto-orange);
+    font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+  }
+</style>

@@ -1,6 +1,6 @@
 {
   "name": "@paretojs/core",
-  "version": "3.0.0",
+  "version": "3.0.2",
   "homepage": "https://paretojs.tech/",
   "repository": {
     "type": "git",
@@ -73,8 +73,8 @@
   },
   "peerDependencies": {
     "express": "^4.0.0 || ^5.0.0",
-    "react": "catalog:",
-    "react-dom": "catalog:"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.5.0",

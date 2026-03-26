@@ -1,6 +1,7 @@
+import fs from 'fs'
+import { createRequire } from 'module'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { createRequire } from 'module'
 import type { InlineConfig, Plugin } from 'vite'
 import type { ParetoConfig } from '../types'
 
@@ -23,7 +24,9 @@ export function createClientConfig(options: {
     mode: isDev ? 'development' : 'production',
     envPrefix: 'PARETO_',
     plugins: [
-      createRequire(import.meta.url ?? __filename)('@vitejs/plugin-react').default(),
+      createRequire(import.meta.url ?? __filename)(
+        '@vitejs/plugin-react',
+      ).default(),
       ...plugins,
     ],
     build: {
@@ -41,7 +44,9 @@ export function createClientConfig(options: {
       },
     },
     define: {
-      'process.env.NODE_ENV': JSON.stringify(isDev ? 'development' : 'production'),
+      'process.env.NODE_ENV': JSON.stringify(
+        isDev ? 'development' : 'production',
+      ),
     },
   }
 
@@ -64,7 +69,9 @@ export function createServerConfig(options: {
     root,
     mode: 'production',
     plugins: [
-      createRequire(import.meta.url ?? __filename)('@vitejs/plugin-react').default(),
+      createRequire(import.meta.url ?? __filename)(
+        '@vitejs/plugin-react',
+      ).default(),
       ...plugins,
     ],
     build: {
@@ -106,6 +113,14 @@ export function getCoreSourceAliases(): Record<string, string> {
     const thisDir = path.dirname(fileURLToPath(import.meta.url))
     srcDir = path.resolve(thisDir, '..')
   }
+
+  // Only alias to source files when src/ exists (monorepo dev).
+  // When installed from npm, src/ is not published — let Vite
+  // resolve via the package.json exports field instead.
+  if (!fs.existsSync(srcDir)) {
+    return {}
+  }
+
   return {
     '@paretojs/core/store': path.resolve(srcDir, 'store', 'index.ts'),
     '@paretojs/core/client': path.resolve(srcDir, 'client.ts'),

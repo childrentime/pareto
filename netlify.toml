@@ -1,6 +1,5 @@
 [build.environment]
 NODE_VERSION = "22.12.0"
-COREPACK_INTEGRITY_KEYS = "0"
 
 [[redirects]]
 from = "/*"

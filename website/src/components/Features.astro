@@ -4,31 +4,37 @@ const features = [
     label: 'Streaming',
     title: 'Progressive loading, out of the box',
     description: '<code>defer()</code> and <code>&lt;Await&gt;</code> stream data through React Suspense boundaries. No full-page spinners.',
+    link: '/concepts/streaming/',
   },
   {
     label: 'Routing',
     title: 'File-based, convention-driven',
     description: '<code>page.tsx</code>, <code>layout.tsx</code>, <code>head.tsx</code>, <code>loader.ts</code> — patterns you already know.',
+    link: '/concepts/routing/',
   },
   {
     label: 'State',
     title: 'Built-in store with SSR sync',
     description: '<code>defineStore()</code> with Immer mutations and automatic server/client serialization. Zero extra deps.',
+    link: '/concepts/state-management/',
   },
   {
     label: 'No RSC',
     title: 'Regular React components',
     description: 'Standard components with data loaders. No mental model split between server and client.',
+    link: '/guides/introduction/',
   },
   {
     label: 'Portable',
     title: 'Standard Express + Vite',
     description: 'No framework lock-in. Your server is Express, your build is Vite. Everything stays portable.',
+    link: '/api/config/',
   },
   {
     label: 'SSG',
     title: 'Static generation, per route',
     description: 'Export <code>config = { render: \'static\' }</code> on any page. Zero-config static generation.',
+    link: '/concepts/ssg/',
   },
 ];
 ---
@@ -38,11 +44,11 @@ const features = [
   <p class="landing-subtitle">Familiar patterns from Next.js and Remix, without the complexity. A focused SSR framework that stays out of your way.</p>
   <div class="features-grid">
     {features.map((f) => (
-      <div class="feature-card">
+      <a href={f.link} class="feature-card">
         <span class="feature-label">{f.label}</span>
         <h3 class="feature-title">{f.title}</h3>
         <p class="feature-desc" set:html={f.description} />
-      </div>
+      </a>
     ))}
   </div>
 </section>

@@ -20,50 +20,21 @@ export default config
 
 ```tsx
 interface ParetoConfig {
-  configureServer?: (app: Express) => void
+  appDir?: string
+  outDir?: string
   configureVite?: (config: ViteConfig, env: { isServer: boolean }) => ViteConfig
 }
 ```
 
 ## Options
 
-### `configureServer`
+### `appDir`
 
-Customize the Express server. This function runs once when the server starts, before any routes are registered. Use it to add middleware, set global headers, or mount additional route handlers:
+The directory containing your route files. Defaults to `app`.
 
-```tsx
-import compression from 'compression'
-import cors from 'cors'
+### `outDir`
 
-const config: ParetoConfig = {
-  configureServer(app) {
-    app.use(compression())
-    app.use(cors({ origin: 'https://example.com' }))
-
-    // Add custom headers
-    app.use((req, res, next) => {
-      res.setHeader('X-Powered-By', 'Pareto')
-      next()
-    })
-
-    // Mount additional routes outside the file-based router
-    app.get('/health', (req, res) => {
-      res.json({ status: 'ok' })
-    })
-  },
-}
-```
-
-Common middleware to add here:
-
-- **`compression()`** — Gzip/Brotli response compression
-- **`cors()`** — Cross-origin resource sharing headers
-- **`helmet()`** — Security headers
-- **`cookie-parser`** — Parse cookies into `req.cookies`
-- **`express.json()`** — Parse JSON request bodies (needed for [resource route](/concepts/resource-routes/) `action` functions)
-- **Rate limiting** — Protect API endpoints from abuse
-
-For auth middleware scoped to specific routes, see [Resource Routes — Middleware patterns](/concepts/resource-routes/).
+The output directory for production builds. Defaults to `.pareto`.
 
 ### `configureVite`
 
@@ -182,6 +153,6 @@ CMD ["npx", "pareto", "start"]
 
 ## Related
 
-- [Resource Routes](/concepts/resource-routes/) — Using `configureServer` for API middleware.
+- [Resource Routes](/concepts/resource-routes/) — API endpoints via `route.ts`.
 - [Static Site Generation](/concepts/ssg/) — SSG deployment and CDN caching with custom headers.
 - [@paretojs/core API](/api/core/) — `ParetoConfig` type and runtime exports.

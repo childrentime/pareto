@@ -12,6 +12,7 @@
   "dependencies": {
     "@astrojs/starlight": "^0.38.2",
     "@fontsource-variable/dm-sans": "^5.2.8",
+    "@fontsource/instrument-serif": "^5.2.8",
     "astro": "^6.0.1",
     "sharp": "^0.34.2"
   }

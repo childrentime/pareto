@@ -18,18 +18,13 @@ export default config
 
 ## 选项
 
-### `configureServer`
+### `appDir`
 
-自定义 Express 服务器（添加中间件等）：
+包含路由文件的目录。默认为 `app`。
 
-```tsx
-const config: ParetoConfig = {
-  configureServer(app) {
-    app.use(compression())
-    app.use(cors())
-  },
-}
-```
+### `outDir`
+
+生产构建的输出目录。默认为 `.pareto`。
 
 ### `configureVite`
 

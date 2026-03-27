@@ -5,7 +5,9 @@ description: Use defer() and Await to stream slow data through Suspense boundari
 
 Pareto supports streaming SSR via `defer()` and `<Await>`. Send the page shell immediately, then stream in slow data as it resolves. This gives users a fast initial paint while slower data loads progressively in the background.
 
-## Basic usage
+![How streaming SSR works in Pareto — the server sends the HTML shell immediately, then streams deferred data as promises resolve.](/streaming-diagram.png)
+
+## How does streaming SSR work in Pareto?
 
 ```tsx
 import { defer, useLoaderData, Await } from '@paretojs/core'
@@ -44,7 +46,7 @@ export default function Page() {
 }
 ```
 
-## How it works
+## What happens under the hood?
 
 1. The loader returns `defer({ ... })` with a mix of resolved values and promises
 2. The server sends the HTML shell immediately with the resolved values
@@ -53,7 +55,7 @@ export default function Page() {
 
 Each `<Await>` component is backed by a React `<Suspense>` boundary. When the promise resolves, React replaces the fallback content in-place without a full re-render. On the client after hydration, this is the same mechanism React uses for lazy-loaded components.
 
-## When to use streaming
+## When should I use streaming?
 
 Use `defer()` when you have data with different loading speeds:
 
@@ -62,7 +64,7 @@ Use `defer()` when you have data with different loading speeds:
 
 If all your data is fast, just return it directly from the loader — no need for `defer()`. Adding unnecessary `defer()` calls adds complexity without benefit.
 
-## When NOT to use streaming
+## When should I avoid streaming?
 
 Streaming is not always the right choice. Avoid `defer()` in these situations:
 
@@ -71,21 +73,20 @@ Streaming is not always the right choice. Avoid `defer()` in these situations:
 - **Dependent data** — If your component cannot render anything meaningful without all data present, deferring individual pieces creates a worse experience (multiple loading spinners instead of one). Await all promises in the loader and return the resolved result.
 - **[Static pages](/concepts/ssg/)** — SSG pages are rendered at build time. Deferred data does not make sense because there is no live request to stream to. Use direct returns for static routes.
 
-## Error handling in streaming
+## How do I handle errors in streamed data?
 
-When a deferred promise rejects, the `<Await>` component throws the error, which is caught by the nearest React error boundary. You can handle this with the `errorElement` prop or by wrapping `<Await>` in a [`ParetoErrorBoundary`](/concepts/error-handling/):
+When a deferred promise rejects, the `<Await>` component throws the error, which is caught by the nearest React error boundary. Wrap `<Await>` in a [`ParetoErrorBoundary`](/concepts/error-handling/) for granular error isolation:
 
 ```tsx
-<Suspense fallback={<Skeleton />}>
-  <Await
-    resolve={slowData}
-    errorElement={<p>Failed to load data. Please try again.</p>}
-  >
-    {(data) => <DataTable rows={data} />}
-  </Await>
-</Suspense>
+<ParetoErrorBoundary fallback={({ error }) => <p>Failed to load data.</p>}>
+  <Suspense fallback={<Skeleton />}>
+    <Await resolve={slowData}>
+      {(data) => <DataTable rows={data} />}
+    </Await>
+  </Suspense>
+</ParetoErrorBoundary>
 ```
 
-If you do not provide an `errorElement`, the error bubbles up to the nearest [`ParetoErrorBoundary`](/concepts/error-handling/). This means a single failed deferred promise can replace your entire page with the error UI. For a better user experience, provide `errorElement` on each `<Await>` so that failures are contained to the section that failed.
+Without a `ParetoErrorBoundary` around a specific `<Await>`, the error bubbles up to the nearest ancestor error boundary. This means a single failed deferred promise can replace your entire page with the error UI. For a better user experience, wrap each `<Await>` in its own `ParetoErrorBoundary` so that failures are contained to the section that failed.
 
 See [Error Handling](/concepts/error-handling/) for more on how error boundaries work.

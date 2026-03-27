@@ -87,13 +87,13 @@ The `head()` function receives the loader data for its route, so you can set tit
 // app/blog/[slug]/head.tsx
 import type { HeadDescriptor } from '@paretojs/core'
 
-export function head({ data }: { data: { post: { title: string; excerpt: string } } }): HeadDescriptor {
+export function head({ loaderData, params }: { loaderData: { post: { title: string; excerpt: string } }; params: Record<string, string> }): HeadDescriptor {
   return {
-    title: `${data.post.title} — My App`,
+    title: `${loaderData.post.title} — My App`,
     meta: [
-      { name: 'description', content: data.post.excerpt },
-      { property: 'og:title', content: data.post.title },
-      { property: 'og:description', content: data.post.excerpt },
+      { name: 'description', content: loaderData.post.excerpt },
+      { property: 'og:title', content: loaderData.post.title },
+      { property: 'og:description', content: loaderData.post.excerpt },
     ],
   }
 }

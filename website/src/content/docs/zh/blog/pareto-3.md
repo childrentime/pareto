@@ -84,34 +84,27 @@ import { ParetoErrorBoundary } from '@paretojs/core'
 ```tsx
 import { defineStore } from '@paretojs/core/store'
 
-const { useStore, getState, setState } = defineStore('counter', {
-  state: () => ({ count: 0 }),
-  actions: {
-    increment(state) {
-      state.count += 1  // Immer 使这变成不可变更新
-    },
-  },
-})
+const { useStore, getState, setState } = defineStore((set) => ({
+  count: 0,
+  increment: () =>
+    set((draft) => {
+      draft.count += 1  // Immer 使这变成不可变更新
+    }),
+}))
 ```
 
 Store API 支持直接解构、通过 `dehydrate()` / `hydrateStores()` 实现 SSR 序列化，以及 Context 作用域的 Store 用于每请求隔离。
 
 ## 安全头
 
-新的 `securityHeaders()` 中间件提供 OWASP 推荐的安全头：
+Pareto 在开发环境中自动应用 OWASP 推荐的安全头。在生产环境中，`securityHeaders()` 从 `@paretojs/core/node` 导出，可用于自定义服务器配置：
 
 ```ts
-// pareto.config.ts
 import { securityHeaders } from '@paretojs/core/node'
-import type { ParetoConfig } from '@paretojs/core'
+import express from 'express'
 
-const config: ParetoConfig = {
-  configureServer(app) {
-    app.use(securityHeaders())
-  },
-}
-
-export default config
+const app = express()
+app.use(securityHeaders())
 ```
 
 自动设置 `X-Content-Type-Options`、`X-Frame-Options`、`X-XSS-Protection`、`Referrer-Policy` 和 `Permissions-Policy` 头。

@@ -5,7 +5,7 @@ description: How Pareto maps your file system to URL routes.
 
 Pareto uses file-based routing. Every `page.tsx` inside `app/` becomes a route. The file system is the router — no separate route configuration file needed.
 
-## Convention files
+## What are the convention files?
 
 Each directory in your `app/` folder can contain special convention files that control how that route behaves:
 
@@ -18,7 +18,7 @@ Each directory in your `app/` folder can contain special convention files that c
 | `not-found.tsx` | 404 page (root level only) |
 | `route.ts` | [Resource route](/concepts/resource-routes/) (JSON API, no HTML) |
 
-## Route mapping
+## How does file-to-URL mapping work?
 
 ```
 app/
@@ -33,7 +33,7 @@ app/
       route.ts          → /api/users (JSON)
 ```
 
-## Dynamic routes
+## How do I create dynamic routes?
 
 Use `[param]` directory names for dynamic segments:
 
@@ -52,7 +52,7 @@ export function loader(ctx: LoaderContext) {
 
 Dynamic routes match any value for that segment. The param name inside the brackets becomes the key in `ctx.params`.
 
-## Catch-all routes
+## How do catch-all routes work?
 
 Use `[...param]` for catch-all segments:
 
@@ -62,7 +62,7 @@ app/docs/[...path]/page.tsx  → /docs/*
 
 The `path` param will be a string containing the rest of the URL. For example, `/docs/getting-started/install` sets `ctx.params.path` to `getting-started/install`.
 
-## Nested layouts
+## How do nested layouts work?
 
 Layouts at each level wrap their children. A root `layout.tsx` wraps every page:
 
@@ -79,7 +79,7 @@ app/
 
 Nested layouts are useful for sections of your app that share a common UI shell. For example, a dashboard section might have a sidebar navigation that only appears on dashboard pages.
 
-## Separate loader files
+## Can I define loaders in a separate file?
 
 You can define a route's loader in a separate `loader.ts` file instead of exporting it from `page.tsx`:
 
@@ -94,7 +94,7 @@ export function loader(ctx: LoaderContext) {
 
 This keeps your data fetching logic separate from your components, which is useful for complex loaders with many imports. If both `loader.ts` and a `loader` export in `page.tsx` exist, `loader.ts` takes precedence.
 
-## Route groups
+## What are route groups?
 
 If you want to share a layout between routes without adding a URL segment, use parenthesized directory names:
 

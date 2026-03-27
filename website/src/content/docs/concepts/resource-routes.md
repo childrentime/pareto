@@ -140,39 +140,32 @@ export async function action(ctx: LoaderContext) {
 
 ## Middleware patterns
 
-For shared logic across multiple resource routes (auth checks, logging, rate limiting), use Express middleware via [`configureServer`](/api/config/) in your `pareto.config.ts`:
+For shared logic across multiple resource routes (auth checks, logging, rate limiting), apply Express middleware in your production server:
 
 ```ts
-// pareto.config.ts
-import type { ParetoConfig } from '@paretojs/core'
+import express from 'express'
+import { createRequestHandler } from '@paretojs/core/node'
 
-const config: ParetoConfig = {
-  configureServer(app) {
-    // Auth middleware for all /api/* routes
-    app.use('/api', (req, res, next) => {
-      const token = req.cookies.token
-      if (!token) {
-        res.status(401).json({ error: 'Unauthorized' })
-        return
-      }
-      next()
-    })
+const app = express()
 
-    // Logging middleware
-    app.use('/api', (req, res, next) => {
-      console.log(`${req.method} ${req.url}`)
-      next()
-    })
-  },
-}
+// Auth middleware for all /api/* routes
+app.use('/api', (req, res, next) => {
+  const token = req.cookies.token
+  if (!token) {
+    res.status(401).json({ error: 'Unauthorized' })
+    return
+  }
+  next()
+})
 
-export default config
+// Pareto request handler
+app.use(createRequestHandler())
 ```
 
 This keeps auth logic in one place instead of repeating it in every resource route.
 
 ## Related
 
-- [Configuration](/api/config/) — `configureServer` for adding Express middleware.
+- [Configuration](/api/config/) — `configureVite` for customizing the build.
 - [File-Based Routing](/concepts/routing/) — How `route.ts` fits into the file-based routing system.
 - [Redirect & 404](/concepts/redirects/) — Using `redirect()` and `notFound()` in resource routes.

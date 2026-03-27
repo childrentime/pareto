@@ -1,4 +1,30 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://paretojs.dev/sitemap.xml
+# AI search crawlers — explicitly welcome
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Training-only crawlers — block
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: cohere-ai
+Disallow: /
+
+Sitemap: https://paretojs.tech/sitemap-index.xml

@@ -1,0 +1,167 @@
+---
+const differentiators = [
+  {
+    point: 'Standard React, no compiler magic',
+    detail: 'Next.js introduced React Server Components and a client/server split that requires "use client" directives and a new mental model. Remix stays closer to standard React but still couples routing to its own server runtime. Pareto uses plain React 19 components with explicit data loaders — no directives, no compiler boundaries, no hidden transforms.',
+  },
+  {
+    point: 'You own the server',
+    detail: 'Your Pareto app runs on Express. You add middleware, mount routes, configure CORS — the same way you would in any Node.js project. There is no framework-controlled server runtime to work around, and no deployment platform assumed.',
+  },
+  {
+    point: 'Vite all the way down',
+    detail: 'Next.js uses Webpack (or Turbopack). Remix recently adopted Vite but still maintains its own build layer. Pareto is built directly on Vite 7 — your config, your plugins, your dev server. Nothing is wrapped or abstracted away.',
+  },
+  {
+    point: 'Deliberately smaller scope',
+    detail: 'No image optimization component, no font subsystem, no edge runtime, no middleware chain, no server actions. Pareto ships what an SSR framework needs — routing, streaming, state, SSG — and leaves the rest to the ecosystem you already know.',
+  },
+];
+---
+
+<section class="why-section">
+  <div class="why-definition">
+    <h2 class="landing-heading">What is Pareto?</h2>
+    <p class="why-definition-text">
+      Pareto is an open-source React SSR framework built on Vite 7 and React 19. It provides streaming server-side rendering, file-based routing, built-in state management, and static site generation — using standard React components and an Express server you fully control. No server components, no compiler magic, no platform lock-in.
+    </p>
+  </div>
+
+  <div class="why-numbers">
+    <h2 class="landing-heading">By the numbers.</h2>
+    <div class="numbers-grid">
+      <div class="number-item">
+        <span class="number-value">~5 KB</span>
+        <span class="number-label">Framework runtime shipped to the browser (gzipped), excluding React itself.</span>
+      </div>
+      <div class="number-item">
+        <span class="number-value">19 KB</span>
+        <span class="number-label">Total client bundle uncompressed. Router, hydration, streaming, and store.</span>
+      </div>
+      <div class="number-item">
+        <span class="number-value">6</span>
+        <span class="number-label">Convention files to learn. page, layout, loader, head, not-found, route.</span>
+      </div>
+      <div class="number-item">
+        <span class="number-value">0</span>
+        <span class="number-label">Custom webpack/turbopack config. Vite handles everything.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="why-differentiators">
+    <h2 class="landing-heading">Why Pareto over Next.js or Remix?</h2>
+    <p class="landing-subtitle">
+      Next.js and Remix are excellent frameworks. If you need their full feature set, use them.
+      Pareto is for teams that want a lighter foundation — familiar conventions without the abstraction cost.
+    </p>
+    <div class="why-list">
+      {differentiators.map((d) => (
+        <div class="why-item">
+          <h3 class="why-item-title">{d.point}</h3>
+          <p class="why-item-detail">{d.detail}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .why-section {
+    padding: 5rem 0 4rem;
+    border-top: 1px solid var(--pareto-divider);
+  }
+
+  .why-definition {
+    margin-bottom: 4rem;
+  }
+
+  .why-definition-text {
+    font-size: 1.1875rem;
+    line-height: 1.7;
+    color: var(--sl-color-gray-2);
+    max-width: 44rem;
+    margin: 0;
+  }
+
+  .why-numbers {
+    margin-bottom: 4rem;
+  }
+
+  .numbers-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--pareto-card-border);
+    border: 1px solid var(--pareto-card-border);
+    border-radius: 1rem;
+    overflow: hidden;
+  }
+
+  @media (max-width: 50rem) {
+    .numbers-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .number-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.75rem;
+    background: var(--pareto-card-bg);
+  }
+
+  .number-value {
+    font-family: var(--sl-font-display, Georgia, serif);
+    font-style: italic;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--pareto-orange);
+    line-height: 1;
+  }
+
+  .number-label {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--sl-color-gray-3);
+  }
+
+  .why-differentiators {
+    /* follows naturally from numbers */
+  }
+
+  .why-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem 3rem;
+  }
+
+  @media (max-width: 50rem) {
+    .why-list {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  .why-item {
+    /* left-aligned by default */
+  }
+
+  .why-item-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--sl-color-white);
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+  }
+
+  .why-item-detail {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--sl-color-gray-3);
+    margin: 0;
+  }
+</style>

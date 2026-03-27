@@ -4,6 +4,8 @@ description: Pareto 3.0 is here — rebuilt on Vite 7, upgraded to React 19, wit
 template: splash
 ---
 
+<p class="blog-meta">By <a href="https://github.com/childrentime">childrentime</a> · March 26, 2026</p>
+
 Pareto 3.0 is a ground-up rebuild of the framework. The bundler, the runtime, the state management, and the CLI have all been rewritten. This is the release we've been working toward: a lightweight React SSR framework that feels fast to use and fast to ship.
 
 ## Vite 7 replaces Rspack
@@ -84,34 +86,27 @@ import { ParetoErrorBoundary } from '@paretojs/core'
 ```tsx
 import { defineStore } from '@paretojs/core/store'
 
-const { useStore, getState, setState } = defineStore('counter', {
-  state: () => ({ count: 0 }),
-  actions: {
-    increment(state) {
-      state.count += 1  // Immer makes this immutable
-    },
-  },
-})
+const { useStore, getState, setState } = defineStore((set) => ({
+  count: 0,
+  increment: () =>
+    set((draft) => {
+      draft.count += 1  // Immer makes this immutable
+    }),
+}))
 ```
 
 The store API supports direct destructuring, SSR serialization via `dehydrate()` / `hydrateStores()`, and context-scoped stores for per-request isolation.
 
 ## Security headers
 
-New `securityHeaders()` middleware provides OWASP-recommended security headers out of the box:
+Pareto automatically applies OWASP-recommended security headers in development. For production, `securityHeaders()` is exported from `@paretojs/core/node` for use in custom server setups:
 
 ```ts
-// pareto.config.ts
 import { securityHeaders } from '@paretojs/core/node'
-import type { ParetoConfig } from '@paretojs/core'
+import express from 'express'
 
-const config: ParetoConfig = {
-  configureServer(app) {
-    app.use(securityHeaders())
-  },
-}
-
-export default config
+const app = express()
+app.use(securityHeaders())
 ```
 
 This sets `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Referrer-Policy`, and `Permissions-Policy` headers automatically.
@@ -139,3 +134,16 @@ Try it now:
 ```bash
 npx create-pareto@latest my-app
 ```
+
+<style>
+{`
+  .blog-meta {
+    font-size: 0.875rem;
+    color: var(--sl-color-gray-3);
+    margin-bottom: 2rem;
+  }
+  .blog-meta a {
+    color: var(--sl-color-accent);
+  }
+`}
+</style>

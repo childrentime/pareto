@@ -3,10 +3,12 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 export default defineConfig({
-	site: 'https://paretojs.dev',
+	site: 'https://paretojs.tech',
 	integrations: [
 		starlight({
 			title: 'Pareto',
+			favicon: '/favicon.png',
+			lastUpdated: true,
 			description: 'Lightweight React SSR framework with streaming, file-based routing, and built-in state management.',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/childrentime/pareto' }],
 			editLink: {
@@ -19,6 +21,7 @@ export default defineConfig({
 			components: {
 				Hero: './src/components/Hero.astro',
 				Header: './src/components/Header.astro',
+				Head: './src/components/Head.astro',
 			},
 			defaultLocale: 'root',
 			locales: {
@@ -43,33 +46,11 @@ export default defineConfig({
 				},
 			],
 			head: [
-				{ tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },
-				{ tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' } },
-				{ tag: 'link', attrs: { href: 'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap', rel: 'stylesheet' } },
+				{ tag: 'link', attrs: { rel: 'preload', href: '/fonts/instrument-serif-latin-400-italic.woff2', as: 'font', type: 'font/woff2', crossorigin: '' } },
 				{ tag: 'meta', attrs: { property: 'og:type', content: 'website' } },
 				{ tag: 'meta', attrs: { property: 'og:site_name', content: 'Pareto' } },
-				{
-					tag: 'script',
-					attrs: { type: 'application/ld+json' },
-					content: JSON.stringify({
-						'@context': 'https://schema.org',
-						'@type': 'SoftwareApplication',
-						name: 'Pareto',
-						applicationCategory: 'DeveloperApplication',
-						operatingSystem: 'Cross-platform',
-						description: 'Lightweight React SSR framework with streaming, file-based routing, and built-in state management. Powered by Vite 7.',
-						url: 'https://paretojs.dev',
-						softwareVersion: '3.0.0',
-						programmingLanguage: ['TypeScript', 'React'],
-						license: 'https://opensource.org/licenses/MIT',
-						offers: {
-							'@type': 'Offer',
-							price: '0',
-							priceCurrency: 'USD',
-						},
-						codeRepository: 'https://github.com/childrentime/pareto',
-					}),
-				},
+				{ tag: 'meta', attrs: { property: 'og:image', content: 'https://paretojs.tech/og-image.png' } },
+				{ tag: 'meta', attrs: { name: 'twitter:image', content: 'https://paretojs.tech/og-image.png' } },
 			],
 		}),
 	],

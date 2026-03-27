@@ -1,0 +1,126 @@
+---
+import StarlightHead from '@astrojs/starlight/components/Head.astro';
+
+const route = Astro.locals.starlightRoute;
+const currentPath = Astro.url.pathname;
+const siteUrl = 'https://paretojs.tech';
+
+const pageTitle = route?.entry?.data?.title || '';
+const pageDesc = route?.entry?.data?.description || '';
+
+const isHomepage = currentPath === '/' || currentPath === '/zh/';
+const isBlogPost = /^\/(zh\/)?blog\/[^/]+\/$/.test(currentPath) && currentPath !== '/blog/' && currentPath !== '/zh/blog/';
+
+const schemas: Record<string, unknown>[] = [];
+
+// Homepage: WebSite + Organization + SoftwareApplication
+if (isHomepage) {
+  schemas.push({
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Pareto',
+    url: siteUrl,
+    description: 'Lightweight React SSR framework with streaming, file-based routing, and built-in state management.',
+    inLanguage: ['en', 'zh-CN'],
+    publisher: {
+      '@type': 'Organization',
+      name: 'Pareto',
+      url: siteUrl,
+      sameAs: ['https://github.com/childrentime/pareto'],
+    },
+  });
+  schemas.push({
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Pareto',
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Cross-platform',
+    description: 'Lightweight React SSR framework with streaming, file-based routing, and built-in state management. Powered by Vite 7.',
+    url: siteUrl,
+    softwareVersion: '3.0.0',
+    programmingLanguage: ['TypeScript', 'JavaScript'],
+    license: 'https://opensource.org/licenses/MIT',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    author: { '@type': 'Organization', name: 'Pareto', url: siteUrl },
+  });
+}
+
+// Blog posts: BlogPosting
+if (isBlogPost) {
+  schemas.push({
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: pageTitle,
+    description: pageDesc,
+    url: `${siteUrl}${currentPath}`,
+    inLanguage: currentPath.startsWith('/zh/') ? 'zh-CN' : 'en',
+    datePublished: '2026-03-26',
+    isPartOf: { '@type': 'WebSite', name: 'Pareto', url: siteUrl },
+    author: { '@type': 'Person', name: 'childrentime', url: 'https://github.com/childrentime' },
+    publisher: { '@type': 'Organization', name: 'Pareto', url: siteUrl },
+  });
+}
+
+// Doc pages: TechArticle
+if (!isHomepage && !isBlogPost) {
+  schemas.push({
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: pageTitle,
+    description: pageDesc,
+    url: `${siteUrl}${currentPath}`,
+    inLanguage: currentPath.startsWith('/zh/') ? 'zh-CN' : 'en',
+    isPartOf: { '@type': 'WebSite', name: 'Pareto', url: siteUrl },
+    publisher: { '@type': 'Organization', name: 'Pareto', url: siteUrl },
+  });
+}
+
+// BreadcrumbList for all non-homepage pages
+if (!isHomepage) {
+  const pathWithoutLocale = currentPath.replace(/^\/zh/, '');
+  const segments = pathWithoutLocale.split('/').filter(Boolean);
+
+  const sectionLabels: Record<string, string> = {
+    guides: 'Getting Started',
+    concepts: 'Core Concepts',
+    api: 'API Reference',
+    blog: 'Blog',
+  };
+
+  const items: Record<string, unknown>[] = [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}/` },
+  ];
+
+  if (segments.length >= 1) {
+    items.push({
+      '@type': 'ListItem',
+      position: 2,
+      name: sectionLabels[segments[0]] || segments[0],
+      item: `${siteUrl}/${segments[0]}/`,
+    });
+  }
+
+  if (segments.length >= 2) {
+    items.push({
+      '@type': 'ListItem',
+      position: 3,
+      name: pageTitle,
+      item: `${siteUrl}${currentPath}`,
+    });
+  }
+
+  schemas.push({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items,
+  });
+}
+
+// hreflang x-default: point to the English version of the current page
+const defaultPath = currentPath.startsWith('/zh/') ? currentPath.replace(/^\/zh/, '') : currentPath;
+---
+<StarlightHead {...Astro.props}><slot /></StarlightHead>
+<link rel="alternate" hreflang="x-default" href={`${siteUrl}${defaultPath}`} />
+{schemas.map((schema) => (
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+))}

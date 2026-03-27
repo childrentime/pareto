@@ -33,7 +33,7 @@ const counterStore = defineStore((set) => ({
 }))
 ```
 
-## Usage in components
+## How do I use stores in components?
 
 Supports direct destructuring — pull out exactly the state and actions you need:
 
@@ -63,48 +63,61 @@ Each store created with `defineStore` returns an object with these methods. See 
 | `setState(fn)` | Update state with Immer draft |
 | `subscribe(fn)` | Listen for state changes |
 
-## Selector pattern for performance
+## How does useStore() handle re-renders?
 
-When a component only needs part of the state, use `getState()` with `subscribe()` to build a selector that avoids unnecessary re-renders. However, for most cases, `useStore()` with destructuring is sufficient — Pareto's store tracks which properties are accessed and only re-renders when those properties change.
+`useStore()` returns a proxy object where each property getter independently calls `useSyncExternalStore`. When you destructure `const { count } = useStore()`, only `count` is subscribed — changes to other properties like `history` do not cause a re-render. No manual selectors needed.
+
+For derived values, destructure what you need and compute from it:
 
 ```tsx
-import { useSyncExternalStore } from 'react'
-
-// Only re-renders when `count` changes, ignores `history` changes
-function CountDisplay() {
-  const count = useSyncExternalStore(
-    counterStore.subscribe,
-    () => counterStore.getState().count
-  )
-  return <span>{count}</span>
+function useOrderTotal() {
+  const { items } = orderStore.useStore()
+  return items.reduce((sum, item) => sum + item.price, 0)
 }
 ```
 
-This manual selector approach is only necessary when you have a store with many frequently-changing properties and a component that reads only a small subset. For the vast majority of components, direct destructuring from `useStore()` is the recommended approach.
+The hook subscribes to `items` via the proxy getter. When `items` changes, the component re-renders and the total is recomputed. No need for `subscribe` or `useSyncExternalStore` — just `useStore()` and plain JavaScript.
 
-## SSR serialization
+## How does SSR serialization work?
 
-Stores are automatically serialized on the server and hydrated on the client. No manual setup needed. During SSR, the server renders the store's initial state into the HTML. On hydration, the client picks up that state so there is no flash of default values. This happens transparently — you write the same store code for both server and client.
+For context stores, SSR hydration is automatic. The loader data is serialized by the framework into the HTML, and on the client `useLoaderData()` reads it back. Pass it to `<Provider initialData={data}>` and the store initializes with the server-side data — no extra setup:
 
-## Context stores
+```tsx
+export function loader(ctx: LoaderContext) {
+  return { products: getProducts() }
+}
+
+export default function Page() {
+  const data = useLoaderData()
+  return (
+    <Provider initialData={data}>
+      <ProductList />
+    </Provider>
+  )
+}
+```
+
+Global stores (`defineStore`) are client-only — they initialize with default state on every render. If you need to hydrate a global store from server data, `dehydrate()` and `hydrateStores()` are available from `@paretojs/core/node` and `@paretojs/core/store`.
+
+## What are context stores?
 
 For per-request state that is SSR-safe, use `defineContextStore`. Global stores created with `defineStore` share state across all requests on the server, which can cause data leaks between users. Context stores use React context to scope state to a single render tree:
 
 ```tsx
 import { defineContextStore } from '@paretojs/core/store'
 
-const { Provider, useStore } = defineContextStore((set) => ({
-  user: null,
+const { Provider, useStore } = defineContextStore((initialUser) => (set) => ({
+  user: initialUser,
   setUser: (user) => set((draft) => { draft.user = user }),
 }))
 ```
 
-Wrap a section of your component tree with `<Provider>`:
+Wrap a section of your component tree with `<Provider>`, passing `initialData`:
 
 ```tsx
-function App() {
+function App({ user }) {
   return (
-    <Provider>
+    <Provider initialData={user}>
       <Dashboard />
     </Provider>
   )
@@ -116,7 +129,7 @@ function Dashboard() {
 }
 ```
 
-## When to use global vs. context stores
+## When should I use global vs. context stores?
 
 - **Global store (`defineStore`)** — Best for client-only state that does not vary per request: UI theme, sidebar open/closed, client-side caches. On the server, the initial state is the same for every request, so there is no cross-request contamination risk.
 - **Context store (`defineContextStore`)** — Best for per-request state: current user, auth tokens, request-specific feature flags. Because context stores are scoped to a Provider, each SSR request gets its own isolated instance.

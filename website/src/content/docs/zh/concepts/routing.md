@@ -5,7 +5,7 @@ description: Pareto 如何将文件系统映射为 URL 路由。
 
 Pareto 使用基于文件的路由。`app/` 目录下的每个 `page.tsx` 都会成为一个路由。
 
-## 约定文件
+## 有哪些约定文件？
 
 | 文件 | 用途 |
 |------|------|
@@ -16,7 +16,7 @@ Pareto 使用基于文件的路由。`app/` 目录下的每个 `page.tsx` 都会
 | `not-found.tsx` | 404 页面（仅限根级） |
 | `route.ts` | 资源路由（JSON API，无 HTML） |
 
-## 路由映射
+## 文件到 URL 的映射是怎样的？
 
 ```
 app/
@@ -31,7 +31,7 @@ app/
       route.ts          → /api/users (JSON)
 ```
 
-## 动态路由
+## 如何创建动态路由？
 
 使用 `[param]` 目录名来定义动态段：
 
@@ -48,7 +48,7 @@ export function loader(ctx: LoaderContext) {
 }
 ```
 
-## 通配路由
+## 通配路由是怎样工作的？
 
 使用 `[...param]` 实现通配段：
 
@@ -56,7 +56,7 @@ export function loader(ctx: LoaderContext) {
 app/docs/[...path]/page.tsx  → /docs/*
 ```
 
-## 嵌套布局
+## 嵌套布局是怎样工作的？
 
 每一级的布局会包裹其子组件。根级 `layout.tsx` 包裹所有页面：
 
@@ -71,7 +71,7 @@ app/
       page.tsx          ← /dashboard/settings (被两层布局包裹)
 ```
 
-## 独立 loader 文件
+## 可以在单独的文件中定义 loader 吗？
 
 你可以在独立的 `loader.ts` 文件中定义路由的 loader，而不是从 `page.tsx` 中导出：
 
@@ -86,7 +86,7 @@ export function loader(ctx: LoaderContext) {
 
 这样可以将数据获取逻辑与组件分离。如果同时存在 `loader.ts` 和 `page.tsx` 中的 `loader` 导出，`loader.ts` 优先。
 
-## 路由分组
+## 什么是路由分组？
 
 如果你想在路由之间共享布局但不添加 URL 段，使用括号包裹的目录名：
 

@@ -126,5 +126,5 @@ function ErrorFallback({ error }: { error: Error }) {
 ## Related
 
 - [Redirect & 404](/concepts/redirects/) — Use `notFound()` for expected missing-resource conditions.
-- [Streaming SSR](/concepts/streaming/) — Deferred promises that reject are caught by `<Await>`'s `errorElement` or the nearest error boundary.
+- [Streaming SSR](/concepts/streaming/) — Deferred promises that reject are caught by the nearest `ParetoErrorBoundary`.
 - [@paretojs/core API](/api/core/) — Full API reference for `ParetoErrorBoundary`.

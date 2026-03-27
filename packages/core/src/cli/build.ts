@@ -1,14 +1,19 @@
-import path from 'path'
 import fs from 'fs'
-import { loadConfig, resolveAppDir, resolveOutDir, findAppFile } from '../config'
-import { scanRoutes } from '../entry'
-import type { RouteDef } from '../types'
+import path from 'path'
 import {
-  paretoVirtualEntry,
+  findAppFile,
+  loadConfig,
+  resolveAppDir,
+  resolveOutDir,
+} from '../config'
+import { scanRoutes } from '../entry'
+import {
   findGlobalCss,
-  VIRTUAL_SERVER_ENTRY,
+  paretoVirtualEntry,
   VIRTUAL_CLIENT_ENTRY,
+  VIRTUAL_SERVER_ENTRY,
 } from '../plugins/virtual-entry'
+import type { RouteDef, RouteManifest } from '../types'
 
 export async function build() {
   const cwd = process.cwd()
@@ -50,7 +55,11 @@ export async function build() {
   )
 
   // 2. Read Vite manifest to get client entry URLs and per-route chunks
-  const { clientEntryUrls, cssUrls, routeManifest } = readViteManifest(clientOutputPath, routes, cwd)
+  const { clientEntryUrls, cssUrls, routeManifest } = readViteManifest(
+    clientOutputPath,
+    routes,
+    cwd,
+  )
 
   // 3. Server build (SSR) — with client entry URLs from manifest
   console.log(`[pareto] Building server...`)
@@ -60,7 +69,16 @@ export async function build() {
       outDir: serverOutputPath,
       entry: VIRTUAL_SERVER_ENTRY,
       config,
-      plugins: [paretoVirtualEntry({ appDir, globalCssPaths, isDev: false, clientEntryUrls, cssUrls, routeManifest })],
+      plugins: [
+        paretoVirtualEntry({
+          appDir,
+          globalCssPaths,
+          isDev: false,
+          clientEntryUrls,
+          cssUrls,
+          routeManifest,
+        }),
+      ],
     }),
   )
 
@@ -105,23 +123,32 @@ interface ViteManifestEntry {
 /**
  * Read the Vite manifest to extract client entry URLs and per-route chunk URLs.
  */
-function readViteManifest(clientOutputPath: string, routes: RouteDef[], cwd: string): {
+function readViteManifest(
+  clientOutputPath: string,
+  routes: RouteDef[],
+  cwd: string,
+): {
   clientEntryUrls: string[]
   cssUrls: string[]
-  routeManifest: import('../types').RouteManifest
+  routeManifest: RouteManifest
 } {
-  const emptyManifest: import('../types').RouteManifest = { routes: {} }
+  const emptyManifest: RouteManifest = { routes: {} }
   const manifestPath = path.resolve(clientOutputPath, '.vite/manifest.json')
   if (!fs.existsSync(manifestPath)) {
-    console.warn('[pareto] Vite manifest not found, client entry URLs will be empty')
+    console.warn(
+      '[pareto] Vite manifest not found, client entry URLs will be empty',
+    )
     return { clientEntryUrls: [], cssUrls: [], routeManifest: emptyManifest }
   }
 
-  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8')) as Record<string, ViteManifestEntry>
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8')) as Record<
+    string,
+    ViteManifestEntry
+  >
 
   // Find the client entry in the manifest
   const entryKey = Object.keys(manifest).find(
-    (k) => k.includes('client-entry') || manifest[k].isEntry,
+    k => k.includes('client-entry') || manifest[k].isEntry,
   )
   if (!entryKey) {
     console.warn('[pareto] Client entry not found in manifest')
@@ -130,10 +157,10 @@ function readViteManifest(clientOutputPath: string, routes: RouteDef[], cwd: str
 
   const entry = manifest[entryKey]
   const clientEntryUrls = ['/' + entry.file]
-  const cssUrls = (entry.css ?? []).map((c) => '/' + c)
+  const cssUrls = (entry.css ?? []).map(c => '/' + c)
 
   // Build per-route manifest from Vite chunk info
-  const routeManifest: import('../types').RouteManifest = { routes: {} }
+  const routeManifest: RouteManifest = { routes: {} }
   for (const route of routes) {
     if (route.isResource) continue
 
@@ -142,7 +169,7 @@ function readViteManifest(clientOutputPath: string, routes: RouteDef[], cwd: str
     const chunkInfo = manifest[relPath]
 
     const js = chunkInfo ? ['/' + chunkInfo.file] : undefined
-    const routeCss = chunkInfo?.css?.map((c) => '/' + c)
+    const routeCss = chunkInfo?.css?.map(c => '/' + c)
 
     routeManifest.routes[route.path] = {
       path: route.path,
@@ -171,7 +198,13 @@ async function generateStaticPages(
   const serverBundle = require(serverEntry) as {
     default?: (req: unknown, res: unknown, next?: () => void) => Promise<void>
     __routes?: { path: string; componentPath: string; isDynamic: boolean }[]
-    __moduleMap?: Record<string, { config?: { render?: string }; staticParams?: () => Promise<Record<string, string>[]> }>
+    __moduleMap?: Record<
+      string,
+      {
+        config?: { render?: string }
+        staticParams?: () => Promise<Record<string, string>[]>
+      }
+    >
   }
 
   const routes = serverBundle.__routes
@@ -184,10 +217,12 @@ async function generateStaticPages(
   const staticPaths: string[] = []
 
   for (const route of routes) {
-    const pageMod = moduleMap[route.componentPath] as {
-      config?: { render?: string }
-      staticParams?: () => Promise<Record<string, string>[]>
-    } | undefined
+    const pageMod = moduleMap[route.componentPath] as
+      | {
+          config?: { render?: string }
+          staticParams?: () => Promise<Record<string, string>[]>
+        }
+      | undefined
     if (!pageMod?.config || pageMod.config.render !== 'static') continue
 
     if (route.isDynamic && pageMod.staticParams) {
@@ -230,20 +265,25 @@ async function generateStaticPages(
 
       const res = Object.assign(stream, {
         statusCode: 200,
-        setHeader() { return res },
+        setHeader() {
+          return res
+        },
       })
 
       void handler(req, res).catch(reject)
     })
 
     // Write to client output directory
-    const outputPath = urlPath === '/'
-      ? path.resolve(clientOutputPath, 'index.html')
-      : path.resolve(clientOutputPath, urlPath.slice(1), 'index.html')
+    const outputPath =
+      urlPath === '/'
+        ? path.resolve(clientOutputPath, 'index.html')
+        : path.resolve(clientOutputPath, urlPath.slice(1), 'index.html')
 
     fs.mkdirSync(path.dirname(outputPath), { recursive: true })
     fs.writeFileSync(outputPath, html)
-    console.log(`[pareto]   ${urlPath} → ${path.relative(process.cwd(), outputPath)}`)
+    console.log(
+      `[pareto]   ${urlPath} → ${path.relative(process.cwd(), outputPath)}`,
+    )
   }
 }
 

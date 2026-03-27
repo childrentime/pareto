@@ -4,7 +4,7 @@ import { LoaderDataContext } from '../data/use-loader-data'
 import { ParetoErrorBoundary } from './error-boundary'
 
 interface RouteSegmentModule {
-  component: React.ComponentType<any>
+  component: React.ComponentType<{ children?: ReactNode }>
   loaderData?: unknown
   loading?: React.ComponentType
   error?: React.ComponentType<{ error: Error }>
@@ -38,12 +38,19 @@ function wrapSegment(
   segment: RouteSegmentModule,
   children: ReactNode | null,
 ): ReactNode {
-  const { component: Component, loaderData, loading: Loading, error: ErrorComponent } = segment
+  const {
+    component: Component,
+    loaderData,
+    loading: Loading,
+    error: ErrorComponent,
+  } = segment
 
   // The component itself, with children outlet for layouts
-  let element: ReactNode = children
-    ? <Component>{children}</Component>
-    : <Component />
+  let element: ReactNode = children ? (
+    <Component>{children}</Component>
+  ) : (
+    <Component />
+  )
 
   // Wrap in LoaderDataContext so useLoaderData works for this segment
   element = (
@@ -54,11 +61,7 @@ function wrapSegment(
 
   // Wrap in Suspense if there's a loading component
   if (Loading) {
-    element = (
-      <Suspense fallback={<Loading />}>
-        {element}
-      </Suspense>
-    )
+    element = <Suspense fallback={<Loading />}>{element}</Suspense>
   }
 
   // Wrap in error boundary if there's an error component

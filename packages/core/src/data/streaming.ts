@@ -1,9 +1,5 @@
 import type { ReactNode } from 'react'
-import {
-  Suspense,
-  createElement,
-  use,
-} from 'react'
+import { Suspense, createElement, use } from 'react'
 import { DeferredData } from '../types'
 
 interface AwaitProps<T> {
@@ -27,8 +23,7 @@ export function Await<T>({ resolve, fallback, children }: AwaitProps<T>) {
   return createElement(
     Suspense,
     { fallback: fallback ?? null },
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    createElement(AwaitInner, { resolve, children } as any),
+    createElement(AwaitInner<T>, { resolve, children }),
   )
 }
 
@@ -40,7 +35,7 @@ function AwaitInner<T>({
   children: (data: T) => ReactNode
 }) {
   const data = resolve instanceof Promise ? use(resolve) : resolve
-  return children(data) as any
+  return children(data) as React.JSX.Element
 }
 
 /**
@@ -75,9 +70,10 @@ export function isDeferredData(value: unknown): value is DeferredData {
  * Promises are replaced with markers that the client replaces
  * with actual promises that resolve when the streamed script arrives.
  */
-export function serializeDeferredData(
-  data: DeferredData,
-): { resolved: Record<string, unknown>; pendingKeys: string[] } {
+export function serializeDeferredData(data: DeferredData): {
+  resolved: Record<string, unknown>
+  pendingKeys: string[]
+} {
   const resolved: Record<string, unknown> = {}
   const pendingKeys: string[] = []
 

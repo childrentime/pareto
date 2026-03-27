@@ -1,6 +1,6 @@
 import { useDebugValue, useSyncExternalStore } from 'react'
-import { createStoreApi } from './core'
 import type { StateCreator, StoreApi } from './core'
+import { createStoreApi } from './core'
 
 type ExtractState<TStore> = TStore extends { getState: () => infer T }
   ? T
@@ -16,7 +16,7 @@ type WithDirectStateAccess<TStore> = TStore extends { getState: () => infer T }
   : never
 
 function createBoundStore<T>(api: StoreApi<T>) {
-  const useBoundStore = (selector: any) => {
+  const useBoundStore = <TSelected>(selector: (state: T) => TSelected) => {
     const slice = useSyncExternalStore(
       api.subscribe,
       () => selector(api.getState()),
@@ -38,7 +38,7 @@ function createEnhancedStore<T>(createState: StateCreator<T>) {
     (total, key) => {
       Object.defineProperty(total, key, {
         get() {
-          return store((s) => s[key as keyof T])
+          return store(s => s[key as keyof T])
         },
         enumerable: true,
       })
@@ -47,7 +47,7 @@ function createEnhancedStore<T>(createState: StateCreator<T>) {
     {} as { [K in keyof T]: T[K] },
   )
 
-  ;(store as any).use = useModel
+  ;(store as unknown as Record<string, unknown>).use = useModel
   return store as WithDirectStateAccess<typeof store>
 }
 

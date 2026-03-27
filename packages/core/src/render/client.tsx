@@ -1,9 +1,5 @@
 import type { ReactNode } from 'react'
-import {
-  Suspense,
-  StrictMode,
-  lazy,
-} from 'react'
+import { StrictMode, Suspense, lazy } from 'react'
 import { hydrateRoot } from 'react-dom/client'
 import { LoaderDataContext } from '../data/use-loader-data'
 import { RouterProvider, useRouterContext } from '../router/context'
@@ -35,7 +31,7 @@ export interface ClientRoute {
   /** Route path pattern, e.g., "/blog/:slug" */
   path: string
   /** Lazy-load the page module */
-  load: () => Promise<any>
+  load: () => Promise<{ default: React.ComponentType }>
   /** Route name for display */
   name: string
   /** Whether this route has a loader */
@@ -43,17 +39,29 @@ export interface ClientRoute {
   /** Dynamic parameter names */
   paramNames?: string[]
   /** Layout components for this route (eagerly imported) */
-  layouts?: React.ComponentType<any>[]
+  layouts?: React.ComponentType<{ children?: ReactNode }>[]
 }
 
 /** Match a URL pathname to a client route using :param syntax */
-function matchClientRoute(pathname: string, routes: ClientRoute[]): ClientRoute | undefined {
-  return routes.find((r) => {
+function matchClientRoute(
+  pathname: string,
+  routes: ClientRoute[],
+): ClientRoute | undefined {
+  return routes.find(r => {
     const pattern = r.path
       .replace(/:(\w+)\*/g, '(.+)')
       .replace(/:(\w+)/g, '([^/]+)')
     return new RegExp(`^${pattern}/?$`).test(pathname)
   })
+}
+
+interface FetchRouteDataResult {
+  loaderData: unknown
+  params: Record<string, string>
+  head?: HeadDescriptor
+  notFound?: boolean
+  error?: string
+  deferredKeys?: string[]
 }
 
 /**
@@ -80,13 +88,16 @@ export function startClient(
   }
 
   const manifest = window.__ROUTE_MANIFEST__ ?? { routes: {} }
-  const initialData = window.__ROUTE_DATA__ ?? {}
+  const initialData: unknown = window.__ROUTE_DATA__ ?? {}
   const initialError = window.__ROUTE_ERROR__
     ? new Error(window.__ROUTE_ERROR__)
     : null
 
   // Build lazy components for all routes
-  const routeComponents = new Map<string, React.LazyExoticComponent<any>>()
+  const routeComponents = new Map<
+    string,
+    React.LazyExoticComponent<React.ComponentType>
+  >()
   for (const route of routes) {
     routeComponents.set(route.path, lazy(route.load))
   }
@@ -94,7 +105,7 @@ export function startClient(
   // Pure data fetcher — no state updates, just returns data.
   // For deferred loaders, creates client-side Promises so <Await> shows fallbacks.
   async function fetchRouteData(pathname: string): Promise<{
-    loaderData: any
+    loaderData: unknown
     params: Record<string, string>
     head?: HeadDescriptor
     notFound?: boolean
@@ -109,17 +120,18 @@ export function startClient(
     if (!response.ok) {
       return { loaderData: null, params: {}, error: 'Loader failed' }
     }
-    const result = await response.json()
+    const result = (await response.json()) as FetchRouteDataResult
 
     // If the server indicated deferred keys, create client-side Promises
     // that fetch each key individually. <Await> renders fallback until resolved.
     if (result.deferredKeys?.length) {
-      for (const key of result.deferredKeys as string[]) {
-        result.loaderData[key] = fetch(
+      const loaderData = result.loaderData as Record<string, unknown>
+      for (const key of result.deferredKeys) {
+        loaderData[key] = fetch(
           `/__pareto/deferred?path=${encodeURIComponent(pathname)}&key=${encodeURIComponent(key)}`,
         )
-          .then((r) => r.json())
-          .then((r) => r.value)
+          .then(r => r.json() as Promise<{ value: unknown }>)
+          .then(r => r.value)
       }
     }
 
@@ -138,7 +150,9 @@ export function startClient(
 
     // Handle client-side 404
     if (router.isNotFound) {
-      let element: React.ReactNode = NotFoundComponent ? <NotFoundComponent /> : null
+      let element: React.ReactNode = NotFoundComponent ? (
+        <NotFoundComponent />
+      ) : null
       // Wrap in root layout if available
       const rootRoute = routes[0]
       const rootLayouts = rootRoute?.layouts ?? []
@@ -152,14 +166,37 @@ export function startClient(
     // Handle loader error (server-side or client-side navigation)
     if (router.navigationError) {
       let element: React.ReactNode = (
-        <div style={{ padding: '2rem', maxWidth: '32rem', margin: '4rem auto', textAlign: 'center' }}>
-          <h2 style={{ color: '#dc2626', fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+        <div
+          style={{
+            padding: '2rem',
+            maxWidth: '32rem',
+            margin: '4rem auto',
+            textAlign: 'center',
+          }}
+        >
+          <h2
+            style={{
+              color: '#dc2626',
+              fontSize: '1.25rem',
+              fontWeight: 600,
+              marginBottom: '0.5rem',
+            }}
+          >
             Something went wrong
           </h2>
-          <p style={{ color: '#666', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
+          <p
+            style={{
+              color: '#666',
+              fontSize: '0.875rem',
+              marginBottom: '1.5rem',
+            }}
+          >
             {router.navigationError.message}
           </p>
-          <a href="/" style={{ color: '#2563eb', fontSize: '0.875rem', fontWeight: 500 }}>
+          <a
+            href="/"
+            style={{ color: '#2563eb', fontSize: '0.875rem', fontWeight: 500 }}
+          >
             Go Home
           </a>
         </div>
@@ -186,13 +223,11 @@ export function startClient(
       ? routeComponents.get(currentRoute.path)
       : undefined
 
-    let element: React.ReactNode = PageComponent
-      ? (
-        <Suspense fallback={null}>
-          <PageComponent />
-        </Suspense>
-      )
-      : null
+    let element: React.ReactNode = PageComponent ? (
+      <Suspense fallback={null}>
+        <PageComponent />
+      </Suspense>
+    ) : null
 
     // Wrap in layouts (innermost to outermost)
     const layouts = currentRoute?.layouts ?? []
@@ -224,6 +259,10 @@ export function startClient(
     )
   }
 
-  hydrateRoot(root, <StrictMode><App /></StrictMode>)
+  hydrateRoot(
+    root,
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  )
 }
-

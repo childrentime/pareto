@@ -11,7 +11,9 @@ const CONFIG_FILENAMES = [
   'pareto.config.mjs',
 ]
 
-export async function loadConfig(cwd: string = process.cwd()): Promise<Required<ParetoConfig>> {
+export async function loadConfig(
+  cwd: string = process.cwd(),
+): Promise<Required<ParetoConfig>> {
   for (const filename of CONFIG_FILENAMES) {
     const configPath = path.resolve(cwd, filename)
     if (fs.existsSync(configPath)) {
@@ -19,14 +21,16 @@ export async function loadConfig(cwd: string = process.cwd()): Promise<Required<
       // and Vite's ssrLoadModule handles TS in dev mode.
       // For .ts files, use tsx/jiti at build time or native support.
       try {
-        const mod = await import(/* @vite-ignore */ pathToFileURL(configPath).href)
-        const resolved = mod.default ?? mod
+        const mod = (await import(
+          /* @vite-ignore */ pathToFileURL(configPath).href
+        )) as Record<string, unknown>
+        const resolved = (mod.default ?? mod) as Partial<ParetoConfig>
         return { ...defaultConfig, ...resolved } as Required<ParetoConfig>
       } catch {
         // Fallback: try require for CJS configs
         try {
-          const mod = require(configPath)
-          const resolved = mod.default ?? mod
+          const mod = require(configPath) as Record<string, unknown>
+          const resolved = (mod.default ?? mod) as Partial<ParetoConfig>
           return { ...defaultConfig, ...resolved } as Required<ParetoConfig>
         } catch {
           console.warn(`[pareto] Failed to load config: ${configPath}`)
@@ -37,10 +41,16 @@ export async function loadConfig(cwd: string = process.cwd()): Promise<Required<
   return { ...defaultConfig }
 }
 
-export function resolveAppDir(config: Required<ParetoConfig>, cwd: string = process.cwd()): string {
+export function resolveAppDir(
+  config: Required<ParetoConfig>,
+  cwd: string = process.cwd(),
+): string {
   return path.resolve(cwd, config.appDir)
 }
 
-export function resolveOutDir(config: Required<ParetoConfig>, cwd: string = process.cwd()): string {
+export function resolveOutDir(
+  config: Required<ParetoConfig>,
+  cwd: string = process.cwd(),
+): string {
   return path.resolve(cwd, config.outDir)
 }

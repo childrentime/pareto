@@ -24,9 +24,10 @@ export function createClientConfig(options: {
     mode: isDev ? 'development' : 'production',
     envPrefix: 'PARETO_',
     plugins: [
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       createRequire(import.meta.url ?? __filename)(
         '@vitejs/plugin-react',
-      ).default(),
+      ).default() as Plugin,
       ...plugins,
     ],
     build: {
@@ -69,9 +70,10 @@ export function createServerConfig(options: {
     root,
     mode: 'production',
     plugins: [
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       createRequire(import.meta.url ?? __filename)(
         '@vitejs/plugin-react',
-      ).default(),
+      ).default() as Plugin,
       ...plugins,
     ],
     build: {

@@ -7,9 +7,15 @@ export interface HydrationPayload {
   storeSnapshots: Record<string, unknown>
 }
 
+declare global {
+  interface Window {
+    __PARETO_DATA__?: HydrationPayload
+  }
+}
+
 export function dehydrate(
   loaderData: Record<string, unknown>,
-  stores?: Record<string, StoreApi<any>>,
+  stores?: Record<string, StoreApi<Record<string, unknown>>>,
 ): string {
   const payload: HydrationPayload = {
     loaderData,
@@ -27,17 +33,19 @@ export function dehydrate(
 
 export function getHydrationData(): HydrationPayload | null {
   if (typeof window === 'undefined') return null
-  return (window as any)[HYDRATION_KEY] ?? null
+  return window.__PARETO_DATA__ ?? null
 }
 
-export function hydrateStores(stores: Record<string, StoreApi<any>>) {
+export function hydrateStores(
+  stores: Record<string, StoreApi<Record<string, unknown>>>,
+) {
   const data = getHydrationData()
   if (!data?.storeSnapshots) return
 
   for (const [name, store] of Object.entries(stores)) {
     const snapshot = data.storeSnapshots[name]
     if (snapshot) {
-      store.setState(() => snapshot)
+      store.setState(() => snapshot as Record<string, unknown>)
     }
   }
 }

@@ -4,11 +4,11 @@ import type { UserConfig } from 'vite'
 // --- Route Types ---
 
 export interface RouteModule {
-  default: React.ComponentType<any>
+  default: React.ComponentType<{ children?: React.ReactNode }>
   loader?: LoaderFunction
   config?: RouteConfig
   staticParams?: () => Promise<Record<string, string>[]>
-  Head?: React.ComponentType<{ data: any }>
+  Head?: React.ComponentType<{ data: unknown }>
 }
 
 export interface RouteConfig {
@@ -45,10 +45,7 @@ export interface LoaderContext {
   params: Record<string, string>
 }
 
-export type LoaderFunction = (
-  context: LoaderContext,
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-) => Promise<any> | any
+export type LoaderFunction = (context: LoaderContext) => unknown
 
 // --- Deferred Data ---
 
@@ -150,7 +147,7 @@ export interface HeadDescriptor {
 }
 
 export type HeadFunction = (ctx: {
-  loaderData: any
+  loaderData: unknown
   params: Record<string, string>
 }) => HeadDescriptor
 

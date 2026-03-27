@@ -1,19 +1,24 @@
+import type { ReactNode } from 'react'
 import {
   createContext,
+  startTransition,
   useCallback,
   useContext,
   useEffect,
   useLayoutEffect,
   useRef,
   useState,
-  startTransition,
 } from 'react'
-import type { ReactNode } from 'react'
-import type { HeadDescriptor, NavigateOptions, RouterState, RouteManifest } from '../types'
+import type {
+  HeadDescriptor,
+  NavigateOptions,
+  RouteManifest,
+  RouterState,
+} from '../types'
 import { updateHead } from './head-manager'
 
 interface NavigationResult {
-  loaderData: any
+  loaderData: unknown
   params: Record<string, string>
   head?: HeadDescriptor
   /** If the loader threw a redirect, contains the target URL */
@@ -30,8 +35,8 @@ interface RouterContextValue extends RouterState {
   back: () => void
   prefetch: (path: string) => void
   manifest: RouteManifest | null
-  loaderData: any
-  setLoaderData: (data: any) => void
+  loaderData: unknown
+  setLoaderData: (data: unknown) => void
   /** Set when a client-side navigation returns 404 */
   isNotFound: boolean
   /** Set when a client-side navigation loader fails */
@@ -52,7 +57,7 @@ export function RouterProvider({
   children?: ReactNode
   initialPathname: string
   initialParams: Record<string, string>
-  initialLoaderData: any
+  initialLoaderData: unknown
   initialError?: Error | null
   manifest: RouteManifest | null
   onNavigate?: (pathname: string) => Promise<NavigationResult>
@@ -62,9 +67,11 @@ export function RouterProvider({
     params: initialParams,
     isNavigating: false,
   })
-  const [loaderData, setLoaderData] = useState(initialLoaderData)
+  const [loaderData, setLoaderData] = useState<unknown>(initialLoaderData)
   const [isNotFound, setIsNotFound] = useState(false)
-  const [navigationError, setNavigationError] = useState<Error | null>(initialError ?? null)
+  const [navigationError, setNavigationError] = useState<Error | null>(
+    initialError ?? null,
+  )
   const prefetchCacheRef = useRef(new Map<string, Promise<NavigationResult>>())
   const pendingScrollRef = useRef(false)
 
@@ -88,14 +95,14 @@ export function RouterProvider({
       const pathname = path.split('?')[0]
       if (path === state.pathname && !opts?.replace) return
 
-      setState((s) => ({ ...s, isNavigating: true }))
+      setState(s => ({ ...s, isNavigating: true }))
 
       try {
         const result = await fetchRouteData(path)
 
         // Handle server-side redirect
         if (result?.redirect) {
-          setState((s) => ({ ...s, isNavigating: false }))
+          setState(s => ({ ...s, isNavigating: false }))
           // Follow the redirect by navigating to the new URL
           void navigate(result.redirect, { replace: true })
           return
@@ -175,7 +182,7 @@ export function RouterProvider({
           }
         })
       } catch {
-        setState((s) => ({ ...s, isNavigating: false }))
+        setState(s => ({ ...s, isNavigating: false }))
       }
     },
     [state.pathname, fetchRouteData],
@@ -203,7 +210,7 @@ export function RouterProvider({
 
       // Also prefetch JS chunks via modulepreload hints
       if (manifest) {
-        const entry = Object.values(manifest.routes).find((r) => r.path === path)
+        const entry = Object.values(manifest.routes).find(r => r.path === path)
         if (entry?.js) {
           for (const jsUrl of entry.js) {
             const link = document.createElement('link')
@@ -239,10 +246,14 @@ export function RouterProvider({
   // Handle streamed deferred data
   useEffect(() => {
     const handleDeferred = (event: Event) => {
-      const key = (event as CustomEvent).detail as string
-      const value = (window as any).__ROUTE_DATA__?.[key]
+      const key = (event as CustomEvent<string>).detail
+      const routeData = window.__ROUTE_DATA__
+      const value = routeData?.[key]
       if (value !== undefined) {
-        setLoaderData((prev: any) => ({ ...prev, [key]: value }))
+        setLoaderData((prev: unknown) => ({
+          ...(prev as Record<string, unknown>),
+          [key]: value,
+        }))
       }
     }
     document.addEventListener('pareto:deferred', handleDeferred)

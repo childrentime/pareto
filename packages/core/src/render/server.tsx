@@ -4,12 +4,9 @@ import { renderToPipeableStream } from 'react-dom/server'
 import serialize from 'serialize-javascript'
 import { isDeferredData, serializeDeferredData } from '../data/streaming'
 import { LoaderDataContext } from '../data/use-loader-data'
-import { matchRoute } from '../router/route-matcher'
 import { RouterProvider } from '../router/context'
-import {
-  ParetoRedirect,
-  ParetoNotFound,
-} from '../types'
+import { mergeHeadDescriptors } from '../router/head-manager'
+import { matchRoute } from '../router/route-matcher'
 import type {
   HeadDescriptor,
   HeadFunction,
@@ -17,7 +14,7 @@ import type {
   RouteDef,
   RouteManifest,
 } from '../types'
-import { mergeHeadDescriptors } from '../router/head-manager'
+import { ParetoNotFound, ParetoRedirect } from '../types'
 import { DeferredScript } from './deferred-script'
 import type { ScriptDescriptor } from './document'
 import { Document } from './document'
@@ -80,8 +77,13 @@ export function createRequestHandler(options: ServerRenderOptions) {
       // No route matched — render not-found.tsx if available
       if (notFoundPath) {
         return renderNotFound(req, res, {
-          notFoundPath, manifest, requireModule, clientEntry,
-          getCssForRoute, cssUrls, streamTimeout,
+          notFoundPath,
+          manifest,
+          requireModule,
+          clientEntry,
+          getCssForRoute,
+          cssUrls,
+          streamTimeout,
         })
       }
       if (next) return next()
@@ -114,8 +116,13 @@ export function createRequestHandler(options: ServerRenderOptions) {
       if (err instanceof ParetoNotFound) {
         if (notFoundPath) {
           return renderNotFound(req, res, {
-            notFoundPath, manifest, requireModule, clientEntry,
-            getCssForRoute, cssUrls, streamTimeout,
+            notFoundPath,
+            manifest,
+            requireModule,
+            clientEntry,
+            getCssForRoute,
+            cssUrls,
+            streamTimeout,
           })
         }
         res.status(404).end('Not Found')
@@ -128,12 +135,16 @@ export function createRequestHandler(options: ServerRenderOptions) {
     }
 
     // Resolve head descriptors
-    const head = loaderError ? undefined : resolveHead(route, loaderData, params, requireModule)
+    const head = loaderError
+      ? undefined
+      : resolveHead(route, loaderData, params, requireModule)
 
     // Resolve loader data (unwrap DeferredData for the component tree)
     const resolvedLoaderData = loaderError
       ? undefined
-      : (isDeferredData(loaderData) ? loaderData.data : loaderData)
+      : isDeferredData(loaderData)
+        ? loaderData.data
+        : loaderData
 
     // Build the component tree
     let element: React.ReactNode
@@ -141,30 +152,65 @@ export function createRequestHandler(options: ServerRenderOptions) {
     if (loaderError) {
       // Loader threw — render a minimal error page
       element = (
-        <div style={{ padding: '2rem', maxWidth: '32rem', margin: '4rem auto', textAlign: 'center' }}>
-          <h2 style={{ color: '#dc2626', fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+        <div
+          style={{
+            padding: '2rem',
+            maxWidth: '32rem',
+            margin: '4rem auto',
+            textAlign: 'center',
+          }}
+        >
+          <h2
+            style={{
+              color: '#dc2626',
+              fontSize: '1.25rem',
+              fontWeight: 600,
+              marginBottom: '0.5rem',
+            }}
+          >
             Something went wrong
           </h2>
-          <p style={{ color: '#666', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
+          <p
+            style={{
+              color: '#666',
+              fontSize: '0.875rem',
+              marginBottom: '1.5rem',
+            }}
+          >
             {loaderError.message}
           </p>
-          <a href="/" style={{ color: '#2563eb', fontSize: '0.875rem', fontWeight: 500 }}>
+          <a
+            href="/"
+            style={{ color: '#2563eb', fontSize: '0.875rem', fontWeight: 500 }}
+          >
             Go Home
           </a>
         </div>
       )
     } else {
       // Normal render — page component
-      const pageMod = requireModule(route.componentPath) as Record<string, unknown>
+      const pageMod = requireModule(route.componentPath) as Record<
+        string,
+        unknown
+      >
       const Page = pageMod.default as React.ComponentType
 
-      element = <Suspense fallback={null}><Page /></Suspense>
+      element = (
+        <Suspense fallback={null}>
+          <Page />
+        </Suspense>
+      )
     }
 
     // Wrap in layouts (innermost to outermost)
     for (let i = route.layoutPaths.length - 1; i >= 0; i--) {
-      const layoutMod = requireModule(route.layoutPaths[i]) as Record<string, unknown>
-      const Layout = layoutMod.default as React.ComponentType<{ children: React.ReactNode }>
+      const layoutMod = requireModule(route.layoutPaths[i]) as Record<
+        string,
+        unknown
+      >
+      const Layout = layoutMod.default as React.ComponentType<{
+        children: React.ReactNode
+      }>
       element = <Layout>{element}</Layout>
     }
 
@@ -208,7 +254,9 @@ export function createRequestHandler(options: ServerRenderOptions) {
     // Serialize initial data for hydration
     const serializedData = loaderError
       ? null
-      : (isDeferredData(loaderData) ? serializeDeferredData(loaderData).resolved : loaderData)
+      : isDeferredData(loaderData)
+        ? serializeDeferredData(loaderData).resolved
+        : loaderData
 
     const dataScript = (
       <script
@@ -218,8 +266,12 @@ export function createRequestHandler(options: ServerRenderOptions) {
             `window.__ROUTE_DATA__=${serialize(serializedData ?? null, { isJSON: true })};`,
             `window.__ROUTE_MANIFEST__=${serialize(manifest, { isJSON: true })};`,
             `window.__MATCHED_ROUTE__=${serialize({ path: route.path, params }, { isJSON: true })};`,
-            loaderError ? `window.__ROUTE_ERROR__=${serialize(loaderError.message, { isJSON: true })};` : '',
-          ].filter(Boolean).join('\n'),
+            loaderError
+              ? `window.__ROUTE_ERROR__=${serialize(loaderError.message, { isJSON: true })};`
+              : '',
+          ]
+            .filter(Boolean)
+            .join('\n'),
         }}
       />
     )
@@ -236,7 +288,13 @@ export function createRequestHandler(options: ServerRenderOptions) {
 
     // Full document
     const doc = (
-      <Document head={head} cssLinks={cssLinks} jsPreloads={jsPreloads} scripts={scripts} dataScript={dataScript}>
+      <Document
+        head={head}
+        cssLinks={cssLinks}
+        jsPreloads={jsPreloads}
+        scripts={scripts}
+        dataScript={dataScript}
+      >
         {wrappedTree}
         {deferredScripts}
       </Document>
@@ -279,7 +337,14 @@ function renderNotFound(
     streamTimeout: number
   },
 ) {
-  const { notFoundPath, manifest, requireModule, clientEntry, cssUrls, streamTimeout } = opts
+  const {
+    notFoundPath,
+    manifest,
+    requireModule,
+    clientEntry,
+    cssUrls,
+    streamTimeout,
+  } = opts
   const notFoundMod = requireModule(notFoundPath) as Record<string, unknown>
   const NotFound = notFoundMod.default as React.ComponentType
 
@@ -352,13 +417,15 @@ async function handleResourceRoute(
 
   // POST/PUT/PATCH/DELETE → action
   if (req.method !== 'GET' && req.method !== 'HEAD') {
-    const actionFn = (routeMod.action ?? routeMod.default) as LoaderFunction | undefined
+    const actionFn = (routeMod.action ?? routeMod.default) as
+      | LoaderFunction
+      | undefined
     if (!actionFn) {
       res.status(405).json({ error: 'Method not allowed' })
       return
     }
     try {
-      const result = await actionFn({ req, res, params })
+      const result: unknown = await actionFn({ req, res, params })
       if (!res.headersSent) {
         res.json(result ?? { ok: true })
       }
@@ -374,13 +441,15 @@ async function handleResourceRoute(
   }
 
   // GET/HEAD → loader
-  const loaderFn = (routeMod.loader ?? routeMod.default) as LoaderFunction | undefined
+  const loaderFn = (routeMod.loader ?? routeMod.default) as
+    | LoaderFunction
+    | undefined
   if (!loaderFn) {
     res.status(405).json({ error: 'No loader defined' })
     return
   }
   try {
-    const result = await loaderFn({ req, res, params })
+    const result: unknown = await loaderFn({ req, res, params })
     if (!res.headersSent) {
       res.json(result ?? null)
     }
@@ -476,13 +545,19 @@ async function handleDeferredRequest(
   }
 
   try {
-    const loaderData = await runLoaders(match.route, match.params, req, res, requireModule)
+    const loaderData = await runLoaders(
+      match.route,
+      match.params,
+      req,
+      res,
+      requireModule,
+    )
     if (!isDeferredData(loaderData)) {
       res.status(400).json({ error: 'Route does not use defer()' })
       return
     }
-    const value = loaderData.data[key]
-    const resolved = value instanceof Promise ? await value : value
+    const value: unknown = loaderData.data[key]
+    const resolved: unknown = value instanceof Promise ? await value : value
     res.json({ key, value: resolved })
   } catch (err) {
     console.error('[pareto] Deferred request error:', err)
@@ -501,7 +576,9 @@ function runLoaders(
   // Check separate loader file first
   if (route.loaderPath) {
     const loaderMod = requireModule(route.loaderPath) as Record<string, unknown>
-    const loaderFn = (loaderMod.loader ?? loaderMod.default) as LoaderFunction | undefined
+    const loaderFn = (loaderMod.loader ?? loaderMod.default) as
+      | LoaderFunction
+      | undefined
     if (loaderFn) return loaderFn({ req, res, params })
   }
 
@@ -521,12 +598,15 @@ function resolveHead(
   params: Record<string, string>,
   requireModule: (path: string) => unknown,
 ): HeadDescriptor | undefined {
-  const paths = route.headPaths.length > 0 ? route.headPaths : (route.headPath ? [route.headPath] : [])
+  const paths =
+    route.headPaths.length > 0
+      ? route.headPaths
+      : route.headPath
+        ? [route.headPath]
+        : []
   if (paths.length === 0) return undefined
 
-  const resolvedData = isDeferredData(loaderData)
-    ? loaderData.data
-    : loaderData
+  const resolvedData = isDeferredData(loaderData) ? loaderData.data : loaderData
 
   const heads: HeadDescriptor[] = []
   for (const headPath of paths) {

@@ -1,6 +1,6 @@
 {
   "name": "@paretojs/core",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "homepage": "https://paretojs.tech/",
   "repository": {
     "type": "git",
@@ -60,6 +60,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc",
+    "lint": "eslint src/",
     "test": "vitest run",
     "test:watch": "vitest"
   },

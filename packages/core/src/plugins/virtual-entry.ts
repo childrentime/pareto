@@ -1,12 +1,12 @@
 import fs from 'fs'
 import path from 'path'
 import type { Plugin, ViteDevServer } from 'vite'
-import type { RouteDef } from '../types'
-import { scanRoutes, findNotFound } from '../router/route-scanner'
 import {
   generateServerEntry,
   generateUnifiedClientEntry,
 } from '../entry/generate'
+import { findNotFound, scanRoutes } from '../router/route-scanner'
+import type { RouteDef, RouteManifest } from '../types'
 
 export const VIRTUAL_SERVER_ENTRY = 'virtual:pareto/server-entry'
 export const VIRTUAL_CLIENT_ENTRY = 'virtual:pareto/client-entry'
@@ -17,10 +17,13 @@ const RESOLVED_SERVER = '\0' + VIRTUAL_SERVER_ENTRY
  * Find global CSS files at the app root level.
  */
 export function findGlobalCss(appDir: string): string[] {
-  const candidates = ['globals.css', 'global.css', 'globals.scss', 'global.scss']
-  return candidates
-    .map((f) => path.join(appDir, f))
-    .filter((f) => fs.existsSync(f))
+  const candidates = [
+    'globals.css',
+    'global.css',
+    'globals.scss',
+    'global.scss',
+  ]
+  return candidates.map(f => path.join(appDir, f)).filter(f => fs.existsSync(f))
 }
 
 /**
@@ -39,7 +42,7 @@ export interface VirtualEntryOptions {
   /** CSS URLs to inject (from Vite manifest, for production builds) */
   cssUrls?: string[]
   /** Per-route JS/CSS manifest (from Vite manifest, for production builds) */
-  routeManifest?: import('../types').RouteManifest
+  routeManifest?: RouteManifest
 }
 
 /**
@@ -48,7 +51,14 @@ export interface VirtualEntryOptions {
  * generation via Vite's plugin load hook.
  */
 export function paretoVirtualEntry(options: VirtualEntryOptions): Plugin {
-  const { appDir, globalCssPaths = [], isDev = false, clientEntryUrls: optClientEntryUrls, cssUrls: optCssUrls, routeManifest: optRouteManifest } = options
+  const {
+    appDir,
+    globalCssPaths = [],
+    isDev = false,
+    clientEntryUrls: optClientEntryUrls,
+    cssUrls: optCssUrls,
+    routeManifest: optRouteManifest,
+  } = options
   let routes: RouteDef[] = []
   let notFoundPath: string | undefined
 
@@ -114,7 +124,8 @@ export function paretoVirtualEntry(options: VirtualEntryOptions): Plugin {
           const serverMod = server.moduleGraph.getModuleById(RESOLVED_SERVER)
           if (serverMod) server.moduleGraph.invalidateModule(serverMod)
 
-          const clientMod = server.moduleGraph.getModuleById(VIRTUAL_CLIENT_ENTRY)
+          const clientMod =
+            server.moduleGraph.getModuleById(VIRTUAL_CLIENT_ENTRY)
           if (clientMod) server.moduleGraph.invalidateModule(clientMod)
 
           server.hot.send({ type: 'full-reload' })

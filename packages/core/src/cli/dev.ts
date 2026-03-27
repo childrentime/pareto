@@ -1,18 +1,18 @@
-import net from 'net'
-import http from 'http'
-import path from 'path'
 import express from 'express'
-import { loadConfig, resolveAppDir, loadApp } from '../config'
+import http from 'http'
+import net from 'net'
+import path from 'path'
+import { loadApp, loadConfig, resolveAppDir } from '../config'
 import {
-  paretoVirtualEntry,
   findGlobalCss,
+  paretoVirtualEntry,
   VIRTUAL_SERVER_ENTRY,
 } from '../plugins/virtual-entry'
 import { securityHeaders } from '../server/security-headers'
 
 /** Check whether a port is available. */
 export function isPortAvailable(port: number): Promise<boolean> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const server = net.createServer()
     server.once('error', () => resolve(false))
     server.once('listening', () => {
@@ -91,11 +91,19 @@ export async function dev() {
       return next()
     }
     try {
-      const serverModule = await vite.ssrLoadModule(VIRTUAL_SERVER_ENTRY)
+      const serverModule = (await vite.ssrLoadModule(VIRTUAL_SERVER_ENTRY)) as {
+        default?: unknown
+      }
       const handler = serverModule.default
 
       if (typeof handler === 'function') {
-        await handler(req, res, next)
+        await (
+          handler as (
+            req: unknown,
+            res: unknown,
+            next: () => void,
+          ) => Promise<void>
+        )(req, res, next)
       } else {
         next()
       }
@@ -109,7 +117,9 @@ export async function dev() {
   })
 
   if (port !== preferredPort) {
-    console.log(`[pareto] Port ${preferredPort} is in use, using ${port} instead`)
+    console.log(
+      `[pareto] Port ${preferredPort} is in use, using ${port} instead`,
+    )
   }
   console.log(`[pareto] Dev server starting...`)
   httpServer.listen(port, () => {

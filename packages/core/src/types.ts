@@ -13,11 +13,6 @@ export interface RouteModule {
 
 export interface RouteConfig {
   render?: 'server' | 'static'
-  revalidate?: {
-    onFocus?: boolean
-    interval?: number
-    onNavigate?: boolean
-  }
 }
 
 export interface RouteDef {
@@ -62,7 +57,9 @@ export type LoaderFunction = (
  * Resolved values are sent in the initial shell; unresolved ones
  * stream in later inside <Suspense> boundaries.
  */
-export class DeferredData<T extends Record<string, unknown> = Record<string, unknown>> {
+export class DeferredData<
+  T extends Record<string, unknown> = Record<string, unknown>,
+> {
   public data: T
   constructor(data: T) {
     this.data = data
@@ -85,7 +82,9 @@ export class DeferredData<T extends Record<string, unknown> = Record<string, unk
  * }
  * ```
  */
-export function defer<T extends Record<string, unknown>>(data: T): DeferredData<T> {
+export function defer<T extends Record<string, unknown>>(
+  data: T,
+): DeferredData<T> {
   return new DeferredData(data)
 }
 
@@ -102,7 +101,10 @@ export function defer<T extends Record<string, unknown>>(data: T): DeferredData<
  * ```
  */
 export class ParetoRedirect {
-  constructor(public url: string, public status = 302) {}
+  constructor(
+    public url: string,
+    public status = 302,
+  ) {}
 }
 
 /**
@@ -147,7 +149,10 @@ export interface HeadDescriptor {
   link?: Record<string, string>[]
 }
 
-export type HeadFunction = (ctx: { loaderData: any; params: Record<string, string> }) => HeadDescriptor
+export type HeadFunction = (ctx: {
+  loaderData: any
+  params: Record<string, string>
+}) => HeadDescriptor
 
 // --- Route Manifest (serialized for client) ---
 

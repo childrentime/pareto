@@ -12,6 +12,8 @@ import {
   ParetoErrorBoundary,
   useLoaderData,
   useRouter,
+  useRouterSnapshot,
+  useStreamData,
   defer,
   redirect,
   notFound,
@@ -86,10 +88,33 @@ const { pathname, params, isNavigating, push, replace, back, prefetch } = useRou
 | `pathname` | `string` | Current URL path |
 | `params` | `Record<string, string>` | Dynamic route parameters |
 | `isNavigating` | `boolean` | `true` during navigation transitions |
-| `push(url)` | `(url: string) => void` | Navigate to URL (adds history entry) |
-| `replace(url)` | `(url: string) => void` | Navigate to URL (replaces history entry) |
+| `push(url, opts?)` | `(url: string, opts?: NavigateOptions) => void` | Navigate to URL (adds history entry) |
+| `replace(url, opts?)` | `(url: string, opts?: NavigateOptions) => void` | Navigate to URL (replaces history entry) |
 | `back()` | `() => void` | Navigate back in history |
 | `prefetch(url)` | `(url: string) => void` | Prefetch a route's loader data |
+
+`NavigateOptions` accepts `{ replace?: boolean, scroll?: boolean }`. For example, `push('/page', { scroll: false })` navigates without scrolling to top.
+
+### `useRouterSnapshot()`
+
+Read-only router state without navigation methods. Lower-level than `useRouter()` — use this when you only need to read the current route.
+
+```tsx
+const { pathname, params, isNavigating } = useRouterSnapshot()
+```
+
+Returns a `RouterState` object with `pathname`, `params`, and `isNavigating`.
+
+### `useStreamData<T>(promiseOrValue)`
+
+Hook to consume a deferred value without `<Await>`. Suspends the component until the promise resolves, so it must be used inside a `<Suspense>` boundary.
+
+```tsx
+function Activity({ data }: { data: Promise<Items> | Items }) {
+  const items = useStreamData(data)
+  return <div>{items.length} items</div>
+}
+```
 
 ## Functions
 

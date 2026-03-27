@@ -62,6 +62,16 @@ app/docs/[...path]/page.tsx  → /docs/*
 
 The `path` param will be a string containing the rest of the URL. For example, `/docs/getting-started/install` sets `ctx.params.path` to `getting-started/install`.
 
+### Optional catch-all routes
+
+Use `[[...param]]` (double brackets) for optional catch-all segments. These work like catch-all routes but also match the parent path:
+
+```
+app/docs/[[...path]]/page.tsx  → /docs and /docs/*
+```
+
+This matches both `/docs` (with `ctx.params.path` undefined) and `/docs/getting-started` (with `ctx.params.path` set to `getting-started`).
+
 ## How do nested layouts work?
 
 Layouts at each level wrap their children. A root `layout.tsx` wraps every page:

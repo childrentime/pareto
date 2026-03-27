@@ -11,12 +11,13 @@ import { defineStore, defineContextStore } from '@paretojs/core/store'
 
 ## `defineStore(initializer)`
 
-Create a global reactive store. Supports direct destructuring.
+Create a global reactive store. Supports direct destructuring. The initializer receives `set` for Immer-powered state updates and `get` for reading current state:
 
 ```tsx
-const counterStore = defineStore((set) => ({
+const counterStore = defineStore((set, get) => ({
   count: 0,
   increment: () => set((draft) => { draft.count++ }),
+  double: () => set((draft) => { draft.count = get().count * 2 }),
 }))
 
 // Usage
@@ -30,14 +31,14 @@ const { count, increment } = counterStore.useStore()
 | `useStore()` | `() => State` | React hook — re-renders on state change |
 | `getState()` | `() => State` | Get current state outside React |
 | `setState(fn)` | `(fn: (draft) => void) => void` | Update state with Immer draft |
-| `subscribe(fn)` | `(fn: () => void) => () => void` | Listen for changes, returns unsubscribe |
+| `subscribe(fn)` | `(fn: (state, prevState) => void) => () => void` | Listen for changes, returns unsubscribe |
 
 ## `defineContextStore(initializer)`
 
 Create a per-instance store with React context. SSR-safe (no shared global state between requests). Use this when the store holds per-request data like the current user or auth tokens. See [State Management — When to use global vs. context stores](/concepts/state-management/) for guidance.
 
 ```tsx
-const { Provider, useStore } = defineContextStore((set) => ({
+const { Provider, useStore } = defineContextStore(() => (set) => ({
   theme: 'light',
   toggle: () => set((d) => { d.theme = d.theme === 'light' ? 'dark' : 'light' }),
 }))

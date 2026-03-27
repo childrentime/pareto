@@ -12,6 +12,8 @@ import {
   ParetoErrorBoundary,
   useLoaderData,
   useRouter,
+  useRouterSnapshot,
+  useStreamData,
   defer,
   redirect,
   notFound,
@@ -79,6 +81,39 @@ const data = useLoaderData<{ user: User }>()
 
 ```tsx
 const { pathname, params, isNavigating, push, replace, back, prefetch } = useRouter()
+```
+
+| 属性 | 类型 | 描述 |
+|------|------|------|
+| `pathname` | `string` | 当前 URL 路径 |
+| `params` | `Record<string, string>` | 动态路由参数 |
+| `isNavigating` | `boolean` | 导航过渡中为 `true` |
+| `push(url, opts?)` | `(url: string, opts?: NavigateOptions) => void` | 导航到 URL（添加历史记录） |
+| `replace(url, opts?)` | `(url: string, opts?: NavigateOptions) => void` | 导航到 URL（替换历史记录） |
+| `back()` | `() => void` | 返回上一页 |
+| `prefetch(url)` | `(url: string) => void` | 预取路由的 loader 数据 |
+
+`NavigateOptions` 接受 `{ replace?: boolean, scroll?: boolean }`。例如 `push('/page', { scroll: false })` 导航时不滚动到顶部。
+
+### `useRouterSnapshot()`
+
+只读路由状态，不含导航方法。比 `useRouter()` 更轻量 — 只需读取当前路由信息时使用。
+
+```tsx
+const { pathname, params, isNavigating } = useRouterSnapshot()
+```
+
+返回 `RouterState` 对象，包含 `pathname`、`params` 和 `isNavigating`。
+
+### `useStreamData<T>(promiseOrValue)`
+
+不使用 `<Await>` 消费延迟值的 Hook。会挂起组件直到 Promise 解析，因此必须在 `<Suspense>` 边界内使用。
+
+```tsx
+function Activity({ data }: { data: Promise<Items> | Items }) {
+  const items = useStreamData(data)
+  return <div>{items.length} items</div>
+}
 ```
 
 ## 函数

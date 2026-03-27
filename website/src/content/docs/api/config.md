@@ -22,7 +22,7 @@ export default config
 interface ParetoConfig {
   appDir?: string
   outDir?: string
-  configureVite?: (config: ViteConfig, env: { isServer: boolean }) => ViteConfig
+  configureVite?: (config: UserConfig, context: { isServer: boolean }) => UserConfig
 }
 ```
 
@@ -135,9 +135,9 @@ npm run build    # Runs pareto build
 npm run start    # Runs pareto start
 ```
 
-The build step outputs:
-- `dist/client/` — Static assets (JS, CSS, images) for CDN deployment
-- `dist/server/` — Server bundle for the Node.js runtime
+The build step outputs (inside the configured `outDir`, default `.pareto`):
+- `.pareto/client/` — Static assets (JS, CSS, images) for CDN deployment
+- `.pareto/server/` — Server bundle for the Node.js runtime
 
 A minimal production `Dockerfile`:
 
@@ -146,7 +146,7 @@ FROM node:20-alpine
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN corepack enable && pnpm install --frozen-lockfile --prod
-COPY dist/ dist/
+COPY .pareto/ .pareto/
 EXPOSE 3000
 CMD ["npx", "pareto", "start"]
 ```

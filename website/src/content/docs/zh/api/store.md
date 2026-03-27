@@ -11,12 +11,13 @@ import { defineStore, defineContextStore } from '@paretojs/core/store'
 
 ## `defineStore(initializer)`
 
-创建全局响应式 Store。支持直接解构。
+创建全局响应式 Store。支持直接解构。初始化函数接收 `set`（Immer 驱动的状态更新）和 `get`（读取当前状态）：
 
 ```tsx
-const counterStore = defineStore((set) => ({
+const counterStore = defineStore((set, get) => ({
   count: 0,
   increment: () => set((draft) => { draft.count++ }),
+  double: () => set((draft) => { draft.count = get().count * 2 }),
 }))
 
 // 使用
@@ -30,14 +31,14 @@ const { count, increment } = counterStore.useStore()
 | `useStore()` | `() => State` | React Hook — 状态变化时重新渲染 |
 | `getState()` | `() => State` | 在 React 外部获取当前状态 |
 | `setState(fn)` | `(fn: (draft) => void) => void` | 使用 Immer draft 更新状态 |
-| `subscribe(fn)` | `(fn: () => void) => () => void` | 监听变化，返回取消订阅函数 |
+| `subscribe(fn)` | `(fn: (state, prevState) => void) => () => void` | 监听变化，返回取消订阅函数 |
 
 ## `defineContextStore(initializer)`
 
 创建基于 React Context 的实例级 Store。SSR 安全（请求之间不共享全局状态）。
 
 ```tsx
-const { Provider, useStore } = defineContextStore((set) => ({
+const { Provider, useStore } = defineContextStore(() => (set) => ({
   theme: 'light',
   toggle: () => set((d) => { d.theme = d.theme === 'light' ? 'dark' : 'light' }),
 }))

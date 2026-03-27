@@ -7,6 +7,8 @@ Pareto 内置了基于 Immer 的状态管理方案。无需额外依赖。
 
 ## defineStore
 
+使用 `defineStore` 创建全局响应式 Store。初始化函数接收 `set`（Immer 驱动的状态更新）和 `get`（读取当前状态）：
+
 ```tsx
 import { defineStore } from '@paretojs/core/store'
 

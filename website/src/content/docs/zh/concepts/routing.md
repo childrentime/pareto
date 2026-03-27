@@ -56,6 +56,18 @@ export function loader(ctx: LoaderContext) {
 app/docs/[...path]/page.tsx  → /docs/*
 ```
 
+`path` 参数是一个字符串，包含 URL 的剩余部分。例如 `/docs/getting-started/install` 会将 `ctx.params.path` 设为 `getting-started/install`。
+
+### 可选通配路由
+
+使用 `[[...param]]`（双括号）实现可选通配段。与通配路由类似，但也会匹配父路径：
+
+```
+app/docs/[[...path]]/page.tsx  → /docs 和 /docs/*
+```
+
+这会同时匹配 `/docs`（`ctx.params.path` 为 undefined）和 `/docs/getting-started`（`ctx.params.path` 为 `getting-started`）。
+
 ## 嵌套布局是怎样工作的？
 
 每一级的布局会包裹其子组件。根级 `layout.tsx` 包裹所有页面：

@@ -11,7 +11,6 @@ Pareto supports streaming SSR via `defer()` and `<Await>`. Send the page shell i
 
 ```tsx
 import { defer, useLoaderData, Await } from '@paretojs/core'
-import { Suspense } from 'react'
 
 export function loader() {
   const quickData = { total: 42 }
@@ -30,17 +29,13 @@ export default function Page() {
     <div>
       <h1>{quickData.total} items</h1>
 
-      <Suspense fallback={<Skeleton />}>
-        <Await resolve={slowData}>
-          {(data) => <DataTable rows={data} />}
-        </Await>
-      </Suspense>
+      <Await resolve={slowData} fallback={<Skeleton />}>
+        {(data) => <DataTable rows={data} />}
+      </Await>
 
-      <Suspense fallback={<Skeleton />}>
-        <Await resolve={slowerData}>
-          {(data) => <Chart data={data} />}
-        </Await>
-      </Suspense>
+      <Await resolve={slowerData} fallback={<Skeleton />}>
+        {(data) => <Chart data={data} />}
+      </Await>
     </div>
   )
 }
@@ -51,9 +46,9 @@ export default function Page() {
 1. The loader returns `defer({ ... })` with a mix of resolved values and promises
 2. The server sends the HTML shell immediately with the resolved values
 3. As each promise resolves, React streams the result into the page
-4. The `<Await>` component renders the `fallback` until the promise resolves, then renders the children
+4. The `<Await>` component shows its `fallback` prop until the promise resolves, then renders the children
 
-Each `<Await>` component is backed by a React `<Suspense>` boundary. When the promise resolves, React replaces the fallback content in-place without a full re-render. On the client after hydration, this is the same mechanism React uses for lazy-loaded components.
+Each `<Await>` component creates its own React `<Suspense>` boundary internally. When the promise resolves, React replaces the fallback content in-place without a full re-render. On the client after hydration, this is the same mechanism React uses for lazy-loaded components.
 
 ## When should I use streaming?
 
@@ -79,11 +74,9 @@ When a deferred promise rejects, the `<Await>` component throws the error, which
 
 ```tsx
 <ParetoErrorBoundary fallback={({ error }) => <p>Failed to load data.</p>}>
-  <Suspense fallback={<Skeleton />}>
-    <Await resolve={slowData}>
-      {(data) => <DataTable rows={data} />}
-    </Await>
-  </Suspense>
+  <Await resolve={slowData} fallback={<Skeleton />}>
+    {(data) => <DataTable rows={data} />}
+  </Await>
 </ParetoErrorBoundary>
 ```
 

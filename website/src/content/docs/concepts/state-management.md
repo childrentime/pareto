@@ -7,7 +7,7 @@ Pareto includes a built-in state management solution powered by Immer. No extra 
 
 ## defineStore
 
-Create a global reactive store with `defineStore`. The initializer function receives a `set` function for Immer-powered mutations:
+Create a global reactive store with `defineStore`. The initializer function receives a `set` function for Immer-powered mutations and a `get` function for reading current state:
 
 ```tsx
 import { defineStore } from '@paretojs/core/store'

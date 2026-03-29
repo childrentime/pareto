@@ -1,5 +1,8 @@
-import { describe, it, expect } from 'vitest'
-import { generateServerEntry, generateUnifiedClientEntry } from '../entry/generate'
+import { describe, expect, it } from 'vitest'
+import {
+  generateServerEntry,
+  generateUnifiedClientEntry,
+} from '../entry/generate'
 import type { RouteDef } from '../types'
 
 const mockRoute: RouteDef = {
@@ -36,11 +39,15 @@ describe('generateServerEntry (refactored)', () => {
       clientEntryUrls: ['/@vite/client', '/virtual:pareto/client-entry'],
     })
 
-    expect(code).toContain("import { createRequestHandler } from '@paretojs/core/node'")
+    expect(code).toContain(
+      "import { createRequestHandler } from '@paretojs/core/node'",
+    )
     expect(code).toContain("import * as mod_0 from '/app/page.tsx'")
     expect(code).toContain("import * as mod_1 from '/app/layout.tsx'")
     expect(code).toContain('moduleMap')
-    expect(code).toContain("clientEntry: [\"/@vite/client\",\"/virtual:pareto/client-entry\"]")
+    expect(code).toContain(
+      'clientEntry: ["/@vite/client","/virtual:pareto/client-entry"]',
+    )
   })
 
   it('generates server entry with empty clientEntryUrls for build mode', () => {
@@ -68,10 +75,12 @@ describe('generateServerEntry (refactored)', () => {
     })
 
     expect(code).toContain("import * as mod_2 from '/app/blog/[slug]/page.tsx'")
-    expect(code).toContain("import * as mod_3 from '/app/blog/[slug]/loader.ts'")
+    expect(code).toContain(
+      "import * as mod_3 from '/app/blog/[slug]/loader.ts'",
+    )
     expect(code).toContain("path: '/blog/:slug'")
-    expect(code).toContain("paramNames: [\"slug\"]")
-    expect(code).toContain("isDynamic: true")
+    expect(code).toContain('paramNames: ["slug"]')
+    expect(code).toContain('isDynamic: true')
   })
 
   it('deduplicates shared module imports', () => {
@@ -80,7 +89,9 @@ describe('generateServerEntry (refactored)', () => {
       routes: [mockRoute, mockDynamicRoute],
     })
 
-    const layoutImports = code.match(/import \* as mod_\d+ from '\/app\/layout\.tsx'/g)
+    const layoutImports = code.match(
+      /import \* as mod_\d+ from '\/app\/layout\.tsx'/g,
+    )
     expect(layoutImports).toHaveLength(1)
   })
 })
@@ -89,9 +100,11 @@ describe('generateUnifiedClientEntry', () => {
   it('generates client entry with lazy page imports', () => {
     const code = generateUnifiedClientEntry([mockRoute])
 
-    expect(code).toContain("import { startClient } from '@paretojs/core/client'")
+    expect(code).toContain(
+      "import { startClient } from '@paretojs/core/client'",
+    )
     expect(code).toContain("const page_0 = () => import('/app/page.tsx')")
-    expect(code).toContain("startClient(routes)")
+    expect(code).toContain('startClient(routes)')
   })
 
   it('eagerly imports shared layouts', () => {
@@ -99,7 +112,9 @@ describe('generateUnifiedClientEntry', () => {
 
     expect(code).toContain("import Layout_0 from '/app/layout.tsx'")
     // Layout should only be imported once (deduplication)
-    const layoutImports = code.match(/import Layout_\d+ from '\/app\/layout\.tsx'/g)
+    const layoutImports = code.match(
+      /import Layout_\d+ from '\/app\/layout\.tsx'/g,
+    )
     expect(layoutImports).toHaveLength(1)
   })
 
@@ -112,8 +127,8 @@ describe('generateUnifiedClientEntry', () => {
   it('marks routes with hasLoader correctly', () => {
     const code = generateUnifiedClientEntry([mockRoute, mockDynamicRoute])
 
-    expect(code).toContain("hasLoader: false")
-    expect(code).toContain("hasLoader: true")
+    expect(code).toContain('hasLoader: false')
+    expect(code).toContain('hasLoader: true')
   })
 
   it('skips resource routes in client entry', () => {
@@ -136,7 +151,11 @@ describe('generateUnifiedClientEntry', () => {
   })
 
   it('includes notFoundComponent when notFoundPath is provided', () => {
-    const code = generateUnifiedClientEntry([mockRoute], [], '/app/not-found.tsx')
+    const code = generateUnifiedClientEntry(
+      [mockRoute],
+      [],
+      '/app/not-found.tsx',
+    )
 
     expect(code).toContain("import NotFoundComponent from '/app/not-found.tsx'")
     expect(code).toContain('notFoundComponent: NotFoundComponent')
@@ -171,13 +190,6 @@ describe('generateServerEntry with headPaths', () => {
     // Both should be in the module map
     expect(code).toContain("'/app/head.tsx':")
     expect(code).toContain("'/app/blog/[slug]/head.tsx':")
-  })
-
-  it('exports __routes and __moduleMap for SSG', () => {
-    const code = generateServerEntry({ routes: [mockRoute] })
-
-    expect(code).toContain('export const __routes = routes')
-    expect(code).toContain('export const __moduleMap = moduleMap')
   })
 
   it('includes notFoundPath in createRequestHandler when provided', () => {

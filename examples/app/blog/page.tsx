@@ -1,7 +1,4 @@
 import { Link } from '@paretojs/core'
-import type { RouteConfig } from '@paretojs/core'
-
-export const config: RouteConfig = { render: 'static' }
 
 const posts = [
   {
@@ -34,7 +31,7 @@ export function loader() {
 export default function BlogIndex() {
   return (
     <div className="space-y-4">
-      {posts.map((post) => (
+      {posts.map(post => (
         <Link
           key={post.slug}
           href={`/blog/${post.slug}`}
@@ -81,16 +78,7 @@ function SourceCode() {
         <pre className="p-5 text-[0.8125rem] leading-relaxed overflow-x-auto">
           <code className="text-stone-300">
             <span className="text-stone-500">
-              {'// 1. Static params for SSG\n'}
-            </span>
-            {'export '}
-            <span className="text-orange-400">staticParams</span>
-            {' = () => [\n'}
-            {"  { slug: 'streaming-ssr' },\n"}
-            {"  { slug: 'file-based-routing' },\n"}
-            {']\n\n'}
-            <span className="text-stone-500">
-              {'// 2. Dynamic loader with [slug] param\n'}
+              {'// 1. Dynamic loader with [slug] param\n'}
             </span>
             {'export function '}
             <span className="text-orange-400">loader</span>
@@ -98,7 +86,7 @@ function SourceCode() {
             {'  return db.getPost(params.slug)\n'}
             {'}\n\n'}
             <span className="text-stone-500">
-              {'// 3. Nested layout wraps all /blog/* pages\n'}
+              {'// 2. Nested layout wraps all /blog/* pages\n'}
             </span>
             <span className="text-stone-500">
               {'// app/blog/layout.tsx → shared header\n'}

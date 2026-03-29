@@ -3,7 +3,7 @@ title: Introduction
 description: What Pareto is and why you might choose it over Next.js or Remix.
 ---
 
-Pareto is a lightweight React SSR framework built on Vite 7. It gives you server-side rendering with streaming, file-based routing, built-in state management, and static site generation — without the complexity of larger frameworks.
+Pareto is a lightweight React SSR framework built on Vite 7. It gives you server-side rendering with streaming, file-based routing, and built-in state management — without the complexity of larger frameworks.
 
 ## Why Pareto?
 
@@ -20,7 +20,6 @@ If you've used Next.js or Remix, you already know the patterns. Pareto uses the 
 |---------|-------------|
 | **[Streaming SSR](/concepts/streaming/)** | `defer()` + `<Await>` for progressive data loading |
 | **[File-Based Routing](/concepts/routing/)** | `page.tsx`, `layout.tsx`, `loader.ts`, `head.tsx`, `not-found.tsx` |
-| **[SSG](/concepts/ssg/)** | `export const config = { render: 'static' }` on any page |
 | **[State Management](/concepts/state-management/)** | `defineStore()` with Immer — supports destructuring, SSR serialization |
 | **[Error Boundaries](/concepts/error-handling/)** | `ParetoErrorBoundary` component for catching render errors |
 | **[Redirect & 404](/concepts/redirects/)** | `throw redirect()` and `throw notFound()` in loaders |
@@ -58,4 +57,4 @@ Pareto does not use React Server Components (RSC). Instead, it uses the loader p
 
 ### Can I deploy Pareto anywhere?
 
-Yes. Pareto produces a standard Node.js server (Express). You can deploy it anywhere Node.js runs: a VPS, a Docker container, AWS EC2/ECS, Google Cloud Run, Railway, Fly.io, or any other hosting platform that supports Node. For [static pages](/concepts/ssg/), you can serve the pre-rendered HTML from any CDN or static host.
+Yes. Pareto produces a standard Node.js server (Express). You can deploy it anywhere Node.js runs: a VPS, a Docker container, AWS EC2/ECS, Google Cloud Run, Railway, Fly.io, or any other hosting platform that supports Node.

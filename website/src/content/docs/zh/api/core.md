@@ -162,7 +162,7 @@ interface LoaderContext {
 
 ```tsx
 interface RouteConfig {
-  render?: 'server' | 'static'
+  render?: 'server'
 }
 ```
 

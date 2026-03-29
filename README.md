@@ -20,7 +20,6 @@ pnpm create pareto my-app
 ## Features
 
 - **SSR & Streaming** — Server-render pages instantly. Use `defer()` to stream slow data through Suspense boundaries.
-- **SSG** — Export `config = { render: 'static' }` to pre-render pages at build time.
 - **File-Based Routing** — `page.tsx`, `layout.tsx`, `loader.ts`, `head.tsx`, `not-found.tsx` conventions.
 - **Dynamic Routes** — `[param]`, `[...slug]`, `[[...optional]]` segments for dynamic URL matching.
 - **Route Groups** — `(groupName)` directories to organize routes without affecting the URL.

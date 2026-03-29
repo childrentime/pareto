@@ -9,3 +9,4 @@ dist-bin
 .env
 .env.local
 .env.*.local
+.gstack/

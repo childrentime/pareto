@@ -92,6 +92,5 @@ Now that your app is running, explore the core concepts:
 - **[State Management](/concepts/state-management/)** — Manage global and per-request state with `defineStore()` and `defineContextStore()`.
 - **[Head Management](/concepts/head-management/)** — Set per-route `<title>` and meta tags via `head.tsx`.
 - **[Error Handling](/concepts/error-handling/)** — Use `ParetoErrorBoundary` to catch render errors in your layouts and pages.
-- **[Static Site Generation](/concepts/ssg/)** — Pre-render pages at build time with `render: 'static'`.
 - **[Resource Routes](/concepts/resource-routes/)** — Create JSON API endpoints with `route.ts`.
 - **[Configuration](/api/config/)** — Customize the Express server, Vite build, and CLI options via `pareto.config.ts`.

@@ -22,7 +22,6 @@ pnpm create pareto my-app
 ## 特性
 
 - **SSR & 流式渲染** — 即时服务端渲染页面。使用 `defer()` 通过 Suspense 边界流式传输慢数据。
-- **SSG 静态生成** — 导出 `config = { render: 'static' }` 即可在构建时预渲染页面。
 - **文件路由** — `page.tsx`、`layout.tsx`、`loader.ts`、`head.tsx`、`not-found.tsx` 约定。
 - **动态路由** — `[param]`、`[...slug]`、`[[...optional]]` 支持动态 URL 匹配。
 - **路由分组** — `(groupName)` 目录用于组织路由，不影响 URL 结构。

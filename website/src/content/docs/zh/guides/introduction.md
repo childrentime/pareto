@@ -3,7 +3,7 @@ title: 介绍
 description: Pareto 是什么，为什么选择它而不是 Next.js 或 Remix。
 ---
 
-Pareto 是一个基于 Vite 7 构建的轻量级 React SSR 框架。它提供了流式服务端渲染、基于文件的路由、内置状态管理和静态站点生成 — 没有大型框架的复杂性。
+Pareto 是一个基于 Vite 7 构建的轻量级 React SSR 框架。它提供了流式服务端渲染、基于文件的路由和内置状态管理 — 没有大型框架的复杂性。
 
 ## 为什么选择 Pareto？
 
@@ -20,7 +20,6 @@ Pareto 是一个基于 Vite 7 构建的轻量级 React SSR 框架。它提供了
 |------|------|
 | **SSR 与流式渲染** | `defer()` + `<Await>` 实现渐进式数据加载 |
 | **基于文件的路由** | `page.tsx`、`layout.tsx`、`loader.ts`、`head.tsx`、`not-found.tsx` |
-| **SSG** | `export const config = { render: 'static' }` 用于任意页面 |
 | **状态管理** | `defineStore()` 配合 Immer — 支持解构、SSR 序列化 |
 | **错误边界** | `ParetoErrorBoundary` 组件捕获渲染错误 |
 | **重定向与 404** | 在 loader 中使用 `throw redirect()` 和 `throw notFound()` |

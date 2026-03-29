@@ -1,5 +1,5 @@
-import type { PropsWithChildren } from 'react'
 import { Link } from '@paretojs/core'
+import type { PropsWithChildren } from 'react'
 
 export default function BlogLayout({ children }: PropsWithChildren) {
   return (
@@ -29,12 +29,8 @@ export default function BlogLayout({ children }: PropsWithChildren) {
           Dynamic routes with{' '}
           <code className="text-[0.8125rem] px-1.5 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-orange-700 dark:text-orange-400">
             [slug]
-          </code>
-          , nested layout, and static generation via{' '}
-          <code className="text-[0.8125rem] px-1.5 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-orange-700 dark:text-orange-400">
-            staticParams
-          </code>
-          .
+          </code>{' '}
+          params and nested layouts.
         </p>
       </div>
 

@@ -154,5 +154,4 @@ CMD ["npx", "pareto", "start"]
 ## Related
 
 - [Resource Routes](/concepts/resource-routes/) — API endpoints via `route.ts`.
-- [Static Site Generation](/concepts/ssg/) — SSG deployment and CDN caching with custom headers.
 - [@paretojs/core API](/api/core/) — `ParetoConfig` type and runtime exports.

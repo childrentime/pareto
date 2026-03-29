@@ -1,0 +1,474 @@
+[
+  {
+    "id": 22,
+    "title": "客户端 API",
+    "content": "#\n\n客户端 API 在 @paretojs/core/client 中暴露。\n\n\nPageContext#\n\nPageContext 是一个 Provider，必须包裹在 client-entry.tsx 周围，为 react-async-helmet 和\ncritical-css 提供支持。",
+    "routePath": "/zh/api/client",
+    "lang": "zh",
+    "toc": [
+      {
+        "text": "PageContext",
+        "id": "pagecontext",
+        "depth": 2,
+        "charIndex": 41
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 23,
+    "title": "Pareto配置",
+    "content": "#\n\n\n配置文件#\n\nPareto接受四种类型的文件作为配置文件：pareto.config.(js|ts|mjs|mts)。\n\n\npageDir#\n\n * 类型：string\n * 默认值：app\n\n指定应用程序的根目录。例如：\n\n\n\n\nconfigureRspack#\n\n * 类型：function\n * 默认值：undefined\n\nconfigureRspack函数支持自定义Rspack的功能。例如：\n\n\n\n\nenableSpa#\n\n * 类型：boolean\n * 默认值：false\n\n启用SPA模式。例如：\n\n\n\n\nenableMonitor#\n\n * Type: boolean\n * Default: false\n\n开启监控。例如：\n\n\n\n\ndistDir#\n\n * Type: string\n * Default: .pareto\n\n指定输出目录。",
+    "routePath": "/zh/api/config",
+    "lang": "zh",
+    "toc": [
+      { "text": "配置文件", "id": "配置文件", "depth": 2, "charIndex": 3 },
+      { "text": "pageDir", "id": "pagedir", "depth": 2, "charIndex": 65 },
+      {
+        "text": "configureRspack",
+        "id": "configurerspack",
+        "depth": 2,
+        "charIndex": 119
+      },
+      { "text": "enableSpa", "id": "enablespa", "depth": 2, "charIndex": 210 },
+      {
+        "text": "enableMonitor",
+        "id": "enablemonitor",
+        "depth": 2,
+        "charIndex": 266
+      },
+      { "text": "distDir", "id": "distdir", "depth": 2, "charIndex": 331 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 24,
+    "title": "页面",
+    "content": "#\n\n在Pareto中，页面被定义为ParetoPage类型，提供一些实用函数。\n\n\ngetServerSideProps#\n\ngetServerSideProps是一个在服务器端请求时调用的函数。它可用于从外部API获取数据，查询数据库或执行其他服务器端任务。\n\n\nsetUpClient#\n\nsetUpClient是一个在客户端调用的函数。它可用于设置页面的客户端部分，例如初始化库或设置事件监听器。\n\n\ngetAssets#\n\n在我们的流式渲染中，当请求到达服务器时，我们将发送静态JS和CSS资源。该函数允许您自定义并添加一些特定于页面的静态元素。例如，它可以是产品详情页面的大图像UR\nL。\n\n例如\n\n",
+    "routePath": "/zh/api/page",
+    "lang": "zh",
+    "toc": [
+      {
+        "text": "getServerSideProps",
+        "id": "getserversideprops",
+        "depth": 2,
+        "charIndex": 42
+      },
+      {
+        "text": "setUpClient",
+        "id": "setupclient",
+        "depth": 2,
+        "charIndex": 133
+      },
+      { "text": "getAssets", "id": "getassets", "depth": 2, "charIndex": 204 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 25,
+    "title": "服务器 API",
+    "content": "#\n\n服务器 API 在 @paretojs/core/node 中暴露。\n\n\nparetoRequestHandler#\n\nparetoRequestHandler 是用于处理页面的服务器端函数。它在 server-entry.tsx 中用于在服务器上呈现页面。 例如：\n\n\n\n\nparetoRequestHandler 选项#\n\ndelay#\n\ndelay 是页面呈现等待的最长时间，参考 renderToPipeableStream。\n\npageWrapper#\n\npageWrapper 是一个函数，允许您自定义和增强页面。例如，要将相同的元标记添加到所有页面中，可以执行以下操作：\n\n\n\npageWrapper 函数的第一个参数是呈现的页面，第二个参数是呈现页面的 getServerSideProps\n返回的对象。当您使用第三方状态管理库时，第二个参数非常有用。",
+    "routePath": "/zh/api/server",
+    "lang": "zh",
+    "toc": [
+      {
+        "text": "paretoRequestHandler",
+        "id": "paretorequesthandler",
+        "depth": 2,
+        "charIndex": 39
+      },
+      {
+        "text": "paretoRequestHandler 选项",
+        "id": "paretorequesthandler-选项",
+        "depth": 3,
+        "charIndex": 140
+      },
+      { "text": "delay", "id": "delay", "depth": 4, "charIndex": 166 },
+      {
+        "text": "pageWrapper",
+        "id": "pagewrapper",
+        "depth": 4,
+        "charIndex": 221
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 26,
+    "title": "共享 API",
+    "content": "#\n\n共享 API 在 @paretojs/core 中暴露。\n\n\nuseStyles#\n\nuseStyles 用于收集关键 CSS，例如：\n\n\n\n\npromiseMap#\n\npromiseMap 用于管理请求的 promise 状态，它在服务器端和客户端之间是同构的。\n\n\nmockClientPromise#\n\nmockClientPromise 用于在客户端初始化 promise 状态。\n\n\nuse#\n\nuse 是一个 polyfill。在 React 19 环境中，它将直接使用 React 19 导出的 use。在 React 18 中，它将回退到\npareto 中定义的 polyfill。请注意，polyfill use 只能用于解决 promises。",
+    "routePath": "/zh/api/shared",
+    "lang": "zh",
+    "toc": [
+      { "text": "useStyles", "id": "usestyles", "depth": 2, "charIndex": 33 },
+      { "text": "promiseMap", "id": "promisemap", "depth": 2, "charIndex": 74 },
+      {
+        "text": "mockClientPromise",
+        "id": "mockclientpromise",
+        "depth": 2,
+        "charIndex": 137
+      },
+      { "text": "use", "id": "use", "depth": 2, "charIndex": 199 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 27,
+    "title": "提前提示（Early Hints）",
+    "content": "#\n\n首先，请阅读关于提前提示（early hints）的内容。\n\n\nNext.js 支持提前提示吗？#\n\n不幸的是，Next.js 不支持这个功能。您可以参考这个讨论了解更多信息。\n\n事实上，我尝试在 Next.js 的页面路由器中做到这一点，但不幸的是，一旦你在自定义服务器上使用了 res.flushHeaders()，Next.js\n的渲染函数就不会工作。\n\n唯一可能的解决方案可能是使用 app router，并且你需要在 layout 的 children 属性上使用suspense进行包裹。这样，Next.js\n就会在请求开始时返回静态HTML外壳。\n\n\n\n\nPareto 支持提前提示吗？#\n\n是的，Pareto 内置了这个功能。不管你是否启用了流式渲染，Pareto 都会在请求的一开始就将你的页面的静态资源发送出去。\n\n",
+    "routePath": "/zh/blog/early-hints",
+    "lang": "zh",
+    "toc": [
+      {
+        "text": "Next.js 支持提前提示吗？",
+        "id": "nextjs-支持提前提示吗",
+        "depth": 2,
+        "charIndex": 34
+      },
+      {
+        "text": "Pareto 支持提前提示吗？",
+        "id": "pareto-支持提前提示吗",
+        "depth": 2,
+        "charIndex": 287
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 28,
+    "title": "为什么选择 Pareto",
+    "content": "#\n\n在我的工作中，经常困扰我的一个问题是：我们的团队不使用像 next.js 或 remix 这样的框架。相反，我们有自己用 webpack+react SSR\n构建的应用程序。对于这些应用程序，集成 React 的流式渲染非常具有挑战性。我认为第一个问题在于 React\n官方团队，因为他们没有明确的最佳实践来实现流式渲染。第二点是，在增强 SSR\n应用程序时使用流式渲染，处理样式和资源，以及同步潜在的服务器端全局存储和客户端全局存储，确实非常复杂。\n\n\n我为什么认为流式渲染很重要#\n\n因为它是一个可以带来更好用户体验的改变者。\n\n流式渲染可以显著减少您的 TTFB（首字节时间）、FCP（首次内容绘制）和\nTTI（首次可交互时间）。这是如何实现的呢？让我们重新阅读一下这篇文章：https://github.com/reactwg/react-18/discussi\nons/37。\n\n首先，因为我们启用了流式渲染，我们可以在请求到达时立即发送页面所需的静态资源，如 js、css、图片、字体。因此，浏览器可以在您的服务器仍在进行 API\n调用时预加载这些资源。我们将静态资源与后端 API 调用解耦，将我们的 TTFB 减少到单个往返时间（RTT）。\n\n其次，对于那些响应时间较长的 API，我们不再需要等待它们完成后再返回页面内容。相反，我们可以首先从响应更快的 API 返回内容，同时发送一个骨架。当较慢的\nAPI 返回时，我们用实际内容替换骨架。这种方法打破了瓶颈效应，显著改善了 FCP。\n\n我们借用了 eBay 文章中的两幅图来更直观地说明这一点。\n\n\n没有流式渲染#\n\n\n\n\n有流式渲染#\n\n",
+    "routePath": "/zh/blog/",
+    "lang": "zh",
+    "toc": [
+      {
+        "text": "我为什么认为流式渲染很重要",
+        "id": "我为什么认为流式渲染很重要",
+        "depth": 2,
+        "charIndex": 230
+      },
+      {
+        "text": "没有流式渲染",
+        "id": "没有流式渲染",
+        "depth": 3,
+        "charIndex": 687
+      },
+      { "text": "有流式渲染", "id": "有流式渲染", "depth": 3, "charIndex": 699 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 29,
+    "title": "为什么不使用服务器组件",
+    "content": "#\n\n\n\n我毫无疑问地认为服务器组件可以带来更好的性能优化，但有三个因素阻止我使用它们。\n\n 1. 与Next.js的深度集成使得在Next.js之外使用服务器组件具有挑战性。在Next.js之外，你的选择可能仅限于Waku。\n 2. 如图所示，代码复杂性与React架构的复杂性成正比。使用React服务器组件可能会使您的代码更加复杂。\n 3. 迁移到服务器组件并不是一个简单的过程。即使从页面路由器过渡到应用路由器也并非易事，因为您可能需要放弃诸如同构全局存储之类的概念，并理解新概念如RSC和服\n    务器操作。此外，许多公司的内部代码库是基于内部webpack SSR基础设施而不是Next.js构建的。\n\n对我个人来说，还有一个比较私人的原因。对于一个内部 B端\n应用，我并不太在意它的捆绑大小，甚至不在乎它是否使用SSR技术。对于移动React应用来说，在大多数情况下，使用流式渲染就足够了。\n\n\n统计数据#\n\n实际上，除了Next.js，许多框架还没有支持服务器组件。当然，t3技术栈是一个例外，因为它们确实跟得上步伐。例如，Remix 和 ModernJS\n还没有支持服务器组件。许多UI库也要求您手动用 'use client' 包装所有内容。",
+    "routePath": "/zh/blog/why-not-server-components",
+    "lang": "zh",
+    "toc": [
+      { "text": "统计数据", "id": "统计数据", "depth": 2, "charIndex": 405 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 30,
+    "title": "CSS",
+    "content": "#\n\nPareto 支持 CSS、SASS 和 CSS 模块。按照惯例，以 .module.(css|scss) 结尾的文件被视为模块化 CSS。\n\n\nTailwind CSS#\n\nNOTE\n\nPareto 与 Tailwind CSS 的集成在热更新上还有一点问题，这主要是因为上游的 rspack 问题。\n\n示例：使用 Tailwind CSS\n\n\n安装 Tailwind#\n\n安装 Tailwind CSS 包并运行 init 命令以生成 tailwind.config.js 和 postcss.config.js 文件：\n\n\n\n\n配置 Tailwind#\n\n在 tailwind.config.js 中，添加将使用 Tailwind CSS 类名的文件路径：\n\n\n\n\n导入样式#\n\n在全局样式表中添加 Tailwind CSS 指令，Tailwind 将使用这些指令将其生成的样式注入到应用程序中，例如：\n\n\n\n在客户端入口文件（client-entry.tsx）中导入 index.css 样式表，以将样式应用到应用程序中的每个路由。\n\n\n\n\n使用类名#\n\n安装 Tailwind CSS 并添加全局样式后，您可以在应用程序中使用 Tailwind 的实用程序类。\n\n",
+    "routePath": "/zh/guide/builtIn/css",
+    "lang": "zh",
+    "toc": [
+      {
+        "text": "Tailwind CSS",
+        "id": "tailwind-css",
+        "depth": 2,
+        "charIndex": 75
+      },
+      {
+        "text": "安装 Tailwind",
+        "id": "安装-tailwind",
+        "depth": 3,
+        "charIndex": 176
+      },
+      {
+        "text": "配置 Tailwind",
+        "id": "配置-tailwind",
+        "depth": 3,
+        "charIndex": 269
+      },
+      { "text": "导入样式", "id": "导入样式", "depth": 3, "charIndex": 338 },
+      { "text": "使用类名", "id": "使用类名", "depth": 3, "charIndex": 477 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 31,
+    "title": "自定义",
+    "content": "#\n\nPareto 支持自定义 rspack 和 babel 配置。\n\n\nrspack 配置#\n\n在项目的根目录下创建 rspack.config.ts 文件。\n\n\n\n\nbabel 配置#\n\n在项目的根目录下创建 babel.config.js 文件。\n\n\n\nbabel 将自动将您的 babel 配置与 Pareto 内置配置合并。",
+    "routePath": "/zh/guide/builtIn/custom",
+    "lang": "zh",
+    "toc": [
+      {
+        "text": "`rspack` 配置",
+        "id": "rspack-配置",
+        "depth": 2,
+        "charIndex": -1
+      },
+      {
+        "text": "`babel` 配置",
+        "id": "babel-配置",
+        "depth": 2,
+        "charIndex": -1
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 32,
+    "title": "Express",
+    "content": "#\n\nPareto的服务器入口点默认是一个Express服务器，因此您可以使用任何Express中间件来处理请求。\n\n\n示例#\n\n",
+    "routePath": "/zh/guide/builtIn/express",
+    "lang": "zh",
+    "toc": [{ "text": "示例", "id": "示例", "depth": 2, "charIndex": 59 }],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 33,
+    "title": "监控",
+    "content": "#\n\nPareto 内置了性能指标监控功能。在使用 create-pareto 创建项目时，您可以在选择模板时选择带有监控选项。\n\n\n设置#\n\n如果您想在项目中手动启用此功能，请按照以下步骤操作。\n\n在项目根目录下创建或更新 pareto.config.ts。\n\n\n\n修改项目根目录下的 server-entry.tsx 文件。\n\n\n\n修改您的 app 目录中任何路由根文件。\n\n\n\n\n结果#\n\n\n\n\n报告#\n\n有关如何报告参数数据以及参数含义的信息，您可以参考这个 地方。",
+    "routePath": "/zh/guide/builtIn/monitor",
+    "lang": "zh",
+    "toc": [
+      { "text": "设置", "id": "设置", "depth": 2, "charIndex": 66 },
+      { "text": "结果", "id": "结果", "depth": 2, "charIndex": 192 },
+      { "text": "报告", "id": "报告", "depth": 2, "charIndex": 200 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 34,
+    "title": "关键 CSS",
+    "content": "#\n\n有关关键 CSS 的详细参考信息，请参阅 https://web.dev/articles/extract-critical-css。\n\n\n如何启用关键 CSS#\n\n通常，我们的一个 React 组件可能如下所示。\n\n\n\n\n\n像 Next.js 这样的框架，或者人们可能使用的 mini-css-extract-plugin，会将 CSS 提取到单独的文件中。\n\n它有一个显著的缺点，即它会为您导入的任何模块提取 CSS，有时这可能是不必要的。\n\n\n\n例如，在上面的情况下，对于处于 A/B 测试控制端的用户来说，任何其他模块的 CSS 都是不必要的。\n\n我们在 isomorphic-style-loader 周围构建了一个内部包装器。现在，您可以使用 useStyles 钩子在渲染过程中收集所需的 CSS。\n\n\n\n为了将其与外部 CSS 区分开来，我们仅对以 .iso.scss 结尾的文件启用关键 CSS 收集。\n\n\n注意事项#\n\n关键 CSS 可以与流式渲染一起使用，但重要的是要注意我们的 useStyles 调用必须放在 use 函数之前，否则这些样式无法在服务器端收集。\n\n",
+    "routePath": "/zh/guide/features/critical-css",
+    "lang": "zh",
+    "toc": [
+      {
+        "text": "如何启用关键 CSS",
+        "id": "如何启用关键-css",
+        "depth": 2,
+        "charIndex": 72
+      },
+      { "text": "注意事项", "id": "注意事项", "depth": 2, "charIndex": 415 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 35,
+    "title": "i18n",
+    "content": "#\n\n我们推荐使用 Lingui 来创建国际化（i18n）应用程序。\n\nNOTE\n\n使用 create-pareto 创建项目时，可以选择带有 i18n 选项的模板。\n\n完整的例子请参考\n\n\n安装#\n\n\n\n\n设置#\n\n\n提取和编译消息#\n\n在项目的根目录创建 lingui.config.js。\n\n\n\n在项目的根目录创建 babel.config.js。\n\n\n\n更新你的 package.json 文件。\n\n\n\n运行 pnpm extract 提取消息。 运行 pnpm compile 编译消息。\n\n\n在项目中使用#\n\n使用 @lingui/macro 的 Trans 来翻译你的文本。\n\n\n每次请求动态加载路由消息#\n\n在项目的根目录创建或更新 global.d.ts。\n\n\n\n在项目的根目录创建 i18n.ts。\n\n\n\n在项目的根目录修改 server-entry.tsx 文件。\n\n\n\n在项目的根目录修改 client-entry.tsx 文件。\n\n",
+    "routePath": "/zh/guide/features/i18n",
+    "lang": "zh",
+    "toc": [
+      { "text": "安装", "id": "安装", "depth": 2, "charIndex": 95 },
+      { "text": "设置", "id": "设置", "depth": 2, "charIndex": 103 },
+      {
+        "text": "提取和编译消息",
+        "id": "提取和编译消息",
+        "depth": 3,
+        "charIndex": 109
+      },
+      {
+        "text": "在项目中使用",
+        "id": "在项目中使用",
+        "depth": 3,
+        "charIndex": 251
+      },
+      {
+        "text": "每次请求动态加载路由消息",
+        "id": "每次请求动态加载路由消息",
+        "depth": 3,
+        "charIndex": 296
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 36,
+    "title": "元信息管理",
+    "content": "#\n\nPareto 使用 react-helmet-async 来进行元数据管理。 因此，你可以使用 react-helmet-async 库中提供的所有功能。\n\n\n示例#\n\n\n\n就是这样！标题标签将在服务器端渲染期间自动移至 head 标签中。\n\n\n常见标签#\n\n有时候你想在多个路由之间设置一些共同的元标签。 你可以定义一个名为 shared-meta.tsx 的文件，并在 client-entry.tsx 和\nserver-entry.tsx 中单独导入它。\n\n\n\n\n注意事项#\n\nNOTE\n\n不要在流式组件中使用 Helmet，它不会生效， 因为流式组件不会立即渲染。",
+    "routePath": "/zh/guide/features/meta",
+    "lang": "zh",
+    "toc": [
+      { "text": "示例", "id": "示例", "depth": 2, "charIndex": 82 },
+      { "text": "常见标签", "id": "常见标签", "depth": 2, "charIndex": 125 },
+      { "text": "注意事项", "id": "注意事项", "depth": 2, "charIndex": 237 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 37,
+    "title": "基础路由",
+    "content": "#\n\n\n是什么#\n\nPareto使用文件系统路由，页面的文件路径简单地映射到路由路径，使整个项目的路由非常直观。\n\n\n\n\n自定义行为#\n\n如果您不想使用 'app' 文件夹作为您的路由文件夹，您也可以通过配置自定义名称。\n\n",
+    "routePath": "/zh/guide/features/route",
+    "lang": "zh",
+    "toc": [
+      { "text": "是什么", "id": "是什么", "depth": 2, "charIndex": 3 },
+      { "text": "自定义行为", "id": "自定义行为", "depth": 2, "charIndex": 60 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 38,
+    "title": "单页面应用（SPA）",
+    "content": "#\n\nPareto 对客户端渲染提供了良好的支持。\n\n\n使用方法#\n\n有时，当您的网站流量过高时，不使用服务器端渲染可以增加服务器的流量容量。在 Pareto 中，您可以通过在 pareto.config.ts 中设置\nenableSpa: true 来启用此功能。当启用此配置时，如果您的 URL 链接包含一个 __csr 参数且为真值，Pareto 将仅从服务器返回一个空的\nHTML 骨架，剩余内容由客户端 JavaScript 加载。\n\n\n\nNOTE\n\n重要提示：当开始使用 SPA 功能时，您需要确定当前是否处于 SPA 模式，并在客户端请求相应的数据。您可以参考这个 示例 来完成这一点。",
+    "routePath": "/zh/guide/features/spa",
+    "lang": "zh",
+    "toc": [
+      { "text": "使用方法", "id": "使用方法", "depth": 2, "charIndex": 27 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 39,
+    "title": "静态资源",
+    "content": "#\n\n每个路由对应一个页面，该页面具有自己的静态资源，如 CSS、JS 等。\n\nPareto 将在请求到达服务器时立即在 head 标签元素中分发这些静态资源。这使得浏览器可以在服务器接口请求间隙下载和解析这些资源。\n\nPareto 提供了一个 getAsset 方法，用于添加一些与页面相关的静态资源。这在某些预览页面（比如商品详情页的头图）中非常有用。\n\n例如：\n\n\n\n从 getAssets 返回的数据将被转换为 link 标签并插入页面中。与 react-async-helmet 中的元数据不同之处在于，它的分发时机会更早。",
+    "routePath": "/zh/guide/features/static-asset",
+    "lang": "zh",
+    "toc": [],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 40,
+    "title": "流式渲染",
+    "content": "#\n\nPareto提供了对流式渲染的一流支持。\n\n\n用法#\n\nNOTE\n\n我们假设您已经有使用流式渲染的经验。如果没有，您可以参考这些文章了解什么是流式渲染。\n\n * Pareto博客\n * https://github.com/reactwg/react-18/discussions/37\n * https://github.com/reactwg/react-18/discussions/22\n * https://innovation.ebayinc.com/tech/engineering/async-fragments-rediscovering\n   -progressive-html-rendering-with-marko/\n\n\n定义流请求和键值#\n\n根据经验，我们只需要对具有缓慢接口的模块进行流式请求。首先，让我们定义请求方法和键值。\n\n\n\n\n设置服务器端Promise#\n\nPareto导出一个promiseMap对象来维护与键值对应的每个请求的Promise状态。让我们设置它。\n\n\n\n\n设置客户端Promise#\n\n众所周知的笑话是：React需要在服务器端和客户端的第一次渲染之间保持一致性，我们还需要在服务器端和客户端之间同步Promise状态。\n\n\n\n\n使用Promise#\n\n哦天啊！我们终于到达这里。通过在React中使用use和suspense来消耗我们的请求Promise，我们可以实现流式传输。\n\nNOTE\n\nuse钩子仅在React 19中引入，因此对于React 18，您需要使用从Pareto导出的use函数。请注意，它仅实现了消耗Promise的能力。\n\n",
+    "routePath": "/zh/guide/features/stream",
+    "lang": "zh",
+    "toc": [
+      { "text": "用法", "id": "用法", "depth": 2, "charIndex": 25 },
+      {
+        "text": "定义流请求和键值",
+        "id": "定义流请求和键值",
+        "depth": 3,
+        "charIndex": 326
+      },
+      {
+        "text": "设置服务器端Promise",
+        "id": "设置服务器端promise",
+        "depth": 3,
+        "charIndex": 385
+      },
+      {
+        "text": "设置客户端Promise",
+        "id": "设置客户端promise",
+        "depth": 3,
+        "charIndex": 459
+      },
+      {
+        "text": "使用Promise",
+        "id": "使用promise",
+        "depth": 3,
+        "charIndex": 546
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 41,
+    "title": "简介",
+    "content": "#\n\n\n定位#\n\nPareto是一个基于rspack的React SSR框架，致力于使您对流式渲染的使用变得简单。它并没有很多复杂的封装，本质上只是一个用于React\nSSR应用程序的简单包装器。\n\n\n项目背景#\n\nPareto被设计为精简的MPA架构，因此它可能更适合那些需要在移动Web视图中开发嵌入式网页的人群。我们从设计之初就考虑了许多性能优化因素，并将其与流式渲染结\n合起来。例如：\n\n 1. 关键CSS：Pareto内置支持关键CSS，比使用外部CSS要快得多。有关更多详细信息，您可以参考提取关键CSS。\n 2. react-helmet-async：Pareto内置支持元数据，这些元数据将在请求开始时发送到浏览器。\n 3. SPA：Pareto内置支持SPA模式。当您的服务器流量过大时，您可以选择切换到SPA模式以增加 QPS 容量。\n 4. 自定义流式渲染架构：与Next.js或Remix不同，我们在请求开始时立即开始发送静态资源。这有助于改善性能指标。\n\n\n支持的React版本#\n\n\nReact19+#\n\nPareto直接支持React19及以上版本\n\n\nReact18#\n\nPareto也支持React 18，但由于React 18中未公开使用 use hook，因此在启用流式渲染功能时，您需要使用Pareto导出的 use 函数。\n\n\n\n\nReact17 & React16.8#\n\nPareto并不直接支持React 17，因为使其兼容性会很复杂。但是，其实也可以在React\n16.8之后的任何版本中启用流式渲染。我在这里提供了一个简单示例，来实现这一点。如果您使用的是低于React\n18的版本，您可以考虑参考此示例将流式渲染集成到您的项目中。",
+    "routePath": "/zh/guide/start/introduction",
+    "lang": "zh",
+    "toc": [
+      { "text": "定位", "id": "定位", "depth": 2, "charIndex": 3 },
+      { "text": "项目背景", "id": "项目背景", "depth": 2, "charIndex": 100 },
+      {
+        "text": "支持的React版本",
+        "id": "支持的react版本",
+        "depth": 2,
+        "charIndex": 441
+      },
+      { "text": "React19+", "id": "react19", "depth": 3, "charIndex": 455 },
+      { "text": "React18", "id": "react18", "depth": 3, "charIndex": 491 },
+      {
+        "text": "React17 & React16.8",
+        "id": "react17--react168",
+        "depth": 3,
+        "charIndex": 586
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 42,
+    "title": "快速开始",
+    "content": "#\n\n\n1. 初始化项目#\n\n您可以使用 create-pareto 命令行工具创建一个 Rspress 项目：\n\n输入项目目录名称，然后命令行工具将为您创建项目。\n\n由于 React 19 尚未发布，您需要在根目录下创建一个新的 .npmrc 文件，并添加\n\n\n\n\n2. 启动开发服务器#\n\n使用以下命令启动本地开发服务：\n\n\n\n提示\n\n对于 dev 命令，您可以使用 --port 或 --host 参数指定开发服务的端口号或主机，例如 pareto dev --port 8080 --host\n0.0.0.0。\n\n\n3. 生产环境构建#\n\n使用以下命令构建生产捆绑包：\n\n\n\n默认情况下，Pareto 将设置 .pareto 作为输出目录。\n\n\n4. 生产环境启动#\n\n使用以下命令启动生产捆绑包：\n\n",
+    "routePath": "/zh/guide/start/quick-start",
+    "lang": "zh",
+    "toc": [
+      {
+        "text": "1. 初始化项目",
+        "id": "1-初始化项目",
+        "depth": 2,
+        "charIndex": 3
+      },
+      {
+        "text": "2. 启动开发服务器",
+        "id": "2-启动开发服务器",
+        "depth": 2,
+        "charIndex": 133
+      },
+      {
+        "text": "3. 生产环境构建",
+        "id": "3-生产环境构建",
+        "depth": 2,
+        "charIndex": 261
+      },
+      {
+        "text": "4. 生产环境启动",
+        "id": "4-生产环境启动",
+        "depth": 2,
+        "charIndex": 326
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  }
+]

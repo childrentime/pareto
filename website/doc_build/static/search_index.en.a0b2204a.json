@@ -1,0 +1,524 @@
+[
+  {
+    "id": 0,
+    "title": "Client API",
+    "content": "#\n\nClient API is exposed in @paretojs/core/client.\n\n\nPageContext#\n\nPageContext is a provider that must wrap around client-entry.tsx, providing\nsupport for react-async-helmet and critical-css.",
+    "routePath": "/api/client",
+    "lang": "en",
+    "toc": [
+      {
+        "text": "PageContext",
+        "id": "pagecontext",
+        "depth": 2,
+        "charIndex": 52
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 1,
+    "title": "Pareto Config",
+    "content": "#\n\n\nConfiguration file#\n\nPareto accepts four types of files as configuration files:\npareto.config.(js|ts|mjs|mts).\n\n\npageDir#\n\n * Type: string\n * Default: app\n\nSpecifies the application root directory. For example:\n\n\n\n\nconfigureRspack#\n\n * Type: function\n * Default: undefined\n\nThe configureRspack function supports customizing the functionality of Rspack.\nFor example:\n\n\n\n\nenableSpa#\n\n * Type: boolean\n * Default: false\n\nEnable SPA mode. For example:\n\n\n\n\nenableMonitor#\n\n * Type: boolean\n * Default: false\n\nEnable the monitor. For example:\n\n\n\n\ndistDir#\n\n * Type: string\n * Default: .pareto\n\nSpecifies the output directory.",
+    "routePath": "/api/config",
+    "lang": "en",
+    "toc": [
+      {
+        "text": "Configuration file",
+        "id": "configuration-file",
+        "depth": 2,
+        "charIndex": 3
+      },
+      { "text": "pageDir", "id": "pagedir", "depth": 2, "charIndex": 116 },
+      {
+        "text": "configureRspack",
+        "id": "configurerspack",
+        "depth": 2,
+        "charIndex": 218
+      },
+      { "text": "enableSpa", "id": "enablespa", "depth": 2, "charIndex": 373 },
+      {
+        "text": "enableMonitor",
+        "id": "enablemonitor",
+        "depth": 2,
+        "charIndex": 455
+      },
+      { "text": "distDir", "id": "distdir", "depth": 2, "charIndex": 544 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 2,
+    "title": "Page",
+    "content": "#\n\nIn pareto, pages are defined as the ParetoPage type, which provides some utility\nfunctions.\n\n\ngetServerSideProps#\n\ngetServerSideProps is a function that is called at request time on the server\nside. It can be used to fetch data from an external API, query a database, or\nperform other server-side tasks.\n\n\nsetUpClient#\n\nsetUpClient is a function that is called on the client side. It can be used to\nset up the client side of the page, such as initializing a library or setting up\nevent listeners.\n\n\ngetAssets#\n\nIn our streaming rendering, we will send down static JS and CSS resources the\nmoment the request reaches the server. This function allows you to customize and\nadd some page-specific static elements. For example, it could be the large image\nURL of a product detail page. For example\n\n",
+    "routePath": "/api/page",
+    "lang": "en",
+    "toc": [
+      {
+        "text": "getServerSideProps",
+        "id": "getserversideprops",
+        "depth": 2,
+        "charIndex": 96
+      },
+      {
+        "text": "setUpClient",
+        "id": "setupclient",
+        "depth": 2,
+        "charIndex": 308
+      },
+      { "text": "getAssets", "id": "getassets", "depth": 2, "charIndex": 501 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 3,
+    "title": "Server API",
+    "content": "#\n\nServer API is exposed in @paretojs/core/node.\n\n\nparetoRequestHandler#\n\nparetoRequestHandler is a server-side function for handling pages. It is used in\nserver-entry.tsx to render pages on the server. For example:\n\n\n\n\nparetoRequestHandler options#\n\ndelay#\n\ndelay is the maximum time the page rendering waits for, refer to\nrenderToPipeableStream.\n\npageWrapper#\n\npageWrapper is a function that allows you to customize and enhance pages. For\nexample, to add the same meta tags to all your pages, you can do the following:\n\n\n\nThe first parameter of the pageWrapper function is the rendered page, and the\nsecond parameter is the object returned by getServerSideProps for the rendered\npage. The second parameter is very useful when you are using a third-party state\nmanagement library.",
+    "routePath": "/api/server",
+    "lang": "en",
+    "toc": [
+      {
+        "text": "paretoRequestHandler",
+        "id": "paretorequesthandler",
+        "depth": 2,
+        "charIndex": 50
+      },
+      {
+        "text": "paretoRequestHandler options",
+        "id": "paretorequesthandler-options",
+        "depth": 3,
+        "charIndex": 219
+      },
+      { "text": "delay", "id": "delay", "depth": 4, "charIndex": 250 },
+      {
+        "text": "pageWrapper",
+        "id": "pagewrapper",
+        "depth": 4,
+        "charIndex": 348
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 4,
+    "title": "Shared API",
+    "content": "#\n\nShared API is exposed in @paretojs/core.\n\n\nuseStyles#\n\nuseStyles is used to collect critical CSS, for example:\n\n\n\n\npromiseMap#\n\npromiseMap is used to manage the promise status of requests, and it is\nisomorphic between the server and the client.\n\n\nmockClientPromise#\n\nmockClientPromise is used to initialize the promise status on the client side.\n\n\nuse#\n\nuse is a polyfill. In a React 19 environment, it will directly use the use\nexported by React 19. In React 18, it will fallback to the polyfill defined in\npareto. Note that the polyfill use can only be used to resolve promises.",
+    "routePath": "/api/shared",
+    "lang": "en",
+    "toc": [
+      { "text": "useStyles", "id": "usestyles", "depth": 2, "charIndex": 45 },
+      {
+        "text": "promiseMap",
+        "id": "promisemap",
+        "depth": 2,
+        "charIndex": 117
+      },
+      {
+        "text": "mockClientPromise",
+        "id": "mockclientpromise",
+        "depth": 2,
+        "charIndex": 249
+      },
+      { "text": "use", "id": "use", "depth": 2, "charIndex": 350 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 5,
+    "title": "EarlyHints",
+    "content": "#\n\nFirst, please read about what early hints are.\n\n\nDoes nextjs support it?#\n\nUnfortunately, it does not support this feature. You can refer to this\ndiscussion to see more.\n\nIn fact, I tried to achieve this in the page router of Next.js, but\nunfortunately, once you use res.flushHeaders() on a custom server, Next.js\nrendering functions will not work.\n\nThe only possible solution might be to use the app router, and you need to wrap\nthe children property of layout with suspense. In this way, Next.js will return\nthe static HTML outer box at the beginning of the request.\n\n\n\n\nDoes pareto support it?#\n\nYes, Pareto has this feature built-in. Regardless of whether you have enabled\nstreaming rendering, Pareto will send out your page's static resources right at\nthe beginning of the request.\n\n",
+    "routePath": "/blog/early-hints",
+    "lang": "en",
+    "toc": [
+      {
+        "text": "Does nextjs support it?",
+        "id": "does-nextjs-support-it",
+        "depth": 2,
+        "charIndex": 51
+      },
+      {
+        "text": "Does pareto support it?",
+        "id": "does-pareto-support-it",
+        "depth": 2,
+        "charIndex": 575
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 6,
+    "title": "Why Pareto",
+    "content": "#\n\nIn the course of my work, there's a problem that often troubles me: Our team\ndoesn't use frameworks like next.js or remix. Instead, we have our own\napplication built with webpack+react SSR. For these applications, integrating\nReact's streaming rendering is very challenging. The first issue, I believe,\nlies with React's official team, as there isn't a clear best practice on how to\nimplement streaming rendering. The second point is, when enhancing SSR\napplications with streaming rendering, the handling of styles and resources,\nalong with the synchronization of potential server-side global stores and\nclient-side global stores, is indeed very complex.\n\n\nWhy I think streaming is important#\n\nBecause it is a game-changer that can bring a better user experience.\n\nStreaming rendering can significantly reduce your TTFB (Time to First Byte), FCP\n(First Contentful Paint), and TTI (Time to Interactive). How is this achieved?\nLet's revisit the article at https://github.com/reactwg/react-18/discussions/37.\n\nFirstly, because we've enabled streaming rendering, we can send out the static\nresources required by the page, such as js, css, image, font, the instant a\nrequest arrives. Therefore, the browser can preload these resources while your\nserver is still making API calls. We've decoupled static resources from backend\nAPI calls, reducing our TTFB to a single round-trip time (RTT).\n\nSecondly, for those APIs that take a longer time to respond, we no longer need\nto wait for them to complete before returning the page content. Instead, we can\nreturn the content from the faster APIs first, while also sending a skeleton.\nWhen the slower APIs have returned, we replace the skeleton with the actual\ncontent. This approach breaks the bottleneck effect, significantly improving the\nFCP.\n\nWe borrow two images from the eBay article to more intuitively illustrate this\npoint.\n\n\nWithout streaming rendering#\n\n\n\n\nWith streaming rendering#\n\n",
+    "routePath": "/blog/",
+    "lang": "en",
+    "toc": [
+      {
+        "text": "Why I think streaming is important",
+        "id": "why-i-think-streaming-is-important",
+        "depth": 2,
+        "charIndex": 660
+      },
+      {
+        "text": "Without streaming rendering",
+        "id": "without-streaming-rendering",
+        "depth": 3,
+        "charIndex": 1877
+      },
+      {
+        "text": "With streaming rendering",
+        "id": "with-streaming-rendering",
+        "depth": 3,
+        "charIndex": 1910
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 7,
+    "title": "Why not use server components",
+    "content": "#\n\n\n\nI have no doubt that server components can bring better performance\noptimization, but there are three factors that have prevented me from using\nthem.\n\n 1. Deep integration with Next.js makes it challenging to use server components\n    outside of Next.js. Outside of Next.js, your options may be limited to Waku.\n 2. As mentioned in the diagram, the complexity of the code is directly\n    proportional to the complexity of the React architecture. Using React server\n    components can make your code more complex.\n 3. Migrating to server components is not an easy process. Even transitioning\n    from a page router to an app router is not straightforward, as you may need\n    to abandon concepts like isomorphic global stores and understand new\n    concepts like RSC and server actions. Additionally, many companies have\n    internal codebases built on internal webpack SSR infrastructure rather than\n    Next.js.\n\nFor me personally, there is also a more personal reason. For an internal B-end\napplication, I don't really care about its bundle size, or even whether it uses\nSSR technology. For a mobile React application, in most cases, using streaming\nrendering is sufficient.\n\n\nStatistics#\n\nIn fact, besides Next.js, many frameworks have not yet supported server\ncomponents. Of course, the t3 technology stack is an exception as they are\nreally keeping up with the pace. For example, Remix and ModernJS have not yet\nsupported server components. Many UI libraries also require you to manually wrap\neverything with 'use client'.",
+    "routePath": "/blog/why-not-server-components",
+    "lang": "en",
+    "toc": [
+      {
+        "text": "Statistics",
+        "id": "statistics",
+        "depth": 2,
+        "charIndex": 1183
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 8,
+    "title": "Css",
+    "content": "#\n\nPareto supports CSS, SASS, and CSS modules. By convention, files ending in\n.module.(css|scss) are treated as modular CSS.\n\n\nTailwind CSS#\n\nNOTE\n\nThe integration between Pareto and Tailwind CSS has a slight issue with hot\nreloading, mainly due to upstream problems with rspack.\n\nExamples: with Tailwind CSS\n\n\nInstalling Tailwind#\n\nInstall the Tailwind CSS packages and run the init command to generate both the\ntailwind.config.js and postcss.config.js files:\n\n\n\n\nConfiguring Tailwind#\n\nInside tailwind.config.js, add paths to the files that will use Tailwind CSS\nclass names:\n\n\n\n\nImporting Styles#\n\nAdd the Tailwind CSS directives that Tailwind will use to inject its generated\nstyles to a Global Stylesheet in your application, for example:\n\n\n\nInside the client entry file (client-entry.tsx), import the index.css stylesheet\nto apply the styles to every route in your application.\n\n\n\n\nUsing Classes#\n\nAfter installing Tailwind CSS and adding the global styles, you can use\nTailwind's utility classes in your application.\n\n",
+    "routePath": "/guide/builtIn/css",
+    "lang": "en",
+    "toc": [
+      {
+        "text": "Tailwind CSS",
+        "id": "tailwind-css",
+        "depth": 2,
+        "charIndex": 126
+      },
+      {
+        "text": "Installing Tailwind",
+        "id": "installing-tailwind",
+        "depth": 3,
+        "charIndex": 310
+      },
+      {
+        "text": "Configuring Tailwind",
+        "id": "configuring-tailwind",
+        "depth": 3,
+        "charIndex": 464
+      },
+      {
+        "text": "Importing Styles",
+        "id": "importing-styles",
+        "depth": 3,
+        "charIndex": 581
+      },
+      {
+        "text": "Using Classes",
+        "id": "using-classes",
+        "depth": 3,
+        "charIndex": 887
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 9,
+    "title": "Custom",
+    "content": "#\n\nPareto support custom rspack and babel configuration.\n\n\nrspack configuration#\n\ncreate rspack.config.ts in the root directory of your project.\n\n\n\n\nbabel configuration#\n\ncreate babel.config.js in the root directory of your project.\n\n\n\nbabel will auto merge your babel configuration with pareto built-in\nconfiguration.",
+    "routePath": "/guide/builtIn/custom",
+    "lang": "en",
+    "toc": [
+      {
+        "text": "`rspack` configuration",
+        "id": "rspack-configuration",
+        "depth": 2,
+        "charIndex": -1
+      },
+      {
+        "text": "`babel` configuration",
+        "id": "babel-configuration",
+        "depth": 2,
+        "charIndex": -1
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 10,
+    "title": "Express",
+    "content": "#\n\nThe server entry point for Pareto is an Express server by default, so you can\nuse any Express middleware to handle requests.\n\n\nExample#\n\n",
+    "routePath": "/guide/builtIn/express",
+    "lang": "en",
+    "toc": [
+      { "text": "Example", "id": "example", "depth": 2, "charIndex": 129 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 11,
+    "title": "Monitor",
+    "content": "#\n\nPareto has built-in monitoring for performance metrics. You can choose a\ntemplate with the monitor option when creating a project using create-pareto.\n\n\nSetUp#\n\nIf you want to manually enable this feature in your project, please follow the\nsteps below.\n\ncreate or update pareto.config.ts in the root directory of your project.\n\n\n\nmodify the server-entry.tsx file in the root directory of your project.\n\n\n\nmodify any route root file in your app dictionary.\n\n\n\n\nResult#\n\n\n\n\nReport#\n\nFor information on how to report parameter data and the meaning of parameters,\nyou can refer to this place.",
+    "routePath": "/guide/builtIn/monitor",
+    "lang": "en",
+    "toc": [
+      { "text": "SetUp", "id": "setup", "depth": 2, "charIndex": 155 },
+      { "text": "Result", "id": "result", "depth": 2, "charIndex": 462 },
+      { "text": "Report", "id": "report", "depth": 2, "charIndex": 474 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 12,
+    "title": "Critical CSS",
+    "content": "#\n\nFor detailed reference information about critical CSS, please refer to\nhttps://web.dev/articles/extract-critical-css.\n\n\nHow to enable critical CSS#\n\nGenerally, one of our React components might look like this.\n\n\n\n\n\nFrameworks like Next.js, or the mini-css-extract-plugin that people might use,\nwill extract CSS into a separate file.\n\nIt has a significant drawback in that it extracts the CSS for any module you\nimport, which can sometimes be unnecessary.\n\n\n\nFor example, in the case above, for people who are on the control side of the\nA/B test, the CSS for any other module is unnecessary.\n\nWe have built an internal wrapper around isomorphic-style-loader. Now, you can\nuse the useStyles hook to collect the CSS needed during the rendering process.\n\n\n\nIn order to distinguish it from external CSS, we only enable critical CSS\ncollection for files ending in .iso.scss.\n\n\nPitfall#\n\nCritical CSS can be used with stream rendering, but it's important to note that\nour useStyles calls must be placed before the use function, otherwise these\nstyles cannot be collected on the server side.\n\n",
+    "routePath": "/guide/features/critical-css",
+    "lang": "en",
+    "toc": [
+      {
+        "text": "How to enable critical CSS",
+        "id": "how-to-enable-critical-css",
+        "depth": 2,
+        "charIndex": 122
+      },
+      { "text": "Pitfall", "id": "pitfall", "depth": 2, "charIndex": 873 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 13,
+    "title": "i18n",
+    "content": "#\n\nWe recommend using Lingui to create i18n applications.\n\nNOTE\n\nYou can choose a template with the i18n option when creating a project using\ncreate-pareto.\n\nfull examples\n\n\nInstallation#\n\n\n\n\nSetUp#\n\n\nExtract and Compile messages#\n\ncreate lingui.config.js in the root directory of your project.\n\n\n\ncreate babel.config.js in the root directory of your project.\n\n\n\nupdate your package.json file.\n\n\n\nrun pnpm extract to extract messages. run pnpm compile to compile messages.\n\n\nUse in your project#\n\nuse Trans of @lingui/macro to translate your text.\n\n\nDynamic load route messages every request#\n\ncreate or update global.d.ts in the root directory of your project.\n\n\n\ncreate i18n.ts in the root directory of your project.\n\n\n\nmodify the server-entry.tsx file in the root directory of your project.\n\n\n\nmodify client-entry.tsx file in the root directory of your project.\n\n",
+    "routePath": "/guide/features/i18n",
+    "lang": "en",
+    "toc": [
+      {
+        "text": "Installation",
+        "id": "installation",
+        "depth": 2,
+        "charIndex": 173
+      },
+      { "text": "SetUp", "id": "setup", "depth": 2, "charIndex": 191 },
+      {
+        "text": "Extract and Compile messages",
+        "id": "extract-and-compile-messages",
+        "depth": 3,
+        "charIndex": 200
+      },
+      {
+        "text": "Use in your project",
+        "id": "use-in-your-project",
+        "depth": 3,
+        "charIndex": 474
+      },
+      {
+        "text": "Dynamic load route messages every request",
+        "id": "dynamic-load-route-messages-every-request",
+        "depth": 3,
+        "charIndex": 549
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 14,
+    "title": "Meta",
+    "content": "#\n\nPareto uses react-helmet-async for metadata management. So you can use all the\nfeatures available in the react-helmet-async library.\n\n\nExamples#\n\n\n\nThat's it!. The title tag will be automatically moved to the head tag during\nserver-side rendering.\n\n\nCommon Tags#\n\nSometimes you want to set some common meta tags between multiple routes. You can\ndefine a shared-meta.tsx file and import it separately in client-entry.tsx and\nserver-entry.tsx.\n\n\n\n\nPitfall#\n\nNOTE\n\nDo not use Helmet in streamed components, it will not take effect, because\nstreamed components are not rendered immediately.",
+    "routePath": "/guide/features/meta",
+    "lang": "en",
+    "toc": [
+      { "text": "Examples", "id": "examples", "depth": 2, "charIndex": 137 },
+      {
+        "text": "Common Tags",
+        "id": "common-tags",
+        "depth": 2,
+        "charIndex": 252
+      },
+      { "text": "Pitfall", "id": "pitfall", "depth": 2, "charIndex": 448 }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 15,
+    "title": "Conventional Route",
+    "content": "#\n\n\nWhat is it#\n\nPareto uses file system routing, and the file path of the page is simply mapped\nto the routing path, which makes the routing of the entire project very\nintuitive.\n\n\n\n\nCustom Behavior#\n\nIf you don't want to use the 'app' folder as your routing folder, you can also\ncustomize the name through configuration.\n\n",
+    "routePath": "/guide/features/route",
+    "lang": "en",
+    "toc": [
+      { "text": "What is it", "id": "what-is-it", "depth": 2, "charIndex": 3 },
+      {
+        "text": "Custom Behavior",
+        "id": "custom-behavior",
+        "depth": 2,
+        "charIndex": 183
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 16,
+    "title": "SPA",
+    "content": "#\n\nPareto provides good support for client-side rendering\n\n\nUsage#\n\nSometimes, when your website traffic is too high, not using server-side\nrendering can greatly increase your server's traffic capacity. In Pareto, you\ncan enable this feature by setting enableSpa: true in the pareto.config.ts. When\nthis configuration is enabled, if your URL link contains a __csr parameter and\nit is truthy, Pareto will only return an empty HTML skeleton from the server,\nwith the remaining content loaded by the client-side JavaScript.\n\n\n\nNOTE\n\nIt's important to note that when you start using the SPA capability, you need to\ndetermine whether you are currently\n\nin SPA mode and request the corresponding data on the client side. You can refer\nto this example to accomplish this.",
+    "routePath": "/guide/features/spa",
+    "lang": "en",
+    "toc": [{ "text": "Usage", "id": "usage", "depth": 2, "charIndex": 59 }],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 17,
+    "title": "Staic Asset",
+    "content": "#\n\nEach route corresponds to a page that has its own static resources, such as CSS,\nJS, etc.\n\nPareto will dispatch these static resources in the head tag element the instant\na request reaches your server. This allows the browser to download and parse\nthese resources during the gap in server interface requests.\n\nPareto provides a getAsset method, which is useful for adding some page-related\nstatic resources. This is very useful in some preview pages.\n\nFor exmaple:\n\n\n\nThe data returned from getAssets will be converted into link tags and inserted\ninto the page. The difference between this and the metadata from\nreact-async-helmet is that its dispatch timing will be earlier.",
+    "routePath": "/guide/features/static-asset",
+    "lang": "en",
+    "toc": [],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 18,
+    "title": "Stream",
+    "content": "#\n\nPareto provides first-class support for stream rendering.\n\n\nUsage#\n\nNOTE\n\nWe assume that you already have experience using stream rendering. If not, you\ncan refer to these articles to understand what stream rendering is.\n\n * pareto blog\n * https://github.com/reactwg/react-18/discussions/37\n * https://github.com/reactwg/react-18/discussions/22\n * https://innovation.ebayinc.com/tech/engineering/async-fragments-rediscovering\n   -progressive-html-rendering-with-marko/\n\n\nDefine stream request and key#\n\nBased on experience, we only need to stream the requests of modules with slow\ninterfaces. First, let's define the request method and key value.\n\n\n\n\nSetup server side promise#\n\nPareto exports a promiseMap object to maintain the promise status of each\nrequest corresponding to the key value. Let's set it up.\n\n\n\n\nSetup client side promise#\n\nA well-known joke is: React needs to maintain consistency between the first\nrender on the server and the client, and we also need to synchronize the promise\nstatus between the server and the client.\n\n\n\n\nConsume Promise#\n\nOh heavens! We've finally arrived here. By using use and suspence in React to\nconsume our request promises, we can achieve stream transmission.\n\nNOTE\n\nThe use hook was only introduced in React 19, so for React 18, you need to use\nthe use function exported from Pareto. Note that it only implements the ability\nto consume promises.\n\n",
+    "routePath": "/guide/features/stream",
+    "lang": "en",
+    "toc": [
+      { "text": "Usage", "id": "usage", "depth": 2, "charIndex": 62 },
+      {
+        "text": "Define stream request and key",
+        "id": "define-stream-request-and-key",
+        "depth": 3,
+        "charIndex": 473
+      },
+      {
+        "text": "Setup server side promise",
+        "id": "setup-server-side-promise",
+        "depth": 3,
+        "charIndex": 653
+      },
+      {
+        "text": "Setup client side promise",
+        "id": "setup-client-side-promise",
+        "depth": 3,
+        "charIndex": 816
+      },
+      {
+        "text": "Consume Promise",
+        "id": "consume-promise",
+        "depth": 3,
+        "charIndex": 1047
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 19,
+    "title": "Introduction",
+    "content": "#\n\n\nPosition#\n\nPareto is a React SSR framework based on rspack, dedicated to making your use of\nstreaming rendering simple. It doesn't have many complex encapsulations,\nessentially it's just a simple wrapper for React SSR applications.\n\n\nProject Background#\n\nPareto is designed as a streamlined MPA architecture, so it might be more\nsuitable for those who need to develop embedded web pages in mobile webviews. We\nconsidered many performance optimization factors from the beginning of the\ndesign, and combined it with streaming rendering. For example:\n\n 1. Critical CSS: Pareto has built-in support for critical CSS, which is much\n    faster than using external CSS. For more details, you can refer to\n    https://web.dev/articles/extract-critical-css?hl=zh-cn\n 2. react-helmet-async: Pareto has built-in support for metadata, which will be\n    sent to the browser at the beginning of the request.\n 3. SPA: Pareto has built-in support for SPA mode. When your server traffic is\n    too large, you can choose to switch to SPA mode to increase capacity.\n 4. Custom Streaming Rendering Architecture: unlike Next.js or Remix, we start\n    sending static resources immediately at the beginning of the request. This\n    helps improve performance metrics.\n\n\nSupported React version#\n\n\nReact19+#\n\nPareto directly supports react19 and above\n\n\nReact18#\n\nPareto also supports React 18, but since use hook is not exposed in React 18,\nyou need to use the use function exported from Pareto when you enable the\nstreaming rendering feature.\n\n\n\n\nReact17 & React16.8#\n\nPareto does not directly support React 17, as making it compatible is quite\ncomplex. However, streaming rendering can be enabled in any version after React\n16.8. I've provided an rough example here that accomplishes this. If you're\nusing a version lower than React 18, you might consider referring to this\nexample to integrate streaming rendering into your project.",
+    "routePath": "/guide/start/introduction",
+    "lang": "en",
+    "toc": [
+      { "text": "Position", "id": "position", "depth": 2, "charIndex": 3 },
+      {
+        "text": "Project Background",
+        "id": "project-background",
+        "depth": 2,
+        "charIndex": 237
+      },
+      {
+        "text": "Supported React version",
+        "id": "supported-react-version",
+        "depth": 2,
+        "charIndex": 1249
+      },
+      { "text": "React19+", "id": "react19", "depth": 3, "charIndex": 1276 },
+      { "text": "React18", "id": "react18", "depth": 3, "charIndex": 1332 },
+      {
+        "text": "React17 & React16.8",
+        "id": "react17--react168",
+        "depth": 3,
+        "charIndex": 1527
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  },
+  {
+    "id": 20,
+    "title": "Quick Start",
+    "content": "#\n\n\n1. Initialize the project#\n\nYou can create a Rspress project using the create-pareto cli:\n\nInput the project directory name, and then the cli will create the project for\nyou.\n\nSince React 19 has not been released yet, you need to create a new .npmrc file\nin the root directory and add\n\n\n\n\n2. Start Dev Server#\n\nStart the local development service with the following command:\n\n\n\nTIP\n\nFor the dev command, you can specify the port number or host of the development\nservice with the --port or --host parameter, such as pareto dev --port 8080\n--host 0.0.0.0.\n\n\n3. Build in Production#\n\nBuild the production bundle with the following command :\n\n\n\nBy default, Pareto will set .pareto as the output directory.\n\n\n4. Start in Production#\n\nStart the production bundle with the following command :\n\n",
+    "routePath": "/guide/start/quick-start",
+    "lang": "en",
+    "toc": [
+      {
+        "text": "1. Initialize the project",
+        "id": "1-initialize-the-project",
+        "depth": 2,
+        "charIndex": 3
+      },
+      {
+        "text": "2. Start Dev Server",
+        "id": "2-start-dev-server",
+        "depth": 2,
+        "charIndex": 292
+      },
+      {
+        "text": "3. Build in Production",
+        "id": "3-build-in-production",
+        "depth": 2,
+        "charIndex": 560
+      },
+      {
+        "text": "4. Start in Production",
+        "id": "4-start-in-production",
+        "depth": 2,
+        "charIndex": 708
+      }
+    ],
+    "domain": "",
+    "frontmatter": {},
+    "version": ""
+  }
+]

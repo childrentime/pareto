@@ -93,9 +93,6 @@ export async function build() {
   const appFilePath = findAppFile(cwd)
   writeProductionServer(outDir, appFilePath)
 
-  // 6. Static site generation (SSG)
-  await generateStaticPages(serverOutputPath, clientOutputPath)
-
   console.log(`[pareto] Build complete. Output: ${outDir}`)
   console.log(`[pareto] Run 'pareto start' to start the production server.`)
 }
@@ -182,109 +179,6 @@ function readViteManifest(
   }
 
   return { clientEntryUrls, cssUrls, routeManifest }
-}
-
-/**
- * Static site generation: render static routes to HTML files.
- */
-async function generateStaticPages(
-  serverOutputPath: string,
-  clientOutputPath: string,
-): Promise<void> {
-  const serverEntry = path.resolve(serverOutputPath, 'index.js')
-  if (!fs.existsSync(serverEntry)) return
-
-  // Load the compiled server bundle
-  const serverBundle = require(serverEntry) as {
-    default?: (req: unknown, res: unknown, next?: () => void) => Promise<void>
-    __routes?: { path: string; componentPath: string; isDynamic: boolean }[]
-    __moduleMap?: Record<
-      string,
-      {
-        config?: { render?: string }
-        staticParams?: () => Promise<Record<string, string>[]>
-      }
-    >
-  }
-
-  const routes = serverBundle.__routes
-  const moduleMap = serverBundle.__moduleMap
-  const handler = serverBundle.default
-
-  if (!routes || !moduleMap || !handler) return
-
-  // Collect paths to render statically
-  const staticPaths: string[] = []
-
-  for (const route of routes) {
-    const pageMod = moduleMap[route.componentPath] as
-      | {
-          config?: { render?: string }
-          staticParams?: () => Promise<Record<string, string>[]>
-        }
-      | undefined
-    if (!pageMod?.config || pageMod.config.render !== 'static') continue
-
-    if (route.isDynamic && pageMod.staticParams) {
-      // Dynamic route with staticParams
-      const paramSets = await pageMod.staticParams()
-      for (const params of paramSets) {
-        let urlPath = route.path
-        for (const [key, value] of Object.entries(params)) {
-          urlPath = urlPath.replace(`:${key}`, value)
-        }
-        staticPaths.push(urlPath)
-      }
-    } else if (!route.isDynamic) {
-      staticPaths.push(route.path)
-    }
-  }
-
-  if (staticPaths.length === 0) return
-
-  console.log(`[pareto] Generating ${staticPaths.length} static page(s)...`)
-
-  const { PassThrough } = await import('stream')
-
-  for (const urlPath of staticPaths) {
-    const html = await new Promise<string>((resolve, reject) => {
-      const chunks: Buffer[] = []
-      const stream = new PassThrough()
-
-      stream.on('data', (chunk: Buffer) => chunks.push(chunk))
-      stream.on('end', () => resolve(Buffer.concat(chunks).toString()))
-      stream.on('error', reject)
-
-      // Mock Express-like req/res
-      const req = {
-        path: urlPath,
-        method: 'GET',
-        headers: {},
-        query: {},
-      }
-
-      const res = Object.assign(stream, {
-        statusCode: 200,
-        setHeader() {
-          return res
-        },
-      })
-
-      void handler(req, res).catch(reject)
-    })
-
-    // Write to client output directory
-    const outputPath =
-      urlPath === '/'
-        ? path.resolve(clientOutputPath, 'index.html')
-        : path.resolve(clientOutputPath, urlPath.slice(1), 'index.html')
-
-    fs.mkdirSync(path.dirname(outputPath), { recursive: true })
-    fs.writeFileSync(outputPath, html)
-    console.log(
-      `[pareto]   ${urlPath} → ${path.relative(process.cwd(), outputPath)}`,
-    )
-  }
 }
 
 function writeProductionServer(outDir: string, appFilePath?: string) {

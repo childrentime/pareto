@@ -170,11 +170,11 @@ interface LoaderContext {
 
 ### `RouteConfig`
 
-Per-route configuration exported from `page.tsx`. See [Static Site Generation](/concepts/ssg/) for SSG usage.
+Per-route configuration exported from `page.tsx`.
 
 ```tsx
 interface RouteConfig {
-  render?: 'server' | 'static'
+  render?: 'server'
 }
 ```
 

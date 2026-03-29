@@ -1,7 +1,5 @@
+import type { LoaderContext } from '@paretojs/core'
 import { Link, useLoaderData } from '@paretojs/core'
-import type { LoaderContext, RouteConfig } from '@paretojs/core'
-
-export const config: RouteConfig = { render: 'static' }
 
 interface Post {
   slug: string
@@ -55,10 +53,6 @@ Both stores use useSyncExternalStore under the hood, which means they work corre
   },
 }
 
-export async function staticParams() {
-  return Object.keys(POSTS).map((slug) => ({ slug }))
-}
-
 export function loader({ params }: LoaderContext) {
   const post = POSTS[params.slug]
   if (!post) {
@@ -78,7 +72,7 @@ export default function BlogPost() {
           <span className="text-[0.6875rem] text-stone-400 dark:text-stone-500 tabular-nums">
             {post.date}
           </span>
-          {post.tags.map((tag) => (
+          {post.tags.map(tag => (
             <span
               key={tag}
               className="text-[0.6875rem] px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 font-medium"

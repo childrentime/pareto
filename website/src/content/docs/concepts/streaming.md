@@ -66,7 +66,6 @@ Streaming is not always the right choice. Avoid `defer()` in these situations:
 - **SEO-critical content** — Search engine crawlers may not execute JavaScript to reveal streamed content. If a piece of data must appear in the initial HTML for SEO, return it directly from the loader instead of deferring it.
 - **Small payloads** — If the total data fetching time is under ~50ms, the overhead of streaming setup is not worth it. Just return everything synchronously.
 - **Dependent data** — If your component cannot render anything meaningful without all data present, deferring individual pieces creates a worse experience (multiple loading spinners instead of one). Await all promises in the loader and return the resolved result.
-- **[Static pages](/concepts/ssg/)** — SSG pages are rendered at build time. Deferred data does not make sense because there is no live request to stream to. Use direct returns for static routes.
 
 ## How do I handle errors in streamed data?
 

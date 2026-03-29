@@ -1,7 +1,5 @@
+import type { LoaderContext } from '@paretojs/core'
 import { Link, useLoaderData } from '@paretojs/core'
-import type { LoaderContext, RouteConfig } from '@paretojs/core'
-
-export const config: RouteConfig = { render: 'static' }
 
 interface HomeData {
   version: string
@@ -28,8 +26,8 @@ export function loader(_ctx: LoaderContext) {
         href: '/ssr-store',
       },
       {
-        title: 'Dynamic Routes & SSG',
-        desc: '[slug] params, nested layouts, and staticParams() for static generation at build time.',
+        title: 'Dynamic Routes',
+        desc: '[slug] params, nested layouts, and file-based routing conventions.',
         href: '/blog',
       },
       {
@@ -124,8 +122,8 @@ export default function IndexPage() {
               <p className="text-[0.875rem] text-stone-500 dark:text-stone-400 leading-relaxed mb-2">
                 {f.desc}
               </p>
-              {f.href && (
-                f.external ? (
+              {f.href &&
+                (f.external ? (
                   <a
                     href={f.href}
                     target="_blank"
@@ -163,8 +161,7 @@ export default function IndexPage() {
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
                   </Link>
-                )
-              )}
+                ))}
             </div>
           ))}
         </div>

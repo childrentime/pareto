@@ -7,12 +7,11 @@ export interface RouteModule {
   default: React.ComponentType<{ children?: React.ReactNode }>
   loader?: LoaderFunction
   config?: RouteConfig
-  staticParams?: () => Promise<Record<string, string>[]>
   Head?: React.ComponentType<{ data: unknown }>
 }
 
 export interface RouteConfig {
-  render?: 'server' | 'static'
+  render?: 'server'
 }
 
 export interface RouteDef {

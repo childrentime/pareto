@@ -56,6 +56,8 @@ The file-based routing system has been refined. Convention files in 3.0:
 | `loader.ts` | Separate loader file for server-side data |
 | `head.tsx` | Per-route `<title>` and meta tags |
 | `not-found.tsx` | 404 page (root level only) |
+| `error.tsx` | Error page — catches loader and render errors |
+| `document.tsx` | [Document customization](/concepts/document-customization/) — `getDocumentProps()` for `<html>` attributes |
 | `route.ts` | Resource route (JSON API, no HTML) |
 
 **New: `loader.ts`** — You can now define loaders in a separate file instead of exporting from `page.tsx`. This keeps data fetching logic separate from your components:
@@ -69,7 +71,7 @@ export function loader(ctx: LoaderContext) {
 }
 ```
 
-**Changed: Error handling** — Error handling is now done via the `ParetoErrorBoundary` component instead of `error.tsx` convention files. This gives you more flexibility — place error boundaries exactly where you need them in the component tree:
+**New: `error.tsx`** — Create an `error.tsx` at the app root to customize the error page shown when a loader throws or a render error is not caught by a `ParetoErrorBoundary`. For component-level error isolation, use `ParetoErrorBoundary` anywhere in the component tree:
 
 ```tsx
 import { ParetoErrorBoundary } from '@paretojs/core'
@@ -95,7 +97,7 @@ const { useStore, getState, setState } = defineStore((set) => ({
 }))
 ```
 
-The store API supports direct destructuring, SSR serialization via `dehydrate()` / `hydrateStores()`, and context-scoped stores for per-request isolation.
+The store API supports direct destructuring, automatic SSR serialization, and context-scoped stores for per-request isolation.
 
 ## Security headers
 
@@ -109,7 +111,7 @@ const app = express()
 app.use(securityHeaders())
 ```
 
-This sets `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Referrer-Policy`, and `Permissions-Policy` headers automatically.
+This sets `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security`, and `Cross-Origin-Opener-Policy` headers automatically.
 
 ## CLI changes
 
@@ -125,7 +127,7 @@ pareto start   # Start production server
 
 1. **Update dependencies** — Install `@paretojs/core@3` and update to React 19.
 2. **Remove Rspack config** — Delete any custom Rspack configuration files. Use `configureVite()` in `pareto.config.ts` instead.
-3. **Replace `error.tsx`** — Remove `error.tsx` files and use `ParetoErrorBoundary` in your layouts/pages instead.
+3. **Update error handling** — `error.tsx` is now optional and provides app-level error pages. Use `ParetoErrorBoundary` in your layouts/pages for component-level error isolation.
 4. **Update imports** — The `@paretojs/core` API surface is largely the same, but check that your imports match the [API reference](/api/core/).
 5. **Test your loaders** — Loader behavior is unchanged, but verify that your data fetching works with Vite's dev server.
 

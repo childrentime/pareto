@@ -1,15 +1,10 @@
+import { Link, useRouter } from '@paretojs/core'
 import type { PropsWithChildren } from 'react'
 import { useEffect, useState } from 'react'
-import { Link, useRouter } from '@paretojs/core'
 
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `(function(){try{var t=localStorage.getItem('pareto-theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark')}catch(e){}})()`,
-        }}
-      />
       <NavigationProgress />
       <header className="sticky top-0 z-30 border-b border-stone-200/80 dark:border-stone-800/60 bg-stone-50/90 dark:bg-stone-950/90 backdrop-blur-lg transition-colors duration-300">
         <div className="max-w-6xl mx-auto px-6 lg:px-8 h-14 flex items-center justify-between">

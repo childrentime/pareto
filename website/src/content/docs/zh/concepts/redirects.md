@@ -79,6 +79,8 @@ export function loader(ctx: LoaderContext) {
 }
 ```
 
+与抛出普通 `Error` 不同，`notFound()` 会将 HTTP 状态码设为 404 并渲染 `not-found.tsx` 组件。对于预期的"资源不存在"场景使用 `notFound()`，对于意外的失败使用 `throw new Error()`。参见[错误处理](/zh/concepts/error-handling/)了解如何用 `ParetoErrorBoundary` 捕获意外错误。
+
 ## not-found.tsx
 
 在应用根目录放置一个 `not-found.tsx`：
@@ -110,3 +112,9 @@ export default function NotFound() {
 | `308` | 永久重定向 | 与 301 相同，但保留 HTTP 方法 |
 
 在大多数情况下，默认的 302 是正确的。仅当旧 URL 永远不会再提供内容时才使用 301。
+
+## 相关
+
+- [错误处理](/zh/concepts/error-handling/) — `ParetoErrorBoundary` 的工作方式以及何时使用它 vs. `not-found.tsx`。
+- [基于文件的路由](/zh/concepts/routing/) — `not-found.tsx` 在路由约定中的位置。
+- [资源路由](/zh/concepts/resource-routes/) — 通过 `route.ts` 创建 JSON API 端点。

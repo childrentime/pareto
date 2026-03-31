@@ -12,12 +12,21 @@ import {
   ParetoErrorBoundary,
   useLoaderData,
   useRouter,
-  useRouterSnapshot,
   useStreamData,
   defer,
   redirect,
   notFound,
-  mergeHeadDescriptors,
+} from '@paretojs/core'
+import type {
+  HeadProps,
+  HeadComponent,
+  DocumentContext,
+  HtmlAttributes,
+  GetDocumentProps,
+  LoaderContext,
+  LoaderFunction,
+  NavigateOptions,
+  ParetoConfig,
 } from '@paretojs/core'
 ```
 
@@ -95,16 +104,6 @@ const { pathname, params, isNavigating, push, replace, back, prefetch } = useRou
 
 `NavigateOptions` 接受 `{ replace?: boolean, scroll?: boolean }`。例如 `push('/page', { scroll: false })` 导航时不滚动到顶部。
 
-### `useRouterSnapshot()`
-
-只读路由状态，不含导航方法。比 `useRouter()` 更轻量 — 只需读取当前路由信息时使用。
-
-```tsx
-const { pathname, params, isNavigating } = useRouterSnapshot()
-```
-
-返回 `RouterState` 对象，包含 `pathname`、`params` 和 `isNavigating`。
-
 ### `useStreamData<T>(promiseOrValue)`
 
 不使用 `<Await>` 消费延迟值的 Hook。会挂起组件直到 Promise 解析，因此必须在 `<Suspense>` 边界内使用。
@@ -158,20 +157,64 @@ interface LoaderContext {
 }
 ```
 
-### `RouteConfig`
+### `LoaderFunction`
+
+`page.tsx` 或 `loader.ts` 文件中导出的 `loader` 函数的类型。
 
 ```tsx
-interface RouteConfig {
-  render?: 'server'
+type LoaderFunction = (context: LoaderContext) => unknown
+```
+
+### `HeadProps`
+
+传递给 `head.tsx` 中 Head 组件的 props。详见 [Head 管理](/zh/concepts/head-management/)。
+
+```tsx
+interface HeadProps {
+  loaderData: unknown
+  params: Record<string, string>
 }
 ```
 
-### `HeadDescriptor`
+### `HeadComponent`
+
+`head.tsx` 文件导出的 Head 组件类型。
 
 ```tsx
-interface HeadDescriptor {
-  title?: string
-  meta?: Record<string, string>[]
-  link?: Record<string, string>[]
+type HeadComponent = (props: HeadProps) => ReactNode
+```
+
+### `DocumentContext`
+
+传递给 `document.tsx` 中 `getDocumentProps` 的上下文对象。
+
+```tsx
+interface DocumentContext {
+  req: Request
+  params: Record<string, string>
+  pathname: string
+  loaderData: unknown
 }
 ```
+
+### `HtmlAttributes`
+
+`getDocumentProps` 的返回类型。所有属性会作为 `<html>` 元素的属性应用。常用属性 `lang`、`dir` 和 `className` 有显式类型定义。
+
+```tsx
+type HtmlAttributes = Record<string, string> & {
+  lang?: string
+  dir?: string
+  className?: string
+}
+```
+
+### `GetDocumentProps`
+
+`document.tsx` 导出的函数类型。
+
+```tsx
+type GetDocumentProps = (ctx: DocumentContext) => HtmlAttributes
+```
+
+参见[文档定制](/zh/concepts/document-customization/)了解 `document.tsx` 用法，参见[错误处理](/zh/concepts/error-handling/)了解 `error.tsx` 用法。

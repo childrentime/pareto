@@ -1,11 +1,12 @@
-import type { HeadFunction } from '@paretojs/core'
+import type { HeadProps } from '@paretojs/core'
 
-export const head: HeadFunction = ({ loaderData }) => ({
-  title: `${loaderData?.post?.title ?? 'Post'} | Pareto Blog`,
-  meta: [
-    {
-      name: 'description',
-      content: loaderData?.post?.content?.slice(0, 160) ?? '',
-    },
-  ],
-})
+export default function Head({ loaderData }: HeadProps) {
+  const post = (loaderData as { post?: { title?: string; content?: string } })
+    ?.post
+  return (
+    <>
+      <title>{post?.title ?? 'Post'} | Pareto Blog</title>
+      <meta name="description" content={post?.content?.slice(0, 160) ?? ''} />
+    </>
+  )
+}

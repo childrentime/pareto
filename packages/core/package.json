@@ -10,20 +10,17 @@
   "keywords": [
     "react",
     "ssr",
-    "ssg",
     "framework",
     "server side rendering",
-    "static site generation",
     "client navigation"
   ],
-  "description": "SSR/SSG React framework with client-side navigation",
+  "description": "SSR React framework with client-side navigation",
   "bugs": {
     "url": "https://github.com/childrentime/pareto/issues"
   },
   "files": [
     "dist",
-    "README.md",
-    "LICENSE.txt"
+    "README.md"
   ],
   "type": "commonjs",
   "exports": {
@@ -37,9 +34,6 @@
       "types": "./dist/store/index.d.ts",
       "import": "./dist/store/index.mjs",
       "require": "./dist/store/index.js"
-    },
-    "./config": {
-      "types": "./dist/index.d.ts"
     },
     "./node": {
       "types": "./dist/node.d.ts",
@@ -65,13 +59,14 @@
     "test:watch": "vitest"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.10",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@types/serialize-javascript": "^5.0.4",
+    "postcss": "^8.5.3",
     "vitest": "^3.1.1"
   },
   "peerDependencies": {
@@ -83,7 +78,6 @@
     "@vitejs/plugin-react": "^4.5.0",
     "cac": "^6.7.14",
     "immer": "^10.1.1",
-    "postcss": "^8.5.3",
     "serialize-javascript": "^6.0.2",
     "vite": "^7.0.0"
   }

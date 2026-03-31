@@ -46,7 +46,7 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --no-frozen-lockfile
 
       # ── System tuning for stable benchmarks ──────────────────────────
       - name: Tune system for benchmarks

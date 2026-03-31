@@ -2,8 +2,12 @@ import type { ReactNode } from 'react'
 import { StrictMode, Suspense, lazy } from 'react'
 import { hydrateRoot } from 'react-dom/client'
 import { LoaderDataContext } from '../data/use-loader-data'
+import { RouteHead } from '../head/client-head'
+import { createNdjsonReader } from '../ndjson/reader'
 import { RouterProvider, useRouterContext } from '../router/context'
-import type { HeadDescriptor, RouteManifest } from '../types'
+import { normalizePath, pathToRegex } from '../router/route-matcher'
+import type { HeadComponent, HtmlAttributes, RouteManifest } from '../types'
+import { DefaultErrorFallback } from './default-error-fallback'
 
 declare global {
   interface Window {
@@ -12,19 +16,6 @@ declare global {
     __MATCHED_ROUTE__: { path: string; params: Record<string, string> }
     __ROUTE_ERROR__?: string
   }
-}
-
-/**
- * Hydrate the server-rendered HTML on the client.
- * Called by the auto-generated per-page client entry point.
- */
-export function hydrateApp(app: ReactNode) {
-  const root = document.getElementById('root')
-  if (!root) {
-    throw new Error('Could not find #root element for hydration')
-  }
-
-  hydrateRoot(root, <StrictMode>{app}</StrictMode>)
 }
 
 export interface ClientRoute {
@@ -40,28 +31,74 @@ export interface ClientRoute {
   paramNames?: string[]
   /** Layout components for this route (eagerly imported) */
   layouts?: React.ComponentType<{ children?: ReactNode }>[]
+  /** Head component loaders for this route (one per head.tsx in the path) */
+  headLoaders?: (() => Promise<{
+    default?: HeadComponent
+    head?: HeadComponent
+  }>)[]
 }
 
-/** Match a URL pathname to a client route using :param syntax */
+/** Pre-compiled pattern cache for client route matching */
+const routePatternCache = new WeakMap<ClientRoute[], Map<string, RegExp>>()
+
+function getRoutePatterns(routes: ClientRoute[]): Map<string, RegExp> {
+  let cache = routePatternCache.get(routes)
+  if (!cache) {
+    cache = new Map()
+    for (const r of routes) {
+      cache.set(r.path, pathToRegex(r.path))
+    }
+    routePatternCache.set(routes, cache)
+  }
+  return cache
+}
+
 function matchClientRoute(
   pathname: string,
   routes: ClientRoute[],
 ): ClientRoute | undefined {
-  return routes.find(r => {
-    const pattern = r.path
-      .replace(/:(\w+)\*/g, '(.+)')
-      .replace(/:(\w+)/g, '([^/]+)')
-    return new RegExp(`^${pattern}/?$`).test(pathname)
-  })
+  const normalized = normalizePath(pathname)
+  const patterns = getRoutePatterns(routes)
+  return routes.find(r => patterns.get(r.path)!.test(normalized))
 }
 
 interface FetchRouteDataResult {
   loaderData: unknown
   params: Record<string, string>
-  head?: HeadDescriptor
   notFound?: boolean
   error?: string
-  deferredKeys?: string[]
+  htmlAttributes?: HtmlAttributes
+}
+
+interface DeferredResolver {
+  resolve: (value: unknown) => void
+  reject: (reason: unknown) => void
+}
+
+/**
+ * Sync html attributes returned by getDocumentProps onto document.documentElement.
+ * Removes stale attributes from the previous navigation, then applies new ones.
+ */
+let managedHtmlAttrs: string[] = []
+
+function applyHtmlAttributes(attrs: HtmlAttributes | undefined) {
+  if (!attrs) return
+  const el = document.documentElement
+
+  for (const name of managedHtmlAttrs) {
+    if (!(name in attrs)) {
+      el.removeAttribute(name === 'className' ? 'class' : name)
+    }
+  }
+
+  const managed: string[] = []
+  for (const [key, value] of Object.entries(attrs)) {
+    const attrName = key === 'className' ? 'class' : key
+    el.setAttribute(attrName, value)
+    managed.push(key)
+  }
+
+  managedHtmlAttrs = managed
 }
 
 /**
@@ -74,6 +111,7 @@ export function startClient(
   routes: ClientRoute[],
   options?: {
     notFoundComponent?: React.ComponentType
+    errorComponent?: React.ComponentType<{ error: Error }>
   },
 ) {
   const root = document.getElementById('root')
@@ -82,16 +120,12 @@ export function startClient(
   }
 
   const matchedRoute = window.__MATCHED_ROUTE__
-  if (!matchedRoute) {
-    console.error('[pareto] No matched route found for hydration')
-    return
-  }
-
   const manifest = window.__ROUTE_MANIFEST__ ?? { routes: {} }
   const initialData: unknown = window.__ROUTE_DATA__ ?? {}
   const initialError = window.__ROUTE_ERROR__
     ? new Error(window.__ROUTE_ERROR__)
     : null
+  const isInitial404 = !matchedRoute
 
   // Build lazy components for all routes
   const routeComponents = new Map<
@@ -102,15 +136,19 @@ export function startClient(
     routeComponents.set(route.path, lazy(route.load))
   }
 
-  // Pure data fetcher — no state updates, just returns data.
-  // For deferred loaders, creates client-side Promises so <Await> shows fallbacks.
-  async function fetchRouteData(pathname: string): Promise<{
-    loaderData: unknown
-    params: Record<string, string>
-    head?: HeadDescriptor
-    notFound?: boolean
-    error?: string
-  }> {
+  /**
+   * Fetch route data for client-side navigation.
+   *
+   * For routes using defer(), the server streams NDJSON: the first line
+   * contains resolved data + pendingKeys (returned immediately so the page
+   * renders), then each deferred value arrives as a subsequent line.
+   * We create Promises for pending keys so <Await> shows fallback, then
+   * resolve them as stream lines arrive and trigger a loaderData update
+   * via RouterProvider.setLoaderData.
+   */
+  async function fetchRouteData(
+    pathname: string,
+  ): Promise<FetchRouteDataResult> {
     const response = await fetch(
       `/__pareto/data?path=${encodeURIComponent(pathname)}`,
     )
@@ -120,22 +158,84 @@ export function startClient(
     if (!response.ok) {
       return { loaderData: null, params: {}, error: 'Loader failed' }
     }
-    const result = (await response.json()) as FetchRouteDataResult
 
-    // If the server indicated deferred keys, create client-side Promises
-    // that fetch each key individually. <Await> renders fallback until resolved.
-    if (result.deferredKeys?.length) {
-      const loaderData = result.loaderData as Record<string, unknown>
-      for (const key of result.deferredKeys) {
-        loaderData[key] = fetch(
-          `/__pareto/deferred?path=${encodeURIComponent(pathname)}&key=${encodeURIComponent(key)}`,
-        )
-          .then(r => r.json() as Promise<{ value: unknown }>)
-          .then(r => r.value)
-      }
+    const contentType = response.headers.get('content-type') ?? ''
+
+    // Non-deferred: plain JSON
+    if (!contentType.includes('ndjson')) {
+      const result = (await response.json()) as FetchRouteDataResult
+      applyHtmlAttributes(result.htmlAttributes)
+      return result
     }
 
-    return result
+    // NDJSON stream
+    const ndjson = createNdjsonReader(response.body!)
+
+    const firstLine = await ndjson.readLine()
+    if (!firstLine) {
+      return { loaderData: null, params: {}, error: 'Empty stream' }
+    }
+    const initial = JSON.parse(firstLine) as {
+      loaderData: Record<string, unknown>
+      params: Record<string, string>
+      pendingKeys?: string[]
+      htmlAttributes?: HtmlAttributes
+      redirect?: string
+      error?: string
+    }
+
+    applyHtmlAttributes(initial.htmlAttributes)
+
+    if (initial.redirect || initial.error || !initial.pendingKeys?.length) {
+      ndjson.cancel()
+      return initial as FetchRouteDataResult
+    }
+
+    // Create Promises for each pending key — <Await> will suspend on these
+    const resolvers = new Map<string, DeferredResolver>()
+    const loaderData = { ...initial.loaderData }
+    for (const key of initial.pendingKeys) {
+      loaderData[key] = new Promise((resolve, reject) => {
+        resolvers.set(key, { resolve, reject })
+      })
+    }
+
+    // Read remaining lines in background, resolving Promises as they arrive
+    void (async () => {
+      let line: string | null
+      while ((line = await ndjson.readLine()) !== null) {
+        if (!line) continue
+        try {
+          const chunk = JSON.parse(line) as {
+            key: string
+            value?: unknown
+            error?: string
+          }
+          const resolver = resolvers.get(chunk.key)
+          if (!resolver) continue
+          resolvers.delete(chunk.key)
+
+          if (chunk.error) {
+            resolver.reject(new Error(chunk.error))
+          } else {
+            resolver.resolve(chunk.value)
+          }
+        } catch {
+          // skip malformed lines
+        }
+      }
+      for (const [, resolver] of resolvers) {
+        resolver.reject(
+          new Error('Stream ended before deferred value resolved'),
+        )
+      }
+    })()
+
+    return {
+      loaderData,
+      params: initial.params,
+      htmlAttributes: initial.htmlAttributes,
+    }
   }
 
   /**
@@ -144,6 +244,8 @@ export function startClient(
    * no duplicate state, all updates flow through RouterProvider.
    */
   const NotFoundComponent = options?.notFoundComponent
+  const ErrorComponent = options?.errorComponent
+  const ErrorFallback = ErrorComponent ?? DefaultErrorFallback
 
   function AppContent() {
     const router = useRouterContext()
@@ -153,7 +255,6 @@ export function startClient(
       let element: React.ReactNode = NotFoundComponent ? (
         <NotFoundComponent />
       ) : null
-      // Wrap in root layout if available
       const rootRoute = routes[0]
       const rootLayouts = rootRoute?.layouts ?? []
       for (let i = rootLayouts.length - 1; i >= 0; i--) {
@@ -166,43 +267,9 @@ export function startClient(
     // Handle loader error (server-side or client-side navigation)
     if (router.navigationError) {
       let element: React.ReactNode = (
-        <div
-          style={{
-            padding: '2rem',
-            maxWidth: '32rem',
-            margin: '4rem auto',
-            textAlign: 'center',
-          }}
-        >
-          <h2
-            style={{
-              color: '#dc2626',
-              fontSize: '1.25rem',
-              fontWeight: 600,
-              marginBottom: '0.5rem',
-            }}
-          >
-            Something went wrong
-          </h2>
-          <p
-            style={{
-              color: '#666',
-              fontSize: '0.875rem',
-              marginBottom: '1.5rem',
-            }}
-          >
-            {router.navigationError.message}
-          </p>
-          <a
-            href="/"
-            style={{ color: '#2563eb', fontSize: '0.875rem', fontWeight: 500 }}
-          >
-            Go Home
-          </a>
-        </div>
+        <ErrorFallback error={router.navigationError} />
       )
 
-      // Wrap in layouts to match the server-rendered tree
       const errorRoute = matchClientRoute(router.pathname, routes)
       const layouts = errorRoute?.layouts ?? []
       for (let i = layouts.length - 1; i >= 0; i--) {
@@ -238,6 +305,11 @@ export function startClient(
 
     return (
       <LoaderDataContext.Provider value={router.loaderData}>
+        <RouteHead
+          route={currentRoute}
+          loaderData={router.loaderData}
+          params={router.params}
+        />
         {element}
       </LoaderDataContext.Provider>
     )
@@ -248,9 +320,10 @@ export function startClient(
     return (
       <RouterProvider
         initialPathname={window.location.pathname}
-        initialParams={matchedRoute.params}
+        initialParams={matchedRoute?.params ?? {}}
         initialLoaderData={initialData}
         initialError={initialError}
+        initialNotFound={isInitial404}
         manifest={manifest}
         onNavigate={fetchRouteData}
       >

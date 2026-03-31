@@ -1,20 +1,26 @@
 import type { Request, Response } from 'express'
-import { Suspense } from 'react'
+import type { ReactElement, ReactNode } from 'react'
+import { createElement, Fragment, isValidElement, Suspense } from 'react'
 import { renderToPipeableStream } from 'react-dom/server'
 import serialize from 'serialize-javascript'
 import { isDeferredData, serializeDeferredData } from '../data/streaming'
 import { LoaderDataContext } from '../data/use-loader-data'
+import { HEAD_ATTR } from '../head/constants'
+import { dedupeHeadElements, flattenHeadChildren } from '../head/dedupe'
+import { resolveServerHead } from '../head/server-head'
+import { createNdjsonWriter } from '../ndjson/writer'
 import { RouterProvider } from '../router/context'
-import { mergeHeadDescriptors } from '../router/head-manager'
 import { matchRoute } from '../router/route-matcher'
 import type {
-  HeadDescriptor,
-  HeadFunction,
+  GetDocumentProps,
+  HeadComponent,
+  HtmlAttributes,
   LoaderFunction,
   RouteDef,
   RouteManifest,
 } from '../types'
 import { ParetoNotFound, ParetoRedirect } from '../types'
+import { DefaultErrorFallback } from './default-error-fallback'
 import { DeferredScript } from './deferred-script'
 import type { ScriptDescriptor } from './document'
 import { Document } from './document'
@@ -42,6 +48,59 @@ interface ServerRenderOptions {
   streamTimeout?: number
   /** Path to not-found.tsx component (app-level 404 page) */
   notFoundPath?: string
+  /** Path to error.tsx component (app-level error page) */
+  errorPath?: string
+  /** Path to root head.tsx (used for 404/error pages that have no matched route) */
+  rootHeadPath?: string
+  /** Path to document.tsx (provides getDocumentProps for <html> attributes) */
+  documentPath?: string
+  /** @see ParetoConfig.wkWebViewFlushHint */
+  wkWebViewFlushHint?: boolean
+}
+
+/** Build the client-entry script descriptors (dev preamble + entry URLs) */
+function buildScripts(clientEntry: string[]): ScriptDescriptor[] {
+  const scripts: ScriptDescriptor[] = []
+  if (process.env.NODE_ENV !== 'production') {
+    scripts.push({ content: REACT_REFRESH_PREAMBLE })
+  }
+  for (const src of clientEntry) {
+    if (src) scripts.push({ src })
+  }
+  return scripts
+}
+
+/** Stream a Document to the response with renderToPipeableStream */
+function streamDocument(
+  res: Response,
+  doc: React.ReactElement,
+  statusCode: number,
+  streamTimeout: number,
+  label = 'Render',
+) {
+  res.setHeader('Content-Type', 'text/html; charset=UTF-8')
+  if (statusCode === 200) {
+    res.setHeader('X-Accel-Buffering', 'no')
+  }
+
+  const { pipe, abort } = renderToPipeableStream(doc, {
+    onShellReady() {
+      res.statusCode = statusCode
+      pipe(res)
+    },
+    onShellError(error) {
+      console.error(`${label} shell error:`, error)
+      res.statusCode = 500
+      res.end('Internal Server Error')
+    },
+    onError(error) {
+      const msg = error instanceof Error ? error.message : ''
+      if (msg.includes('closed early') || msg.includes('aborted')) return
+      console.error(`${label} streaming error:`, error)
+    },
+  })
+
+  setTimeout(() => abort(), streamTimeout)
 }
 
 /**
@@ -58,37 +117,130 @@ export function createRequestHandler(options: ServerRenderOptions) {
     cssUrls = [],
     streamTimeout = 10000,
     notFoundPath,
+    errorPath,
+    rootHeadPath,
+    documentPath,
+    wkWebViewFlushHint = false,
   } = options
+
+  const scripts = buildScripts(clientEntry)
+
+  // Resolve the user's getDocumentProps function (if app/document.tsx exists)
+  let getDocumentProps: GetDocumentProps | undefined
+  if (documentPath) {
+    const docMod = requireModule(documentPath) as Record<string, unknown>
+    getDocumentProps = (docMod.getDocumentProps ?? docMod.default) as
+      | GetDocumentProps
+      | undefined
+  }
+
+  function resolveHtmlAttributes(
+    req: Request,
+    params: Record<string, string>,
+    loaderData: unknown,
+  ): HtmlAttributes {
+    if (!getDocumentProps) return {}
+    return getDocumentProps({
+      req,
+      params,
+      pathname: req.path,
+      loaderData,
+    })
+  }
+
+  function renderNotFoundPage(req: Request, res: Response) {
+    if (!notFoundPath) return false
+
+    const notFoundMod = requireModule(notFoundPath) as Record<string, unknown>
+    const NotFound = notFoundMod.default as React.ComponentType
+
+    let headContent: ReactNode = null
+    if (rootHeadPath) {
+      const headMod = requireModule(rootHeadPath) as Record<string, unknown>
+      const Head = headMod.default as HeadComponent | undefined
+      if (Head) {
+        const children = flattenHeadChildren(
+          Head({ loaderData: undefined, params: {} }),
+        )
+        const deduped = dedupeHeadElements(children)
+        headContent =
+          deduped.length > 0
+            ? createElement(
+                Fragment,
+                null,
+                ...deduped.map((node, i) => {
+                  if (!isValidElement(node)) return node
+                  const el = node as ReactElement<Record<string, unknown>>
+                  return createElement(el.type as string, {
+                    ...el.props,
+                    [HEAD_ATTR]: '',
+                    key: el.key ?? `head-${i}`,
+                  })
+                }),
+              )
+            : null
+      }
+    }
+
+    const htmlAttributes = resolveHtmlAttributes(req, {}, undefined)
+
+    const element = (
+      <RouterProvider
+        initialPathname={req.path}
+        initialParams={{}}
+        initialLoaderData={undefined}
+        manifest={manifest}
+      >
+        <LoaderDataContext.Provider value={undefined}>
+          <NotFound />
+        </LoaderDataContext.Provider>
+      </RouterProvider>
+    )
+
+    const dataScript = (
+      <script
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{
+          __html: `window.__ROUTE_DATA__=null;\nwindow.__ROUTE_MANIFEST__=${serialize(manifest, { isJSON: true })};\nwindow.__MATCHED_ROUTE__=null;`,
+        }}
+      />
+    )
+
+    const doc = (
+      <Document
+        headContent={headContent}
+        cssLinks={cssUrls}
+        scripts={scripts}
+        dataScript={dataScript}
+        htmlAttributes={htmlAttributes}
+        wkWebViewFlushHint={wkWebViewFlushHint}
+      >
+        {element}
+      </Document>
+    )
+
+    streamDocument(res, doc, 404, streamTimeout, 'Not-found')
+    return true
+  }
 
   return async (req: Request, res: Response, next?: () => void) => {
     // Data endpoint for client-side navigation
     if (req.path === '/__pareto/data') {
-      return handleDataRequest(req, res, routes, requireModule)
-    }
-
-    // Deferred data endpoint — resolve a single deferred key
-    if (req.path === '/__pareto/deferred') {
-      return handleDeferredRequest(req, res, routes, requireModule)
+      return handleDataRequest(
+        req,
+        res,
+        routes,
+        requireModule,
+        getDocumentProps,
+      )
     }
 
     // Route matching
     const match = matchRoute(req.path, routes)
     if (!match) {
-      // No route matched — render not-found.tsx if available
-      if (notFoundPath) {
-        return renderNotFound(req, res, {
-          notFoundPath,
-          manifest,
-          requireModule,
-          clientEntry,
-          getCssForRoute,
-          cssUrls,
-          streamTimeout,
-        })
-      }
+      if (renderNotFoundPage(req, res)) return
       if (next) return next()
-      res.status(404)
-      res.end('Not Found')
+      res.status(404).end('Not Found')
       return
     }
 
@@ -107,39 +259,33 @@ export function createRequestHandler(options: ServerRenderOptions) {
     try {
       loaderData = await runLoaders(route, params, req, res, requireModule)
     } catch (err) {
-      // Redirect — send HTTP redirect response
       if (err instanceof ParetoRedirect) {
         res.redirect(err.status, err.url)
         return
       }
-      // Not found — render 404 page
       if (err instanceof ParetoNotFound) {
-        if (notFoundPath) {
-          return renderNotFound(req, res, {
-            notFoundPath,
-            manifest,
-            requireModule,
-            clientEntry,
-            getCssForRoute,
-            cssUrls,
-            streamTimeout,
-          })
-        }
+        if (renderNotFoundPage(req, res)) return
         res.status(404).end('Not Found')
         return
       }
-      // Other error — will render with error boundary
       loaderError = err instanceof Error ? err : new Error(String(err))
       statusCode = 500
       console.error('[pareto] Loader error:', loaderError)
     }
 
-    // Resolve head descriptors
-    const head = loaderError
-      ? undefined
-      : resolveHead(route, loaderData, params, requireModule)
+    const htmlAttributes = resolveHtmlAttributes(
+      req,
+      params,
+      loaderError ? undefined : loaderData,
+    )
 
-    // Resolve loader data (unwrap DeferredData for the component tree)
+    const headContent = resolveServerHead(
+      route,
+      loaderError ? undefined : loaderData,
+      params,
+      requireModule,
+    )
+
     const resolvedLoaderData = loaderError
       ? undefined
       : isDeferredData(loaderData)
@@ -150,45 +296,16 @@ export function createRequestHandler(options: ServerRenderOptions) {
     let element: React.ReactNode
 
     if (loaderError) {
-      // Loader threw — render a minimal error page
-      element = (
-        <div
-          style={{
-            padding: '2rem',
-            maxWidth: '32rem',
-            margin: '4rem auto',
-            textAlign: 'center',
-          }}
-        >
-          <h2
-            style={{
-              color: '#dc2626',
-              fontSize: '1.25rem',
-              fontWeight: 600,
-              marginBottom: '0.5rem',
-            }}
-          >
-            Something went wrong
-          </h2>
-          <p
-            style={{
-              color: '#666',
-              fontSize: '0.875rem',
-              marginBottom: '1.5rem',
-            }}
-          >
-            {loaderError.message}
-          </p>
-          <a
-            href="/"
-            style={{ color: '#2563eb', fontSize: '0.875rem', fontWeight: 500 }}
-          >
-            Go Home
-          </a>
-        </div>
-      )
+      if (errorPath) {
+        const errorMod = requireModule(errorPath) as Record<string, unknown>
+        const ErrorPage = errorMod.default as React.ComponentType<{
+          error: Error
+        }>
+        element = <ErrorPage error={loaderError} />
+      } else {
+        element = <DefaultErrorFallback error={loaderError} />
+      }
     } else {
-      // Normal render — page component
       const pageMod = requireModule(route.componentPath) as Record<
         string,
         unknown
@@ -214,14 +331,12 @@ export function createRequestHandler(options: ServerRenderOptions) {
       element = <Layout>{element}</Layout>
     }
 
-    // Single LoaderDataContext wrapping everything
     element = (
       <LoaderDataContext.Provider value={resolvedLoaderData}>
         {element}
       </LoaderDataContext.Provider>
     )
 
-    // Wrap in RouterProvider for <Link> support during SSR
     const wrappedTree = (
       <RouterProvider
         initialPathname={req.path}
@@ -247,11 +362,9 @@ export function createRequestHandler(options: ServerRenderOptions) {
       }
     }
 
-    // Prepare assets
     const cssLinks = [...cssUrls, ...(getCssForRoute?.(route) ?? [])]
     const jsPreloads = getJsForRoute?.(route) ?? []
 
-    // Serialize initial data for hydration
     const serializedData = loaderError
       ? null
       : isDeferredData(loaderData)
@@ -276,133 +389,23 @@ export function createRequestHandler(options: ServerRenderOptions) {
       />
     )
 
-    // Build scripts array
-    const isDev = process.env.NODE_ENV !== 'production'
-    const scripts: ScriptDescriptor[] = []
-    if (isDev) {
-      scripts.push({ content: REACT_REFRESH_PREAMBLE })
-    }
-    for (const src of clientEntry) {
-      if (src) scripts.push({ src })
-    }
-
-    // Full document
     const doc = (
       <Document
-        head={head}
+        headContent={headContent}
         cssLinks={cssLinks}
         jsPreloads={jsPreloads}
         scripts={scripts}
         dataScript={dataScript}
+        htmlAttributes={htmlAttributes}
+        wkWebViewFlushHint={wkWebViewFlushHint}
       >
         {wrappedTree}
         {deferredScripts}
       </Document>
     )
 
-    // Stream the response
-    res.setHeader('Content-Type', 'text/html; charset=UTF-8')
-    res.setHeader('X-Accel-Buffering', 'no')
-
-    const { pipe, abort } = renderToPipeableStream(doc, {
-      onShellReady() {
-        res.statusCode = statusCode
-        pipe(res)
-      },
-      onShellError(error) {
-        console.error('Shell render error:', error)
-        res.statusCode = 500
-        res.end('Internal Server Error')
-      },
-      onError(error) {
-        console.error('Streaming render error:', error)
-      },
-    })
-
-    setTimeout(() => abort(), streamTimeout)
+    streamDocument(res, doc, statusCode, streamTimeout)
   }
-}
-
-/** Render the not-found.tsx page with a 404 status */
-function renderNotFound(
-  req: Request,
-  res: Response,
-  opts: {
-    notFoundPath: string
-    manifest: RouteManifest
-    requireModule: (path: string) => unknown
-    clientEntry: string[]
-    getCssForRoute?: (route: RouteDef) => string[]
-    cssUrls: string[]
-    streamTimeout: number
-  },
-) {
-  const {
-    notFoundPath,
-    manifest,
-    requireModule,
-    clientEntry,
-    cssUrls,
-    streamTimeout,
-  } = opts
-  const notFoundMod = requireModule(notFoundPath) as Record<string, unknown>
-  const NotFound = notFoundMod.default as React.ComponentType
-
-  const element = (
-    <RouterProvider
-      initialPathname={req.path}
-      initialParams={{}}
-      initialLoaderData={undefined}
-      manifest={manifest}
-    >
-      <LoaderDataContext.Provider value={undefined}>
-        <NotFound />
-      </LoaderDataContext.Provider>
-    </RouterProvider>
-  )
-
-  const isDev = process.env.NODE_ENV !== 'production'
-  const scripts: ScriptDescriptor[] = []
-  if (isDev) {
-    scripts.push({ content: REACT_REFRESH_PREAMBLE })
-  }
-  for (const src of clientEntry) {
-    if (src) scripts.push({ src })
-  }
-
-  const dataScript = (
-    <script
-      suppressHydrationWarning
-      dangerouslySetInnerHTML={{
-        __html: `window.__ROUTE_DATA__=null;\nwindow.__ROUTE_MANIFEST__=${serialize(manifest, { isJSON: true })};\nwindow.__MATCHED_ROUTE__=null;`,
-      }}
-    />
-  )
-
-  const doc = (
-    <Document cssLinks={cssUrls} scripts={scripts} dataScript={dataScript}>
-      {element}
-    </Document>
-  )
-
-  res.setHeader('Content-Type', 'text/html; charset=UTF-8')
-
-  const { pipe, abort } = renderToPipeableStream(doc, {
-    onShellReady() {
-      res.statusCode = 404
-      pipe(res)
-    },
-    onShellError(error) {
-      console.error('Not-found render error:', error)
-      res.statusCode = 500
-      res.end('Internal Server Error')
-    },
-    onError(error) {
-      console.error('Not-found streaming error:', error)
-    },
-  })
-
-  setTimeout(() => abort(), streamTimeout)
 }
 
 /** Handle resource routes (route.ts without page.tsx) — return raw data */
@@ -463,12 +466,20 @@ async function handleResourceRoute(
   }
 }
 
-/** Handle /__pareto/data requests for client-side navigation */
+/**
+ * Handle /__pareto/data requests for client-side navigation.
+ *
+ * For non-deferred loaders, responds with plain JSON.
+ * For deferred loaders, uses the NDJSON writer (see `ndjson/writer.ts`)
+ * to stream resolved data immediately, then each deferred value as it
+ * resolves. The client consumes this via `ndjson/reader.ts`.
+ */
 async function handleDataRequest(
   req: Request,
   res: Response,
   routes: RouteDef[],
   requireModule: (path: string) => unknown,
+  getDocumentProps?: GetDocumentProps,
 ) {
   const rawPath = req.query.path as string
   if (!rawPath) {
@@ -495,21 +506,51 @@ async function handleDataRequest(
 
   try {
     const loaderData = await runLoaders(route, params, req, res, requireModule)
-    const head = resolveHead(route, loaderData, params, requireModule)
 
-    // For deferred data, return resolved values immediately and mark pending keys.
-    // The client will fetch each pending key via /__pareto/deferred.
-    let resolvedData = loaderData
-    let deferredKeys: string[] | undefined
-    if (isDeferredData(loaderData)) {
-      const { resolved, pendingKeys } = serializeDeferredData(loaderData)
-      resolvedData = resolved
-      if (pendingKeys.length > 0) {
-        deferredKeys = pendingKeys
-      }
+    if (!isDeferredData(loaderData)) {
+      // No deferred keys — plain JSON response (no streaming needed)
+      const htmlAttributes = getDocumentProps
+        ? getDocumentProps({ req, params, pathname: targetPath, loaderData })
+        : undefined
+      res.json({ loaderData, params, htmlAttributes })
+      return
     }
 
-    res.json({ loaderData: resolvedData, head, params, deferredKeys })
+    // Deferred data: stream via NDJSON
+    const { resolved, pendingKeys } = serializeDeferredData(loaderData)
+
+    const htmlAttributes = getDocumentProps
+      ? getDocumentProps({
+          req,
+          params,
+          pathname: targetPath,
+          loaderData: resolved,
+        })
+      : undefined
+
+    const writer = createNdjsonWriter(res)
+    writer.writeInitial({
+      loaderData: resolved,
+      params,
+      pendingKeys,
+      htmlAttributes,
+    })
+
+    await Promise.all(
+      pendingKeys.map(async key => {
+        try {
+          const value = await (loaderData.data[key] as Promise<unknown>)
+          writer.writeChunk({ key, value })
+        } catch (err) {
+          writer.writeChunk({
+            key,
+            error: err instanceof Error ? err.message : 'Deferred value failed',
+          })
+        }
+      }),
+    )
+
+    writer.end()
   } catch (err) {
     if (err instanceof ParetoRedirect) {
       res.json({ redirect: err.url, status: err.status })
@@ -521,47 +562,6 @@ async function handleDataRequest(
     }
     console.error('[pareto] Data request error:', err)
     res.status(500).json({ error: 'Loader failed' })
-  }
-}
-
-/** Handle /__pareto/deferred — resolve a single deferred key from a route's loader */
-async function handleDeferredRequest(
-  req: Request,
-  res: Response,
-  routes: RouteDef[],
-  requireModule: (path: string) => unknown,
-) {
-  const targetPath = req.query.path as string
-  const key = req.query.key as string
-  if (!targetPath || !key) {
-    res.status(400).json({ error: 'Missing path or key parameter' })
-    return
-  }
-
-  const match = matchRoute(targetPath, routes)
-  if (!match) {
-    res.status(404).json({ error: 'Route not found' })
-    return
-  }
-
-  try {
-    const loaderData = await runLoaders(
-      match.route,
-      match.params,
-      req,
-      res,
-      requireModule,
-    )
-    if (!isDeferredData(loaderData)) {
-      res.status(400).json({ error: 'Route does not use defer()' })
-      return
-    }
-    const value: unknown = loaderData.data[key]
-    const resolved: unknown = value instanceof Promise ? await value : value
-    res.json({ key, value: resolved })
-  } catch (err) {
-    console.error('[pareto] Deferred request error:', err)
-    res.status(500).json({ error: 'Deferred fetch failed' })
   }
 }
 
@@ -589,35 +589,4 @@ function runLoaders(
   }
 
   return undefined
-}
-
-/** Resolve head descriptors for the matched route, merging from all headPaths */
-function resolveHead(
-  route: RouteDef,
-  loaderData: unknown,
-  params: Record<string, string>,
-  requireModule: (path: string) => unknown,
-): HeadDescriptor | undefined {
-  const paths =
-    route.headPaths.length > 0
-      ? route.headPaths
-      : route.headPath
-        ? [route.headPath]
-        : []
-  if (paths.length === 0) return undefined
-
-  const resolvedData = isDeferredData(loaderData) ? loaderData.data : loaderData
-
-  const heads: HeadDescriptor[] = []
-  for (const headPath of paths) {
-    const headMod = requireModule(headPath) as Record<string, unknown>
-    const headFn = (headMod.head ?? headMod.default) as HeadFunction | undefined
-    if (headFn) {
-      heads.push(headFn({ loaderData: resolvedData, params }))
-    }
-  }
-
-  if (heads.length === 0) return undefined
-  if (heads.length === 1) return heads[0]
-  return mergeHeadDescriptors(...heads)
 }

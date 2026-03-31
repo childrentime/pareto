@@ -6,26 +6,23 @@ import {
   useContext,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react'
 import type {
-  HeadDescriptor,
   NavigateOptions,
   RouteManifest,
+  RouteManifestEntry,
   RouterState,
 } from '../types'
-import { updateHead } from './head-manager'
+import { pathToRegex } from './route-matcher'
 
 interface NavigationResult {
   loaderData: unknown
   params: Record<string, string>
-  head?: HeadDescriptor
-  /** If the loader threw a redirect, contains the target URL */
   redirect?: string
-  /** If the server returned 404 */
   notFound?: boolean
-  /** If the server returned an error */
   error?: string
 }
 
@@ -37,13 +34,31 @@ interface RouterContextValue extends RouterState {
   manifest: RouteManifest | null
   loaderData: unknown
   setLoaderData: (data: unknown) => void
-  /** Set when a client-side navigation returns 404 */
   isNotFound: boolean
-  /** Set when a client-side navigation loader fails */
   navigationError: Error | null
 }
 
 export const RouterContext = createContext<RouterContextValue | null>(null)
+
+/**
+ * Build regex matchers from manifest route patterns for prefetch matching.
+ * Converts route path patterns like "/blog/:slug" into RegExp objects
+ * so prefetch can match actual URLs to their route entries.
+ */
+function buildManifestMatchers(manifest: RouteManifest | null) {
+  if (!manifest) return []
+  return Object.values(manifest.routes).map(entry => {
+    return { entry, regex: pathToRegex(entry.path) }
+  })
+}
+
+function findManifestEntry(
+  matchers: { entry: RouteManifestEntry; regex: RegExp }[],
+  pathname: string,
+): RouteManifestEntry | undefined {
+  const stripped = pathname.split('?')[0]
+  return matchers.find(m => m.regex.test(stripped))?.entry
+}
 
 export function RouterProvider({
   children,
@@ -51,6 +66,7 @@ export function RouterProvider({
   initialParams,
   initialLoaderData,
   initialError,
+  initialNotFound,
   manifest,
   onNavigate,
 }: {
@@ -59,6 +75,7 @@ export function RouterProvider({
   initialParams: Record<string, string>
   initialLoaderData: unknown
   initialError?: Error | null
+  initialNotFound?: boolean
   manifest: RouteManifest | null
   onNavigate?: (pathname: string) => Promise<NavigationResult>
 }) {
@@ -68,16 +85,24 @@ export function RouterProvider({
     isNavigating: false,
   })
   const [loaderData, setLoaderData] = useState<unknown>(initialLoaderData)
-  const [isNotFound, setIsNotFound] = useState(false)
+  const [isNotFound, setIsNotFound] = useState(initialNotFound ?? false)
   const [navigationError, setNavigationError] = useState<Error | null>(
     initialError ?? null,
   )
   const prefetchCacheRef = useRef(new Map<string, Promise<NavigationResult>>())
   const pendingScrollRef = useRef(false)
 
+  // Stable ref for current pathname — avoids closing over state.pathname
+  const pathnameRef = useRef(state.pathname)
+  pathnameRef.current = state.pathname
+
+  const manifestMatchers = useMemo(
+    () => buildManifestMatchers(manifest),
+    [manifest],
+  )
+
   const fetchRouteData = useCallback(
     async (path: string): Promise<NavigationResult | undefined> => {
-      // Check prefetch cache first
       const cached = prefetchCacheRef.current.get(path)
       if (cached) {
         prefetchCacheRef.current.delete(path)
@@ -90,25 +115,20 @@ export function RouterProvider({
 
   const navigate = useCallback(
     async (path: string, opts?: NavigateOptions) => {
-      // Strip query string from pathname for route matching and state,
-      // but pass the full path to fetchRouteData and history API
       const pathname = path.split('?')[0]
-      if (path === state.pathname && !opts?.replace) return
+      if (path === pathnameRef.current && !opts?.replace) return
 
       setState(s => ({ ...s, isNavigating: true }))
 
       try {
         const result = await fetchRouteData(path)
 
-        // Handle server-side redirect
         if (result?.redirect) {
           setState(s => ({ ...s, isNavigating: false }))
-          // Follow the redirect by navigating to the new URL
           void navigate(result.redirect, { replace: true })
           return
         }
 
-        // Handle 404
         if (result?.notFound) {
           startTransition(() => {
             if (opts?.replace) {
@@ -130,7 +150,6 @@ export function RouterProvider({
           return
         }
 
-        // Handle loader error
         if (result?.error) {
           startTransition(() => {
             if (opts?.replace) {
@@ -172,20 +191,20 @@ export function RouterProvider({
           setIsNotFound(false)
           setNavigationError(null)
 
-          // Update document head on client-side navigation
-          if (result?.head) {
-            updateHead(result.head)
-          }
-
           if (opts?.scroll !== false) {
             pendingScrollRef.current = true
           }
         })
-      } catch {
-        setState(s => ({ ...s, isNavigating: false }))
+      } catch (err) {
+        startTransition(() => {
+          setState(s => ({ ...s, isNavigating: false }))
+          setNavigationError(
+            err instanceof Error ? err : new Error(String(err)),
+          )
+        })
       }
     },
-    [state.pathname, fetchRouteData],
+    [fetchRouteData],
   )
 
   const push = useCallback(
@@ -208,24 +227,21 @@ export function RouterProvider({
       const promise = onNavigate(path)
       prefetchCacheRef.current.set(path, promise)
 
-      // Also prefetch JS chunks via modulepreload hints
-      if (manifest) {
-        const entry = Object.values(manifest.routes).find(r => r.path === path)
-        if (entry?.js) {
-          for (const jsUrl of entry.js) {
-            const link = document.createElement('link')
-            link.rel = 'modulepreload'
-            link.href = jsUrl
-            document.head.appendChild(link)
-          }
+      // Prefetch JS chunks via modulepreload — use regex matching for dynamic routes
+      const entry = findManifestEntry(manifestMatchers, path)
+      if (entry?.js) {
+        for (const jsUrl of entry.js) {
+          if (document.querySelector(`link[href="${jsUrl}"]`)) continue
+          const link = document.createElement('link')
+          link.rel = 'modulepreload'
+          link.href = jsUrl
+          document.head.appendChild(link)
         }
       }
     },
-    [onNavigate, manifest],
+    [onNavigate, manifestMatchers],
   )
 
-  // Scroll to top after React commits the new page — avoids flashing
-  // the old page at scroll position 0 before the new content renders.
   useLayoutEffect(() => {
     if (pendingScrollRef.current) {
       pendingScrollRef.current = false
@@ -233,7 +249,6 @@ export function RouterProvider({
     }
   }, [state.pathname])
 
-  // Handle browser back/forward
   useEffect(() => {
     const handlePopState = () => {
       const path = window.location.pathname
@@ -243,7 +258,6 @@ export function RouterProvider({
     return () => window.removeEventListener('popstate', handlePopState)
   }, [navigate])
 
-  // Handle streamed deferred data
   useEffect(() => {
     const handleDeferred = (event: Event) => {
       const key = (event as CustomEvent<string>).detail

@@ -13,7 +13,7 @@
 - `react file-based routing`
 - `react server side rendering streaming`
 - `react defer suspense streaming`
-- `react ssg vite`
+- `react ssr streaming vite`
 - `react state management immer`
 - `react error boundary ssr`
 
@@ -37,7 +37,7 @@ paretojs.dev/
       /state-management        # defineStore + immer
       /error-handling          # error.tsx + error boundaries
       /head-management         # head.tsx + meta tags
-      /ssg                     # Static site generation
+      /env-variables            # Environment variables
       /resource-routes         # API endpoints via route.ts
       /redirects-and-404       # redirect() + notFound()
     /api/

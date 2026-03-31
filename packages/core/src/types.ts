@@ -1,18 +1,8 @@
 import type { Request, Response } from 'express'
+import type { ReactNode } from 'react'
 import type { UserConfig } from 'vite'
 
 // --- Route Types ---
-
-export interface RouteModule {
-  default: React.ComponentType<{ children?: React.ReactNode }>
-  loader?: LoaderFunction
-  config?: RouteConfig
-  Head?: React.ComponentType<{ data: unknown }>
-}
-
-export interface RouteConfig {
-  render?: 'server'
-}
 
 export interface RouteDef {
   path: string
@@ -21,8 +11,7 @@ export interface RouteDef {
   segments: string[]
   componentPath: string
   layoutPaths: string[]
-  headPath?: string
-  /** All head.tsx paths from root to page directory (for merging) */
+  /** All head.tsx paths from root to page directory */
   headPaths: string[]
   loaderPath?: string
   isDynamic: boolean
@@ -135,20 +124,72 @@ export interface ParetoConfig {
     config: UserConfig,
     context: { isServer: boolean },
   ) => UserConfig
+  /**
+   * Inject a hidden element with 200+ zero-width characters into the HTML
+   * shell to force iOS WKWebView to begin rendering before the stream
+   * completes.
+   *
+   * WebKit delays first paint until visible text exceeds 200 characters
+   * (WebCore `FrameView::visualCharacterThreshold`). For pages with
+   * minimal text (dashboards, skeleton screens, image-heavy layouts),
+   * this threshold may not be met in the initial shell, causing a white
+   * flash in iOS apps that use WKWebView.
+   *
+   * Trade-offs:
+   * - Adds ~220 bytes of zero-width spaces to the HTML payload.
+   * - Uses `aria-hidden="true"` so screen readers ignore it.
+   * - No visual effect (zero-width chars in a 0×0 overflow-hidden div).
+   * - Only relevant for pages loaded inside iOS WKWebView (native apps).
+   *   Safari / Chrome browsers are not affected.
+   *
+   * @default false
+   * @see https://github.com/xiaoxiaojx/blog/issues/37
+   */
+  wkWebViewFlushHint?: boolean
 }
+
+// --- Document Types ---
+
+/**
+ * Context passed to `getDocumentProps` in `app/document.tsx`.
+ * Use this to derive `<html>` attributes from the current request.
+ *
+ * @example
+ * ```ts
+ * export function getDocumentProps(ctx: DocumentContext) {
+ *   const lang = ctx.params.lang || 'en'
+ *   return { lang, dir: lang === 'ar' ? 'rtl' : 'ltr' }
+ * }
+ * ```
+ */
+export interface DocumentContext {
+  req: Request
+  params: Record<string, string>
+  pathname: string
+  loaderData: unknown
+}
+
+/**
+ * Attributes applied to the `<html>` element.
+ * Returned by `getDocumentProps` in `app/document.tsx`.
+ */
+export type HtmlAttributes = Record<string, string> & {
+  lang?: string
+  dir?: string
+  className?: string
+}
+
+/** Signature of the user-exported function in `app/document.tsx`. */
+export type GetDocumentProps = (ctx: DocumentContext) => HtmlAttributes
 
 // --- Head Types ---
 
-export interface HeadDescriptor {
-  title?: string
-  meta?: Record<string, string>[]
-  link?: Record<string, string>[]
-}
-
-export type HeadFunction = (ctx: {
+export interface HeadProps {
   loaderData: unknown
   params: Record<string, string>
-}) => HeadDescriptor
+}
+
+export type HeadComponent = (props: HeadProps) => ReactNode
 
 // --- Route Manifest (serialized for client) ---
 

@@ -1,6 +1,6 @@
 ---
 title: "@paretojs/core/store"
-description: State management API — defineStore, defineContextStore, and hydration helpers.
+description: State management API — defineStore and defineContextStore.
 ---
 
 Built-in state management powered by Immer. See [State Management](/concepts/state-management/) for concepts, guidance on when to use global vs. context stores, and performance tips.
@@ -38,13 +38,13 @@ const { count, increment } = counterStore.useStore()
 Create a per-instance store with React context. SSR-safe (no shared global state between requests). Use this when the store holds per-request data like the current user or auth tokens. See [State Management — When to use global vs. context stores](/concepts/state-management/) for guidance.
 
 ```tsx
-const { Provider, useStore } = defineContextStore(() => (set) => ({
-  theme: 'light',
+const { Provider, useStore } = defineContextStore((initial: { theme: string }) => (set) => ({
+  theme: initial.theme,
   toggle: () => set((d) => { d.theme = d.theme === 'light' ? 'dark' : 'light' }),
 }))
 
-// Wrap in Provider
-<Provider>
+// Wrap in Provider with initialData
+<Provider initialData={{ theme: 'light' }}>
   <App />
 </Provider>
 
@@ -56,35 +56,8 @@ const { theme, toggle } = useStore()
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `Provider` | `React.FC<PropsWithChildren>` | Context provider — wrap your component tree |
+| `Provider` | `React.FC<{ children: ReactNode; initialData: Init }>` | Context provider — wrap your component tree |
 | `useStore()` | `() => State` | React hook — reads from the nearest Provider |
-
-## Selector pattern
-
-For components that read a small slice of a large store, you can build a manual selector using `getState()` and `subscribe()` to avoid re-rendering when unrelated state changes:
-
-```tsx
-import { useSyncExternalStore } from 'react'
-
-const appStore = defineStore((set) => ({
-  count: 0,
-  theme: 'light',
-  notifications: [],
-  increment: () => set((d) => { d.count++ }),
-  addNotification: (n) => set((d) => { d.notifications.push(n) }),
-}))
-
-// Only re-renders when `count` changes
-function CountBadge() {
-  const count = useSyncExternalStore(
-    appStore.subscribe,
-    () => appStore.getState().count
-  )
-  return <span className="badge">{count}</span>
-}
-```
-
-For most components, `useStore()` with direct destructuring is sufficient and recommended. The selector pattern is an optimization for specific performance-sensitive cases — use it when profiling shows unnecessary re-renders.
 
 ## Immer mutations
 
@@ -103,13 +76,26 @@ Immer ensures immutability under the hood. Each `set()` call produces a new stat
 
 ## SSR hydration
 
-During server-side rendering, global stores (`defineStore`) are serialized into the HTML as a `<script>` tag containing the store's state. On the client, the store reads this serialized state during hydration, so the client starts with the exact same state the server rendered.
+Use `defineContextStore` to hydrate a store from server data. Pass loader data to `<Provider initialData={data}>`:
 
-This is automatic — you do not need to write any hydration code. The sequence is:
+```tsx
+const { Provider, useStore } = defineContextStore((data) => (set) => ({
+  count: data.count,
+  increment: () => set((d) => { d.count++ }),
+}))
 
-1. **Server**: Loader populates data → store is updated → React renders → store state is serialized into HTML
-2. **Client**: HTML loads → store reads serialized state → React hydrates with matching state → no flash of default values
+export function loader() {
+  return { count: 10 }
+}
 
-Context stores (`defineContextStore`) also participate in SSR hydration. Their state is serialized per-Provider, so each context instance hydrates independently.
+export default function Page() {
+  const data = useLoaderData()
+  return (
+    <Provider initialData={data}>
+      <Counter />
+    </Provider>
+  )
+}
+```
 
-If a store is updated after hydration (e.g., by a user interaction), the new state is not serialized — it lives only on the client until the next navigation or page reload.
+See a full example at [`examples/app/ssr-store/page.tsx`](https://github.com/childrentime/pareto/blob/main/examples/app/ssr-store/page.tsx).

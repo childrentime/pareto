@@ -77,7 +77,9 @@ export default [
       '**/__tests__/**',
       '**/e2e/**',
       '**/playwright.config.*',
+      '**/vitest.config.*',
       'benchmarks/**',
+      'example-custom-server/**',
     ]
   },
   {

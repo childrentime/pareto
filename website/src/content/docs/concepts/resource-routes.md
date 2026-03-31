@@ -81,17 +81,19 @@ export async function loader(ctx: LoaderContext) {
 
 For structured error responses, you can set the status code explicitly. Unlike page routes, resource routes do not render error boundaries — they return JSON to the caller.
 
-You can also use [`redirect()`](/concepts/redirects/) and `notFound()` in resource routes:
+For auth failures, return a JSON error response rather than `redirect()` — API callers are typically `fetch()`, not direct browser navigation:
 
 ```ts
-import { redirect, notFound } from '@paretojs/core'
-
-export function loader(ctx: LoaderContext) {
+export async function loader(ctx: LoaderContext) {
   if (!ctx.req.cookies.token) {
-    throw redirect('/login')
+    ctx.res.status(401)
+    return { error: 'Unauthorized' }
   }
   const resource = await getResource(ctx.params.id)
-  if (!resource) throw notFound()
+  if (!resource) {
+    ctx.res.status(404)
+    return { error: 'Not found' }
+  }
   return { resource }
 }
 ```
@@ -140,13 +142,15 @@ export async function action(ctx: LoaderContext) {
 
 ## Middleware patterns
 
-For shared logic across multiple resource routes (auth checks, logging, rate limiting), apply Express middleware in your production server:
+For shared logic across multiple resource routes (auth checks, logging, rate limiting), apply Express middleware in your custom server (`app.ts`):
 
 ```ts
+// app.ts
 import express from 'express'
-import { createRequestHandler } from '@paretojs/core/node'
+import { securityHeaders } from '@paretojs/core/node'
 
 const app = express()
+app.use(securityHeaders())
 
 // Auth middleware for all /api/* routes
 app.use('/api', (req, res, next) => {
@@ -158,14 +162,13 @@ app.use('/api', (req, res, next) => {
   next()
 })
 
-// Pareto request handler
-app.use(createRequestHandler())
+export default app
 ```
 
-This keeps auth logic in one place instead of repeating it in every resource route.
+Your custom routes and middleware take priority. Unmatched requests fall through to Pareto's routing automatically. See [@paretojs/core/node](/api/node/) for details on the custom server pattern.
 
 ## Related
 
 - [Configuration](/api/config/) — `configureVite` for customizing the build.
 - [File-Based Routing](/concepts/routing/) — How `route.ts` fits into the file-based routing system.
-- [Redirect & 404](/concepts/redirects/) — Using `redirect()` and `notFound()` in resource routes.
+- [Redirect & 404](/concepts/redirects/) — Using `redirect()` and `notFound()` in page loaders.

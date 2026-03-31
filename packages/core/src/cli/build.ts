@@ -1,18 +1,15 @@
 import fs from 'fs'
 import path from 'path'
-import {
-  findAppFile,
-  loadConfig,
-  resolveAppDir,
-  resolveOutDir,
-} from '../config'
-import { scanRoutes } from '../entry'
+import { findAppFile } from '../config/app'
+import { loadConfig, resolveAppDir, resolveOutDir } from '../config/load'
+import { toImportPath } from '../entry/generate'
 import {
   findGlobalCss,
   paretoVirtualEntry,
   VIRTUAL_CLIENT_ENTRY,
   VIRTUAL_SERVER_ENTRY,
 } from '../plugins/virtual-entry'
+import { scanRoutes } from '../router/route-scanner'
 import type { RouteDef, RouteManifest } from '../types'
 
 export async function build() {
@@ -50,7 +47,14 @@ export async function build() {
       outDir: clientOutputPath,
       entry: VIRTUAL_CLIENT_ENTRY,
       config,
-      plugins: [paretoVirtualEntry({ appDir, globalCssPaths, isDev: false })],
+      plugins: [
+        paretoVirtualEntry({
+          appDir,
+          globalCssPaths,
+          isDev: false,
+          wkWebViewFlushHint: config.wkWebViewFlushHint,
+        }),
+      ],
     }),
   )
 
@@ -77,6 +81,7 @@ export async function build() {
           clientEntryUrls,
           cssUrls,
           routeManifest,
+          wkWebViewFlushHint: config.wkWebViewFlushHint,
         }),
       ],
     }),
@@ -86,7 +91,7 @@ export async function build() {
   const publicDir = path.resolve(cwd, 'public')
   const staticDir = path.resolve(outDir, 'static')
   if (fs.existsSync(publicDir)) {
-    copyDirSync(publicDir, staticDir)
+    fs.cpSync(publicDir, staticDir, { recursive: true })
   }
 
   // 5. Write production server entry (with optional app.ts support)
@@ -97,24 +102,38 @@ export async function build() {
   console.log(`[pareto] Run 'pareto start' to start the production server.`)
 }
 
-function copyDirSync(src: string, dest: string) {
-  fs.mkdirSync(dest, { recursive: true })
-  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
-    const srcPath = path.join(src, entry.name)
-    const destPath = path.join(dest, entry.name)
-    if (entry.isDirectory()) {
-      copyDirSync(srcPath, destPath)
-    } else {
-      fs.copyFileSync(srcPath, destPath)
-    }
-  }
-}
-
 interface ViteManifestEntry {
   file: string
   css?: string[]
   isEntry?: boolean
   imports?: string[]
+}
+
+type ViteManifestMap = Record<string, ViteManifestEntry>
+
+/**
+ * Recursively collect all transitive JS imports for a manifest entry.
+ * This ensures modulepreload covers the full dependency graph.
+ */
+function collectTransitiveImports(
+  manifest: ViteManifestMap,
+  entryKey: string,
+  visited: Set<string> = new Set<string>(),
+): string[] {
+  if (visited.has(entryKey)) return []
+  visited.add(entryKey)
+
+  const entry = manifest[entryKey]
+  if (!entry) return []
+
+  const files: string[] = []
+  for (const importKey of entry.imports ?? []) {
+    const imported = manifest[importKey]
+    if (!imported) continue
+    files.push('/' + imported.file)
+    files.push(...collectTransitiveImports(manifest, importKey, visited))
+  }
+  return files
 }
 
 /**
@@ -138,10 +157,9 @@ function readViteManifest(
     return { clientEntryUrls: [], cssUrls: [], routeManifest: emptyManifest }
   }
 
-  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8')) as Record<
-    string,
-    ViteManifestEntry
-  >
+  const manifest = JSON.parse(
+    fs.readFileSync(manifestPath, 'utf-8'),
+  ) as ViteManifestMap
 
   // Find the client entry in the manifest
   const entryKey = Object.keys(manifest).find(
@@ -162,17 +180,19 @@ function readViteManifest(
     if (route.isResource) continue
 
     // Convert absolute component path to project-relative for manifest lookup
-    const relPath = path.relative(cwd, route.componentPath).replace(/\\/g, '/')
+    const relPath = toImportPath(path.relative(cwd, route.componentPath))
     const chunkInfo = manifest[relPath]
 
-    const js = chunkInfo ? ['/' + chunkInfo.file] : undefined
+    const js = chunkInfo
+      ? ['/' + chunkInfo.file, ...collectTransitiveImports(manifest, relPath)]
+      : undefined
     const routeCss = chunkInfo?.css?.map(c => '/' + c)
 
     routeManifest.routes[route.path] = {
       path: route.path,
       paramNames: route.paramNames,
       hasLoader: !!route.loaderPath,
-      hasHead: !!route.headPath || route.headPaths.length > 0,
+      hasHead: route.headPaths.length > 0,
       js,
       css: routeCss,
     }
@@ -182,117 +202,11 @@ function readViteManifest(
 }
 
 function writeProductionServer(outDir: string, appFilePath?: string) {
-  // If user has an app.ts/app.js, load it to get a custom Express app
-  const appSetup = appFilePath
-    ? `
-// Load user's custom Express app
-try {
-  const userApp = require('${appFilePath.replace(/\\/g, '/')}');
-  const customApp = userApp.default || userApp;
-  if (typeof customApp === 'function') {
-    app = customApp;
-    hasCustomApp = true;
-  }
-} catch (_e) {
-  console.warn('[pareto] Failed to load app file, using default Express app');
-}
-`
-    : ''
+  const appArg = appFilePath ? `, '${toImportPath(appFilePath)}'` : ''
 
   const serverScript = `#!/usr/bin/env node
-const path = require('path');
-const fs = require('fs');
-const express = require('express');
-
-// Load .env files (production mode)
-(function loadEnv() {
-  const cwd = process.cwd();
-  const mode = process.env.NODE_ENV || 'production';
-  const files = ['.env', '.env.local', '.env.' + mode, '.env.' + mode + '.local'];
-  files.forEach(function(file) {
-    const p = path.resolve(cwd, file);
-    try {
-      if (!fs.existsSync(p)) return;
-      fs.readFileSync(p, 'utf-8').split('\\n').forEach(function(line) {
-        line = line.trim();
-        if (!line || line[0] === '#') return;
-        var eq = line.indexOf('=');
-        if (eq === -1) return;
-        var key = line.slice(0, eq).trim();
-        var val = line.slice(eq + 1).trim();
-        if ((val[0] === '"' || val[0] === "'") && val[val.length - 1] === val[0]) val = val.slice(1, -1);
-        if (!(key in process.env)) process.env[key] = val;
-      });
-    } catch (_e) {}
-  });
-})();
-
-const PORT = process.env.PORT || 3000;
-var app = express();
-var hasCustomApp = false;
-const outDir = __dirname;
-${appSetup}
-// Security headers (skip if user provides custom app — they manage their own middleware)
-if (!hasCustomApp) {
-  app.use(function(_req, res, next) {
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    res.setHeader('Permissions-Policy', 'interest-cohort=()');
-    res.setHeader('X-XSS-Protection', '1; mode=block');
-    res.setHeader('X-DNS-Prefetch-Control', 'off');
-    next();
-  });
-}
-
-// Gzip compression
-try {
-  const compression = require('compression');
-  app.use(compression());
-} catch (_e) {
-  // compression package is optional — install it for gzip support
-}
-
-// Serve static assets with long-lived cache headers
-app.use('/assets', express.static(path.join(outDir, 'client/assets'), {
-  maxAge: '1y',
-  immutable: true,
-}));
-
-// Serve client files
-app.use('/', express.static(path.join(outDir, 'client')));
-
-// Serve public static files
-app.use('/', express.static(path.join(outDir, 'static')));
-
-// SSR handler
-const serverBundle = require('./server/index.js');
-const handler = serverBundle.default || serverBundle;
-
-if (typeof handler === 'function') {
-  app.use('/', (req, res, next) => handler(req, res, next));
-}
-
-const server = app.listen(PORT, () => {
-  console.log('[pareto] Production server running at http://localhost:' + PORT);
-});
-
-// Graceful shutdown
-function shutdown(signal) {
-  console.log('[pareto] ' + signal + ' received, shutting down gracefully...');
-  server.close(() => {
-    console.log('[pareto] Server closed.');
-    process.exit(0);
-  });
-  // Force exit after 10s if connections aren't drained
-  setTimeout(() => {
-    console.error('[pareto] Forced shutdown after timeout.');
-    process.exit(1);
-  }, 10000);
-}
-
-process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT', () => shutdown('SIGINT'));
+var { startProductionServer } = require('@paretojs/core/node');
+startProductionServer(__dirname${appArg});
 `
   fs.writeFileSync(path.resolve(outDir, 'index.js'), serverScript)
 }

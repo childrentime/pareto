@@ -14,6 +14,8 @@ Pareto 使用基于文件的路由。`app/` 目录下的每个 `page.tsx` 都会
 | `loader.ts` | 独立的 loader 文件，用于服务端数据获取 |
 | `head.tsx` | 路由级 `<title>` 和 meta 标签 |
 | `not-found.tsx` | 404 页面（仅限根级） |
+| `error.tsx` | 错误页面 — 捕获 loader 和渲染错误（仅限根级） |
+| `document.tsx` | [文档定制](/zh/concepts/document-customization/) — `getDocumentProps()` 设置 `<html>` 属性（仅限根级） |
 | `route.ts` | 资源路由（JSON API，无 HTML） |
 
 ## 文件到 URL 的映射是怎样的？

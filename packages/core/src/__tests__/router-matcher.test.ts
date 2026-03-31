@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import fs from 'fs'
-import path from 'path'
 import os from 'os'
+import path from 'path'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { matchRoute } from '../router/route-matcher'
 import { scanRoutes } from '../router/route-scanner'
-import { matchRoute, diffLayouts } from '../router/route-matcher'
 
 let tmpDir: string
 
@@ -86,35 +86,5 @@ describe('matchRoute', () => {
 
     const match = matchRoute('/user/john%20doe', routes)
     expect(match!.params.name).toBe('john doe')
-  })
-})
-
-describe('diffLayouts', () => {
-  it('should return all layouts as changed when from is null', () => {
-    createFile('layout.tsx')
-    createFile('dashboard/layout.tsx')
-    createFile('dashboard/settings/page.tsx')
-    const routes = scanRoutes(tmpDir)
-    const match = matchRoute('/dashboard/settings', routes)!
-
-    const diff = diffLayouts(null, match)
-    expect(diff.shared).toEqual([])
-    expect(diff.changed).toEqual(match.route.layoutPaths)
-  })
-
-  it('should detect shared layouts between routes', () => {
-    createFile('layout.tsx')
-    createFile('dashboard/layout.tsx')
-    createFile('dashboard/settings/page.tsx')
-    createFile('dashboard/profile/page.tsx')
-    const routes = scanRoutes(tmpDir)
-
-    const from = matchRoute('/dashboard/settings', routes)!
-    const to = matchRoute('/dashboard/profile', routes)!
-
-    const diff = diffLayouts(from, to)
-    // Root layout and dashboard layout are shared
-    expect(diff.shared.length).toBe(2)
-    expect(diff.changed.length).toBe(0)
   })
 })

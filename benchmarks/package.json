@@ -1,0 +1,27 @@
+{
+  "name": "pareto-benchmarks",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "bench": "tsx run.ts",
+    "bench:pareto": "tsx run.ts --only pareto",
+    "bench:nextjs": "tsx run.ts --only nextjs",
+    "bench:remix": "tsx run.ts --only remix",
+    "bench:render": "tsx render-bench.tsx",
+    "bench:size": "tsx build-size.ts",
+    "bench:all": "tsx run.ts && tsx render-bench.tsx && tsx build-size.ts --skip-build",
+    "bench:aggregate": "tsx aggregate.ts",
+    "build:all": "pnpm --filter ./pareto build && pnpm --filter ./nextjs build && pnpm --filter ./remix build"
+  },
+  "devDependencies": {
+    "autocannon": "^8.0.0",
+    "tinybench": "^3.0.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.13.10",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

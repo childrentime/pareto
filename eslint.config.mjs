@@ -77,6 +77,7 @@ export default [
       '**/__tests__/**',
       '**/e2e/**',
       '**/playwright.config.*',
+      'benchmarks/**',
     ]
   },
   {

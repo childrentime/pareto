@@ -1,0 +1,10 @@
+results-*.json
+aggregated-results.json
+BENCHMARK-RESULTS.md
+*-output.txt
+node_modules/
+
+# Build outputs
+pareto/.pareto/
+nextjs/.next/
+remix/build/

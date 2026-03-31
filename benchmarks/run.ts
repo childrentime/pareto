@@ -100,8 +100,10 @@ function startServer(fw: Framework): ChildProcess {
   const child = spawn('sh', ['-c', fw.startCmd], {
     cwd,
     stdio: 'pipe',
+    detached: true,
     env: { ...process.env, ...fw.startEnv },
   })
+  child.unref()
 
   child.stderr?.on('data', (data: Buffer) => {
     const msg = data.toString().trim()
@@ -117,13 +119,20 @@ function killServer(child: ChildProcess): Promise<void> {
       resolve()
       return
     }
-    child.on('exit', () => resolve())
-    child.kill('SIGTERM')
-    setTimeout(() => {
-      if (!child.killed && child.exitCode === null) {
-        child.kill('SIGKILL')
-      }
-    }, 5000)
+
+    const done = () => {
+      child.removeListener('exit', done)
+      resolve()
+    }
+    child.on('exit', done)
+
+    try {
+      process.kill(-child.pid!, 'SIGKILL')
+    } catch {
+      child.kill('SIGKILL')
+    }
+
+    setTimeout(done, 2000)
   })
 }
 

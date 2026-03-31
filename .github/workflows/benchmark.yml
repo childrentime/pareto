@@ -98,15 +98,27 @@ jobs:
           # Clean up old results
           rm -f results-*.json
 
+          wait_ports_free() {
+            for attempt in $(seq 1 10); do
+              all_free=true
+              for port in 4000 4001 4002; do
+                if fuser "${port}/tcp" 2>/dev/null; then
+                  all_free=false
+                  fuser -k "${port}/tcp" 2>/dev/null || true
+                fi
+              done
+              if $all_free; then return 0; fi
+              sleep 1
+            done
+            echo "Warning: ports may still be in use"
+          }
+
           for i in $(seq 1 "$RUNS"); do
             echo "══════════════════════════════════════════════════"
             echo "  Round $i / $RUNS"
             echo "══════════════════════════════════════════════════"
 
-            # Kill anything on benchmark ports
-            for port in 4000 4001 4002; do
-              fuser -k "${port}/tcp" 2>/dev/null || true
-            done
+            wait_ports_free
 
             # Cooldown between runs to let CPU thermals stabilize
             if [ "$i" -gt 1 ]; then
@@ -117,7 +129,7 @@ jobs:
             # Run with --skip-build since we built once above
             pnpm bench -- --skip-build --duration="${BENCH_DURATION}" 2>&1
 
-            # Ensure servers are dead before next round
+            # Kill any leftover server processes
             for port in 4000 4001 4002; do
               fuser -k "${port}/tcp" 2>/dev/null || true
             done

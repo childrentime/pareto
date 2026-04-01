@@ -1,10 +1,12 @@
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
-import type { BenchmarkReport, BenchmarkResult } from './report.js'
+import {
+  RESULTS_DIR,
+  type BenchmarkReport,
+  type BenchmarkResult,
+} from './report.js'
 import { frameworks, scenarios } from './scenarios.js'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+import { cv, fmtBytes, fmtMs, fmtNum, median, pad } from './utils.js'
 
 interface AggregatedMetric {
   median: number
@@ -22,7 +24,8 @@ interface AggregatedResult {
   latencyP50: AggregatedMetric
   latencyP99: AggregatedMetric
   throughput: AggregatedMetric
-  errors: number
+  errorsPerRun: AggregatedMetric
+  totalErrors: number
 }
 
 interface AggregatedReport {
@@ -35,23 +38,6 @@ interface AggregatedReport {
   rawFiles: string[]
 }
 
-function median(arr: number[]): number {
-  const sorted = [...arr].sort((a, b) => a - b)
-  const mid = Math.floor(sorted.length / 2)
-  return sorted.length % 2 === 0
-    ? (sorted[mid - 1]! + sorted[mid]!) / 2
-    : sorted[mid]!
-}
-
-function cv(arr: number[]): number {
-  if (arr.length < 2) return 0
-  const mean = arr.reduce((s, v) => s + v, 0) / arr.length
-  if (mean === 0) return 0
-  const variance =
-    arr.reduce((s, v) => s + (v - mean) ** 2, 0) / (arr.length - 1)
-  return (Math.sqrt(variance) / mean) * 100
-}
-
 function aggregateMetric(values: number[]): AggregatedMetric {
   return {
     median: median(values),
@@ -62,47 +48,40 @@ function aggregateMetric(values: number[]): AggregatedMetric {
   }
 }
 
-function fmtNum(n: number): string {
-  return n.toLocaleString('en-US', { maximumFractionDigits: 0 })
-}
-
-function fmtMs(n: number): string {
-  if (n < 1) return `${(n * 1000).toFixed(0)}μs`
-  if (n < 1000) return `${n.toFixed(1)}ms`
-  return `${(n / 1000).toFixed(2)}s`
-}
-
-function fmtBytes(n: number): string {
-  if (n < 1024) return `${n}B`
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)}KB`
-  return `${(n / (1024 * 1024)).toFixed(1)}MB`
-}
-
-function pad(
-  str: string,
-  len: number,
-  align: 'left' | 'right' = 'left',
-): string {
-  if (align === 'right') return str.padStart(len)
-  return str.padEnd(len)
-}
-
 function loadReports(pattern?: string): BenchmarkReport[] {
-  const dir = pattern ? path.dirname(pattern) : __dirname
+  const defaultDir = RESULTS_DIR
+  const patternLooksLikePath = pattern
+    ? pattern.includes('/') ||
+      pattern.includes('\\') ||
+      pattern.endsWith('.json')
+    : false
+  const dir =
+    pattern && patternLooksLikePath
+      ? path.dirname(path.resolve(process.cwd(), pattern))
+      : defaultDir
+  if (!fs.existsSync(dir)) return []
+
   const files = fs
     .readdirSync(dir)
     .filter(f => f.startsWith('results-') && f.endsWith('.json'))
     .sort()
+  if (files.length === 0) return []
 
-  const matchFiles = pattern
-    ? files.filter(f =>
-        f.includes(
-          pattern.replace(/.*results-/, 'results-').replace('.json', ''),
-        ),
-      )
+  const targetFiles = pattern
+    ? (() => {
+        const raw = path.basename(pattern)
+        const token = raw
+          .replace(/^results-/, '')
+          .replace(/\.json$/i, '')
+          .trim()
+        const matched = token ? files.filter(f => f.includes(token)) : files
+        return matched
+      })()
     : files
 
-  const targetFiles = matchFiles.length > 0 ? matchFiles : files.slice(-3)
+  if (pattern && targetFiles.length === 0) {
+    throw new Error(`No benchmark files matched pattern "${pattern}" in ${dir}`)
+  }
 
   return targetFiles.map(f => {
     const content = fs.readFileSync(path.join(dir, f), 'utf-8')
@@ -110,6 +89,33 @@ function loadReports(pattern?: string): BenchmarkReport[] {
       _file: string
     }
   })
+}
+
+function assertConsistentConfig(reports: BenchmarkReport[]): void {
+  const groups = new Map<string, string[]>()
+
+  for (const report of reports) {
+    const key = JSON.stringify(report.config)
+    const file =
+      (report as BenchmarkReport & { _file?: string })._file ?? 'unknown'
+    const existing = groups.get(key)
+    if (existing) {
+      existing.push(file)
+    } else {
+      groups.set(key, [file])
+    }
+  }
+
+  if (groups.size <= 1) return
+
+  const details = [...groups.entries()]
+    .map(([config, files]) => `${config}\n  - ${files.join('\n  - ')}`)
+    .join('\n\n')
+
+  throw new Error(
+    `Found mixed benchmark configs in result files. ` +
+      `Please aggregate only comparable runs.\n\n${details}`,
+  )
 }
 
 function aggregateResults(
@@ -132,6 +138,8 @@ function aggregateResults(
 
       if (runs.length === 0) continue
 
+      const errorValues = runs.map(r => r.errors)
+
       aggregated.push({
         framework: fw,
         scenario: sc,
@@ -140,7 +148,8 @@ function aggregateResults(
         latencyP50: aggregateMetric(runs.map(r => r.latency.p50)),
         latencyP99: aggregateMetric(runs.map(r => r.latency.p99)),
         throughput: aggregateMetric(runs.map(r => r.throughput.average)),
-        errors: runs.reduce((s, r) => s + r.errors, 0),
+        errorsPerRun: aggregateMetric(errorValues),
+        totalErrors: errorValues.reduce((s, v) => s + v, 0),
       })
     }
   }
@@ -289,14 +298,18 @@ function printAggregatedReport(report: AggregatedReport): void {
     console.log('  ' + pad(sc, 16) + row.join(''))
   }
 
-  // Errors
-  const hasErrors = report.results.some(r => r.errors > 0)
+  // Errors (median per-run + total)
+  const hasErrors = report.results.some(r => r.totalErrors > 0)
   if (hasErrors) {
-    console.log('\n  Errors (total across all runs)')
+    console.log('\n  Errors (median per-run / total across all runs)')
     console.log()
     for (const r of report.results) {
-      if (r.errors > 0) {
-        console.log(`  ! ${r.framework} / ${r.scenario}: ${r.errors} errors`)
+      if (r.totalErrors > 0) {
+        console.log(
+          `  ! ${r.framework} / ${r.scenario}: ` +
+            `${fmtNum(r.errorsPerRun.median)} median/run, ` +
+            `${r.totalErrors} total across ${r.runs} runs`,
+        )
       }
     }
   }
@@ -402,6 +415,8 @@ function main() {
     process.exit(1)
   }
 
+  assertConsistentConfig(reports)
+
   console.log(`Aggregating ${reports.length} benchmark runs...`)
 
   const lastReport = reports[reports.length - 1]!
@@ -420,14 +435,16 @@ function main() {
   printAggregatedReport(aggregatedReport)
 
   if (outputJson) {
-    const outPath = path.resolve(__dirname, 'aggregated-results.json')
+    fs.mkdirSync(RESULTS_DIR, { recursive: true })
+    const outPath = path.resolve(RESULTS_DIR, 'aggregated-results.json')
     fs.writeFileSync(outPath, JSON.stringify(aggregatedReport, null, 2))
     console.log(`JSON saved to ${outPath}`)
   }
 
   if (outputMd) {
     const md = generateMarkdown(aggregatedReport)
-    const outPath = path.resolve(__dirname, 'BENCHMARK-RESULTS.md')
+    fs.mkdirSync(RESULTS_DIR, { recursive: true })
+    const outPath = path.resolve(RESULTS_DIR, 'BENCHMARK-RESULTS.md')
     fs.writeFileSync(outPath, md)
     console.log(`Markdown saved to ${outPath}`)
   }

@@ -3,8 +3,10 @@ import os from 'os'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import type { Framework, Scenario } from './scenarios.js'
+import { fmtBytes, fmtMs, fmtNum, pad } from './utils.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+export const RESULTS_DIR = path.resolve(__dirname, '.results')
 
 export interface BenchmarkResult {
   framework: string
@@ -25,7 +27,6 @@ export interface BenchmarkResult {
     max: number
     p50: number
     p90: number
-    p95: number
     p99: number
   }
   throughput: {
@@ -57,31 +58,6 @@ export interface BenchmarkReport {
     nodeVersion: string
     cpus: number
   }
-}
-
-function fmtNum(n: number): string {
-  return n.toLocaleString('en-US', { maximumFractionDigits: 0 })
-}
-
-function fmtMs(n: number): string {
-  if (n < 1) return `${(n * 1000).toFixed(0)}μs`
-  if (n < 1000) return `${n.toFixed(1)}ms`
-  return `${(n / 1000).toFixed(2)}s`
-}
-
-function fmtBytes(n: number): string {
-  if (n < 1024) return `${n}B`
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)}KB`
-  return `${(n / (1024 * 1024)).toFixed(1)}MB`
-}
-
-function pad(
-  str: string,
-  len: number,
-  align: 'left' | 'right' = 'left',
-): string {
-  if (align === 'right') return str.padStart(len)
-  return str.padEnd(len)
 }
 
 export function printReport(
@@ -243,8 +219,9 @@ export function saveReport(
     },
   }
 
+  fs.mkdirSync(RESULTS_DIR, { recursive: true })
   const outPath = path.resolve(
-    __dirname,
+    RESULTS_DIR,
     `results-${new Date().toISOString().replace(/[:.]/g, '-')}.json`,
   )
   fs.writeFileSync(outPath, JSON.stringify(report, null, 2))

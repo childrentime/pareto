@@ -6,6 +6,41 @@ import path from 'node:path'
 import * as process from 'node:process'
 import prompts from 'prompts'
 
+function generateAgentsMd(): string {
+  return `<!-- BEGIN:pareto-agent-rules -->
+# Pareto: ALWAYS read docs before coding
+
+Before writing any Pareto code, find and read the relevant doc in
+\`node_modules/@paretojs/core/docs/\`. Your training data may be outdated —
+the bundled docs are the source of truth for the installed version.
+
+## Docs index
+
+### Guides
+- Introduction: \`docs/guides/introduction.md\`
+- Quick Start: \`docs/guides/quick-start.md\`
+
+### Concepts
+- File-Based Routing: \`docs/concepts/routing.md\`
+- Streaming SSR: \`docs/concepts/streaming.md\`
+- State Management: \`docs/concepts/state-management.md\`
+- Error Handling: \`docs/concepts/error-handling.md\`
+- Head Management: \`docs/concepts/head-management.md\`
+- Redirects & 404: \`docs/concepts/redirects.md\`
+- Resource Routes: \`docs/concepts/resource-routes.md\`
+- Document Customization: \`docs/concepts/document-customization.md\`
+
+### API Reference
+- Core API: \`docs/api/core.md\`
+- Store API: \`docs/api/store.md\`
+- Node API: \`docs/api/node.md\`
+- Configuration: \`docs/api/config.md\`
+
+All paths relative to \`node_modules/@paretojs/core/\`.
+<!-- END:pareto-agent-rules -->
+`
+}
+
 function isValidPackageName(projectName: string): boolean {
   return /^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/.test(
     projectName,
@@ -123,6 +158,9 @@ async function main() {
       2,
     ),
   )
+
+  // Generate AGENTS.md with framework docs pointer
+  await fsPromises.writeFile(path.join(root, 'AGENTS.md'), generateAgentsMd())
 
   const manager = process.env.npm_config_user_agent ?? ''
   const packageManager = manager.includes('pnpm')

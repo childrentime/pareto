@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "generate:llms": "tsx scripts/generate-llms-txt.ts",
+    "build": "pnpm generate:llms && astro build",
     "preview": "astro preview",
     "astro": "astro"
   },

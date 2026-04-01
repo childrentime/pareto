@@ -2,7 +2,9 @@ import { execSync } from 'child_process'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { gzipSync } from 'zlib'
 import { frameworks } from './scenarios.js'
+import { fmtBytes, pad } from './utils.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -46,10 +48,8 @@ const buildOutputDirs: Record<string, { client: string; server: string }> = {
 
 function getGzipSize(filePath: string): number {
   try {
-    const result = execSync(`gzip -c "${filePath}" | wc -c`, {
-      encoding: 'utf-8',
-    }).trim()
-    return parseInt(result, 10)
+    const content = fs.readFileSync(filePath)
+    return gzipSync(content).byteLength
   } catch {
     return 0
   }
@@ -86,21 +86,6 @@ function measureDir(baseDir: string, extensions: string[]): SizeEntry[] {
       }
     })
     .sort((a, b) => b.size - a.size)
-}
-
-function fmtBytes(n: number): string {
-  if (n < 1024) return `${n}B`
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)}KB`
-  return `${(n / (1024 * 1024)).toFixed(1)}MB`
-}
-
-function pad(
-  str: string,
-  len: number,
-  align: 'left' | 'right' = 'left',
-): string {
-  if (align === 'right') return str.padStart(len)
-  return str.padEnd(len)
 }
 
 function main() {

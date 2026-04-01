@@ -1,15 +1,22 @@
-import { execSync, spawn, type ChildProcess } from 'child_process'
+import autocannon from 'autocannon'
+import { execSync } from 'child_process'
 import fs from 'fs'
-import { createRequire } from 'module'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { RESULTS_DIR } from './report.js'
 import { frameworks, scenarios, type Framework } from './scenarios.js'
+import {
+  fmtMs,
+  fmtNum,
+  killServer,
+  log,
+  pad,
+  sleep,
+  startServer,
+  waitForServer,
+} from './utils.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const _require = createRequire(import.meta.url)
-const autocannon = _require('autocannon') as (
-  opts: Record<string, unknown>,
-) => Promise<Record<string, any>>
 
 const args = process.argv.slice(2)
 const skipBuild = args.includes('--skip-build')
@@ -38,28 +45,26 @@ const activeScenarios = scenarioFilter
     )
   : scenarios
 
-function log(msg: string) {
-  const ts = new Date().toISOString().slice(11, 19)
-  console.log(`[${ts}] ${msg}`)
+interface StepResult {
+  connections: number
+  rps: number
+  latencyP50: number
+  latencyP99: number
+  latencyAvg: number
+  errors: number
+  timeouts: number
+  non2xx: number
+  totalRequests: number
+  errorRate: number
 }
 
-function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-async function waitForServer(port: number, timeout = 30_000): Promise<void> {
-  const start = Date.now()
-  const url = `http://127.0.0.1:${port}/`
-  while (Date.now() - start < timeout) {
-    try {
-      const res = await fetch(url)
-      if (res.ok) return
-    } catch {
-      // not ready yet
-    }
-    await sleep(500)
-  }
-  throw new Error(`Server on port ${port} did not start within ${timeout}ms`)
+interface RampResult {
+  framework: string
+  scenario: string
+  steps: StepResult[]
+  maxSustainableQPS: number
+  maxConnections: number
+  hasHealthyStep: boolean
 }
 
 function buildFramework(fw: Framework): void {
@@ -71,81 +76,6 @@ function buildFramework(fw: Framework): void {
     env: { ...process.env, NODE_ENV: 'production' },
   })
   log(`${fw.name} build complete`)
-}
-
-function startServer(fw: Framework): ChildProcess {
-  const cwd = path.resolve(__dirname, fw.dir)
-  const child = spawn('sh', ['-c', fw.startCmd], {
-    cwd,
-    stdio: 'pipe',
-    detached: true,
-    env: { ...process.env, ...fw.startEnv },
-  })
-  child.unref()
-  child.stderr?.on('data', (data: Buffer) => {
-    const msg = data.toString().trim()
-    if (msg) log(`[${fw.name} stderr] ${msg}`)
-  })
-  return child
-}
-
-function killServer(child: ChildProcess): Promise<void> {
-  return new Promise(resolve => {
-    if (child.killed || child.exitCode !== null) {
-      resolve()
-      return
-    }
-    const done = () => {
-      child.removeListener('exit', done)
-      resolve()
-    }
-    child.on('exit', done)
-    try {
-      process.kill(-child.pid!, 'SIGKILL')
-    } catch {
-      child.kill('SIGKILL')
-    }
-    setTimeout(done, 2000)
-  })
-}
-
-interface StepResult {
-  connections: number
-  rps: number
-  latencyP50: number
-  latencyP99: number
-  latencyAvg: number
-  errors: number
-  timeouts: number
-  totalRequests: number
-  errorRate: number
-}
-
-interface RampResult {
-  framework: string
-  scenario: string
-  steps: StepResult[]
-  maxSustainableQPS: number
-  maxConnections: number
-}
-
-function fmtNum(n: number): string {
-  return n.toLocaleString('en-US', { maximumFractionDigits: 0 })
-}
-
-function fmtMs(n: number): string {
-  if (n < 1) return `${(n * 1000).toFixed(0)}μs`
-  if (n < 1000) return `${n.toFixed(0)}ms`
-  return `${(n / 1000).toFixed(2)}s`
-}
-
-function pad(
-  str: string,
-  len: number,
-  align: 'left' | 'right' = 'left',
-): string {
-  if (align === 'right') return str.padStart(len)
-  return str.padEnd(len)
 }
 
 async function rampTest(url: string, steps: number[]): Promise<StepResult[]> {
@@ -168,8 +98,9 @@ async function rampTest(url: string, steps: number[]): Promise<StepResult[]> {
     })
 
     const totalRequests = raw.requests?.total ?? 0
-    const errors = (raw.errors ?? 0) + (raw.timeouts ?? 0)
-    const errorRate = totalRequests > 0 ? errors / totalRequests : 0
+    const totalFailures =
+      (raw.errors ?? 0) + (raw.timeouts ?? 0) + (raw.non2xx ?? 0)
+    const errorRate = totalRequests > 0 ? totalFailures / totalRequests : 0
 
     const step: StepResult = {
       connections,
@@ -179,6 +110,7 @@ async function rampTest(url: string, steps: number[]): Promise<StepResult[]> {
       latencyAvg: raw.latency?.average ?? 0,
       errors: raw.errors ?? 0,
       timeouts: raw.timeouts ?? 0,
+      non2xx: raw.non2xx ?? 0,
       totalRequests,
       errorRate,
     }
@@ -187,7 +119,7 @@ async function rampTest(url: string, steps: number[]): Promise<StepResult[]> {
     log(
       `  ${connections} conn → ${fmtNum(step.rps)}/s, ` +
         `p50=${fmtMs(step.latencyP50)}, p99=${fmtMs(step.latencyP99)}, ` +
-        `errors=${step.errors + step.timeouts}`,
+        `failures=${step.errors + step.timeouts + step.non2xx}`,
     )
 
     if (step.latencyP99 > P99_THRESHOLD_MS * 3 || errorRate > 0.1) {
@@ -201,9 +133,14 @@ async function rampTest(url: string, steps: number[]): Promise<StepResult[]> {
   return results
 }
 
-function findMaxQPS(steps: StepResult[]): { qps: number; connections: number } {
+function findMaxQPS(steps: StepResult[]): {
+  qps: number
+  connections: number
+  hasHealthyStep: boolean
+} {
   let maxQPS = 0
   let maxConn = 0
+  let hasHealthyStep = false
 
   for (const step of steps) {
     const healthy =
@@ -213,16 +150,11 @@ function findMaxQPS(steps: StepResult[]): { qps: number; connections: number } {
     if (healthy && step.rps > maxQPS) {
       maxQPS = step.rps
       maxConn = step.connections
+      hasHealthyStep = true
     }
   }
 
-  if (maxQPS === 0 && steps.length > 0) {
-    const first = steps[0]!
-    maxQPS = first.rps
-    maxConn = first.connections
-  }
-
-  return { qps: maxQPS, connections: maxConn }
+  return { qps: maxQPS, connections: maxConn, hasHealthyStep }
 }
 
 function printResults(results: RampResult[]): void {
@@ -257,6 +189,7 @@ function printResults(results: RampResult[]): void {
     const row = frameworkNames.map(fw => {
       const r = results.find(res => res.framework === fw && res.scenario === sc)
       if (!r) return pad('—', colWidth, 'right')
+      if (!r.hasHealthyStep) return pad('NO HEALTHY STEP', colWidth, 'right')
       return pad(`${fmtNum(r.maxSustainableQPS)}/s`, colWidth, 'right')
     })
     console.log('  ' + pad(sc, 16) + row.join(''))
@@ -341,6 +274,7 @@ function generateMarkdown(results: RampResult[]): string {
     const cells = frameworkNames.map(fw => {
       const r = results.find(res => res.framework === fw && res.scenario === sc)
       if (!r) return '—'
+      if (!r.hasHealthyStep) return 'NO HEALTHY STEP'
       return `**${fmtNum(r.maxSustainableQPS)}**/s`
     })
     lines.push(`| ${sc} | ${cells.join(' | ')} |`)
@@ -384,7 +318,22 @@ function generateMarkdown(results: RampResult[]): string {
   return lines.join('\n')
 }
 
+// ---------------------------------------------------------------------------
+// Main — test one framework at a time to avoid resource contention
+// ---------------------------------------------------------------------------
+
 async function main() {
+  if (activeFrameworks.length === 0) {
+    console.error(`Unknown framework: ${onlyFlag}`)
+    console.error(`Available: ${frameworks.map(f => f.dir).join(', ')}`)
+    process.exit(1)
+  }
+  if (activeScenarios.length === 0) {
+    console.error(`Unknown scenario filter: ${scenarioFilter}`)
+    console.error(`Available: ${scenarios.map(s => s.name).join(', ')}`)
+    process.exit(1)
+  }
+
   console.log()
   log('Ramp-up Load Test — Finding Max Sustainable QPS')
   log(`Frameworks: ${activeFrameworks.map(f => f.name).join(', ')}`)
@@ -411,32 +360,29 @@ async function main() {
   }
 
   const allResults: RampResult[] = []
-  const servers: ChildProcess[] = []
 
-  try {
-    for (const fw of activeFrameworks) {
-      log(`Starting ${fw.name} on port ${fw.port}...`)
-      const child = startServer(fw)
-      servers.push(child)
+  // Test one framework at a time to avoid resource contention
+  for (const fw of activeFrameworks) {
+    log(`Starting ${fw.name} on port ${fw.port}...`)
+    const server = startServer(fw, __dirname)
+
+    try {
       await waitForServer(fw.port)
       log(`${fw.name} ready on :${fw.port}`)
-    }
+      console.log()
 
-    console.log()
-
-    for (const scenario of activeScenarios) {
-      log(`━━━ ${scenario.name}: ${scenario.description} ━━━`)
-
-      for (const fw of activeFrameworks) {
+      for (const scenario of activeScenarios) {
         if (fw.skipScenarios?.includes(scenario.name)) {
-          log(`Skipping ${fw.name} (not supported)`)
+          log(`Skipping ${fw.name} / ${scenario.name} (not supported)`)
           continue
         }
+
+        log(`━━━ ${scenario.name}: ${scenario.description} ━━━`)
         const url = `http://127.0.0.1:${fw.port}${scenario.path}`
         log(`Ramp testing ${fw.name} @ ${url}`)
 
         const steps = await rampTest(url, CONCURRENCY_STEPS)
-        const { qps, connections } = findMaxQPS(steps)
+        const { qps, connections, hasHealthyStep } = findMaxQPS(steps)
 
         allResults.push({
           framework: fw.name,
@@ -444,33 +390,42 @@ async function main() {
           steps,
           maxSustainableQPS: qps,
           maxConnections: connections,
+          hasHealthyStep,
         })
 
-        log(
-          `→ ${fw.name} max sustainable: ${fmtNum(qps)}/s @ ${connections} connections`,
-        )
+        if (!hasHealthyStep) {
+          log(
+            `→ ${fw.name} max sustainable: NO HEALTHY STEP ` +
+              `(all steps exceeded thresholds)`,
+          )
+        } else {
+          log(
+            `→ ${fw.name} max sustainable: ${fmtNum(qps)}/s @ ${connections} connections`,
+          )
+        }
         console.log()
       }
+    } finally {
+      log(`Shutting down ${fw.name}...`)
+      await killServer(server)
+      await sleep(2000)
     }
-
-    printResults(allResults)
-
-    const outPath = path.resolve(
-      __dirname,
-      `ramp-results-${new Date().toISOString().replace(/[:.]/g, '-')}.json`,
-    )
-    fs.writeFileSync(outPath, JSON.stringify(allResults, null, 2))
-    log(`JSON saved to ${outPath}`)
-
-    const md = generateMarkdown(allResults)
-    const mdPath = path.resolve(__dirname, 'RAMP-RESULTS.md')
-    fs.writeFileSync(mdPath, md)
-    log(`Markdown saved to ${mdPath}`)
-  } finally {
-    log('Shutting down servers...')
-    await Promise.all(servers.map(killServer))
-    log('Done')
   }
+
+  printResults(allResults)
+
+  fs.mkdirSync(RESULTS_DIR, { recursive: true })
+  const outPath = path.resolve(
+    RESULTS_DIR,
+    `ramp-results-${new Date().toISOString().replace(/[:.]/g, '-')}.json`,
+  )
+  fs.writeFileSync(outPath, JSON.stringify(allResults, null, 2))
+  log(`JSON saved to ${outPath}`)
+
+  const md = generateMarkdown(allResults)
+  const mdPath = path.resolve(RESULTS_DIR, 'RAMP-RESULTS.md')
+  fs.writeFileSync(mdPath, md)
+  log(`Markdown saved to ${mdPath}`)
 }
 
 main().catch(err => {

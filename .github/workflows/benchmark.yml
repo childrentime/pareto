@@ -49,7 +49,7 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm install --frozen-lockfile
 
       # ── System tuning for stable benchmarks ──────────────────────────
       - name: Tune system for benchmarks
@@ -103,14 +103,15 @@ jobs:
         working-directory: benchmarks
         env:
           BENCH_RUNS: ${{ inputs.runs || '1' }}
-          BENCH_DURATION: ${{ inputs.duration || '10' }}
+          BENCH_DURATION: ${{ inputs.duration || '30' }}
         run: |
           RUNS=${BENCH_RUNS}
           echo "Running ${RUNS} benchmark rounds with ${BENCH_DURATION}s duration..."
           echo ""
 
           # Clean up old results
-          rm -f results-*.json
+          mkdir -p .results
+          rm -f .results/results-*.json
 
           wait_ports_free() {
             for attempt in $(seq 1 10); do
@@ -143,11 +144,6 @@ jobs:
             # Run with --skip-build since we built once above
             pnpm bench -- --skip-build --duration="${BENCH_DURATION}" 2>&1
 
-            # Kill any leftover server processes
-            for port in 4000 4001 4002 4003; do
-              fuser -k "${port}/tcp" 2>/dev/null || true
-            done
-
             echo ""
           done
 
@@ -163,11 +159,11 @@ jobs:
         with:
           name: benchmark-results-${{ github.sha }}
           path: |
-            benchmarks/results-*.json
-            benchmarks/ramp-results-*.json
-            benchmarks/aggregated-results.json
-            benchmarks/BENCHMARK-RESULTS.md
-            benchmarks/RAMP-RESULTS.md
+            benchmarks/.results/results-*.json
+            benchmarks/.results/ramp-results-*.json
+            benchmarks/.results/aggregated-results.json
+            benchmarks/.results/BENCHMARK-RESULTS.md
+            benchmarks/.results/RAMP-RESULTS.md
             benchmarks/build-size-output.txt
             benchmarks/render-bench-output.txt
             benchmarks/aggregate-output.txt
@@ -181,7 +177,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const mdPath = 'benchmarks/BENCHMARK-RESULTS.md';
+            const mdPath = 'benchmarks/.results/BENCHMARK-RESULTS.md';
 
             if (!fs.existsSync(mdPath)) {
               console.log('No markdown report found, skipping comment.');
@@ -189,8 +185,8 @@ jobs:
             }
 
             const md = fs.readFileSync(mdPath, 'utf-8');
-            const rampMd = fs.existsSync('benchmarks/RAMP-RESULTS.md')
-              ? fs.readFileSync('benchmarks/RAMP-RESULTS.md', 'utf-8')
+            const rampMd = fs.existsSync('benchmarks/.results/RAMP-RESULTS.md')
+              ? fs.readFileSync('benchmarks/.results/RAMP-RESULTS.md', 'utf-8')
               : '';
             const sizeOutput = fs.existsSync('benchmarks/build-size-output.txt')
               ? fs.readFileSync('benchmarks/build-size-output.txt', 'utf-8')

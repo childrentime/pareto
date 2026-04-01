@@ -2,13 +2,18 @@ import { performance } from 'perf_hooks'
 import React from 'react'
 import { renderToPipeableStream, renderToString } from 'react-dom/server'
 import { PassThrough, Writable } from 'stream'
+import { fmtBytes, fmtNum, fmtOps, fmtTime, pad, percentile } from './utils.js'
 
 const ITEM_COUNTS = [10, 100, 500] as const
 const WARMUP_ITERATIONS = 500
 const MIN_TIME_MS = 3000
 const MIN_ITERATIONS = 100
 
-let _sink: unknown
+const BENCH_SINK_KEY = '__paretoRenderBenchSink'
+
+function consumeResult(value: unknown): void {
+  ;(globalThis as Record<string, unknown>)[BENCH_SINK_KEY] = value
+}
 
 function generateItems(count: number) {
   return Array.from({ length: count }, (_, i) => ({
@@ -131,7 +136,7 @@ interface BenchResult {
 
 function benchSync(fn: () => unknown): BenchResult {
   for (let i = 0; i < WARMUP_ITERATIONS; i++) {
-    _sink = fn()
+    consumeResult(fn())
   }
 
   const samples: number[] = []
@@ -140,7 +145,7 @@ function benchSync(fn: () => unknown): BenchResult {
 
   while (true) {
     const t0 = performance.now()
-    _sink = fn()
+    consumeResult(fn())
     const t1 = performance.now()
     samples.push(t1 - t0)
     iterations++
@@ -161,14 +166,14 @@ function benchSync(fn: () => unknown): BenchResult {
     iterations,
     totalMs,
     samples,
-    p50Ms: samples[Math.floor(samples.length * 0.5)]!,
-    p99Ms: samples[Math.floor(samples.length * 0.99)]!,
+    p50Ms: percentile(samples, 0.5),
+    p99Ms: percentile(samples, 0.99),
   }
 }
 
 async function benchAsync(fn: () => Promise<unknown>): Promise<BenchResult> {
   for (let i = 0; i < Math.min(WARMUP_ITERATIONS, 100); i++) {
-    await fn()
+    consumeResult(await fn())
   }
 
   const samples: number[] = []
@@ -177,7 +182,7 @@ async function benchAsync(fn: () => Promise<unknown>): Promise<BenchResult> {
 
   while (true) {
     const t0 = performance.now()
-    await fn()
+    consumeResult(await fn())
     const t1 = performance.now()
     samples.push(t1 - t0)
     iterations++
@@ -198,41 +203,9 @@ async function benchAsync(fn: () => Promise<unknown>): Promise<BenchResult> {
     iterations,
     totalMs,
     samples,
-    p50Ms: samples[Math.floor(samples.length * 0.5)]!,
-    p99Ms: samples[Math.floor(samples.length * 0.99)]!,
+    p50Ms: percentile(samples, 0.5),
+    p99Ms: percentile(samples, 0.99),
   }
-}
-
-function fmtNum(n: number): string {
-  return n.toLocaleString('en-US', { maximumFractionDigits: 0 })
-}
-
-function fmtTime(ms: number): string {
-  if (ms < 0.001) return `${(ms * 1_000_000).toFixed(0)}ns`
-  if (ms < 1) return `${(ms * 1_000).toFixed(1)}μs`
-  if (ms < 1000) return `${ms.toFixed(2)}ms`
-  return `${(ms / 1000).toFixed(2)}s`
-}
-
-function fmtOps(ops: number): string {
-  if (ops >= 1_000_000) return `${(ops / 1_000_000).toFixed(2)}M`
-  if (ops >= 1_000) return `${(ops / 1_000).toFixed(1)}K`
-  return fmtNum(ops)
-}
-
-function fmtBytes(n: number): string {
-  if (n < 1024) return `${n}B`
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)}KB`
-  return `${(n / (1024 * 1024)).toFixed(1)}MB`
-}
-
-function pad(
-  str: string,
-  len: number,
-  align: 'left' | 'right' = 'left',
-): string {
-  if (align === 'right') return str.padStart(len)
-  return str.padEnd(len)
 }
 
 function printRow(label: string, r: BenchResult) {

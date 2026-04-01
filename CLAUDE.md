@@ -11,6 +11,9 @@
 - Naming convention: `{topic}-{platform}.md` (e.g. `benchmarks-devto.md`, `benchmarks-juejin.md`).
 - dev.to posts include frontmatter (`published`, `tags`, `canonical_url`). Medium and 掘金 are plain markdown.
 - Always set `canonical_url` to the paretojs.tech blog post to avoid SEO duplication.
+- **dev.to**: API key in `.env` as `DEV_TO_API_KEY`. Publish via `curl -X POST https://dev.to/api/articles` with `api-key` header.
+- **Medium**: Use the `/medium-push` skill — reads markdown file and pushes to Medium editor via Chrome extension bridge.
+- **掘金**: Manual copy-paste from the `*-juejin.md` file.
 
 ## Code Conventions
 

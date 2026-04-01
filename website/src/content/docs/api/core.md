@@ -12,12 +12,21 @@ import {
   ParetoErrorBoundary,
   useLoaderData,
   useRouter,
-  useRouterSnapshot,
   useStreamData,
   defer,
   redirect,
   notFound,
-  mergeHeadDescriptors,
+} from '@paretojs/core'
+import type {
+  HeadProps,
+  HeadComponent,
+  DocumentContext,
+  HtmlAttributes,
+  GetDocumentProps,
+  LoaderContext,
+  LoaderFunction,
+  NavigateOptions,
+  ParetoConfig,
 } from '@paretojs/core'
 ```
 
@@ -95,16 +104,6 @@ const { pathname, params, isNavigating, push, replace, back, prefetch } = useRou
 
 `NavigateOptions` accepts `{ replace?: boolean, scroll?: boolean }`. For example, `push('/page', { scroll: false })` navigates without scrolling to top.
 
-### `useRouterSnapshot()`
-
-Read-only router state without navigation methods. Lower-level than `useRouter()` — use this when you only need to read the current route.
-
-```tsx
-const { pathname, params, isNavigating } = useRouterSnapshot()
-```
-
-Returns a `RouterState` object with `pathname`, `params`, and `isNavigating`.
-
 ### `useStreamData<T>(promiseOrValue)`
 
 Hook to consume a deferred value without `<Await>`. Suspends the component until the promise resolves, so it must be used inside a `<Suspense>` boundary.
@@ -146,14 +145,6 @@ Throw in a loader to render `not-found.tsx` with 404 status. See [Redirect & 404
 throw notFound()
 ```
 
-### `mergeHeadDescriptors(...descriptors)`
-
-Merge multiple `HeadDescriptor` objects. Used internally by the framework to merge head descriptors from root to page. You can use it in custom setups. See [Head Management](/concepts/head-management/) for how head merging works.
-
-```tsx
-const merged = mergeHeadDescriptors(rootHead, layoutHead, pageHead)
-```
-
 ## Types
 
 ### `LoaderContext`
@@ -168,24 +159,64 @@ interface LoaderContext {
 }
 ```
 
-### `RouteConfig`
+### `LoaderFunction`
 
-Per-route configuration exported from `page.tsx`.
+The type for `loader` functions exported from `page.tsx` or `loader.ts` files.
 
 ```tsx
-interface RouteConfig {
-  render?: 'server'
+type LoaderFunction = (context: LoaderContext) => unknown
+```
+
+### `HeadProps`
+
+Props passed to Head components in `head.tsx` files. See [Head Management](/concepts/head-management/) for usage patterns.
+
+```tsx
+interface HeadProps {
+  loaderData: unknown
+  params: Record<string, string>
 }
 ```
 
-### `HeadDescriptor`
+### `HeadComponent`
 
-The return type of `head()` functions in `head.tsx` files. See [Head Management](/concepts/head-management/) for merging behavior and OG tag examples.
+The type for Head components exported from `head.tsx` files.
 
 ```tsx
-interface HeadDescriptor {
-  title?: string
-  meta?: Record<string, string>[]
-  link?: Record<string, string>[]
+type HeadComponent = (props: HeadProps) => ReactNode
+```
+
+### `DocumentContext`
+
+The context object passed to `getDocumentProps` in `document.tsx`.
+
+```tsx
+interface DocumentContext {
+  req: Request
+  params: Record<string, string>
+  pathname: string
+  loaderData: unknown
 }
 ```
+
+### `HtmlAttributes`
+
+The return type of `getDocumentProps`. All properties are applied as attributes on the `<html>` element. Common attributes `lang`, `dir`, and `className` are typed explicitly for convenience.
+
+```tsx
+type HtmlAttributes = Record<string, string> & {
+  lang?: string
+  dir?: string
+  className?: string
+}
+```
+
+### `GetDocumentProps`
+
+The function type for `document.tsx` exports.
+
+```tsx
+type GetDocumentProps = (ctx: DocumentContext) => HtmlAttributes
+```
+
+See [Document Customization](/concepts/document-customization/) for `document.tsx` usage and [Error Handling](/concepts/error-handling/) for `error.tsx` usage.

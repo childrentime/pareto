@@ -123,6 +123,24 @@ function ErrorFallback({ error }: { error: Error }) {
 }
 ```
 
+## App-level error page
+
+For errors not caught by any `ParetoErrorBoundary`, create `app/error.tsx` to show a custom error page instead of the built-in default:
+
+```tsx
+// app/error.tsx
+export default function ErrorPage({ error }: { error: Error }) {
+  return (
+    <div>
+      <h1>Something went wrong</h1>
+      <p>{error.message}</p>
+    </div>
+  )
+}
+```
+
+This is optional — if no `error.tsx` exists, Pareto shows a built-in fallback. Use `ParetoErrorBoundary` for granular, component-level error isolation, and `error.tsx` for a catch-all error page.
+
 ## Related
 
 - [Redirect & 404](/concepts/redirects/) — Use `notFound()` for expected missing-resource conditions.

@@ -1,5 +1,4 @@
 import { useRouterContext } from './context'
-import type { NavigateOptions, RouterState } from '../types'
 
 /**
  * Hook to access the client-side router for programmatic navigation.
@@ -18,22 +17,9 @@ export function useRouter() {
     pathname: ctx.pathname,
     params: ctx.params,
     isNavigating: ctx.isNavigating,
-    push: (path: string, opts?: NavigateOptions) => ctx.push(path, opts),
-    replace: (path: string, opts?: NavigateOptions) => ctx.replace(path, opts),
-    back: () => ctx.back(),
-    prefetch: (path: string) => ctx.prefetch(path),
-  }
-}
-
-/**
- * Hook to access the raw router state (pathname, params, isNavigating).
- * Lower-level than useRouter — does not include navigation methods.
- */
-export function useRouterSnapshot(): RouterState {
-  const ctx = useRouterContext()
-  return {
-    pathname: ctx.pathname,
-    params: ctx.params,
-    isNavigating: ctx.isNavigating,
+    push: ctx.push,
+    replace: ctx.replace,
+    back: ctx.back,
+    prefetch: ctx.prefetch,
   }
 }

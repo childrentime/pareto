@@ -1,0 +1,237 @@
+name: Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: 'Number of benchmark runs (more = more stable)'
+        required: false
+        default: '5'
+        type: choice
+        options: ['1', '3', '5', '7']
+      duration:
+        description: 'Seconds per benchmark scenario'
+        required: false
+        default: '30'
+      post_comment:
+        description: 'Post results as PR comment (only works on PRs)'
+        required: false
+        default: true
+        type: boolean
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/core/src/**'
+      - 'benchmarks/**'
+
+concurrency:
+  group: benchmark-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_ENV: production
+
+jobs:
+  benchmark:
+    name: SSR Benchmark (${{ inputs.runs || '1' }} runs)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # ── System tuning for stable benchmarks ──────────────────────────
+      - name: Tune system for benchmarks
+        run: |
+          # Raise file descriptor limits
+          ulimit -n 65536 || true
+
+          # Disable address space randomization (reduces variance)
+          echo 0 | sudo tee /proc/sys/kernel/randomize_va_space || true
+
+          # Set CPU governor to performance (prevents frequency scaling)
+          for cpu in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
+            echo performance | sudo tee "$cpu" 2>/dev/null || true
+          done
+
+          # Print system info for reproducibility
+          echo "=== System Info ==="
+          nproc
+          free -h
+          node --version
+          cat /proc/cpuinfo | grep "model name" | head -1
+
+      # ── Build all frameworks once ────────────────────────────────────
+      - name: Build all frameworks
+        working-directory: benchmarks
+        run: pnpm build:all
+
+      # ── Build size (deterministic, only needs one run) ───────────────
+      - name: Measure build sizes
+        working-directory: benchmarks
+        run: pnpm bench:size -- --skip-build --files 2>&1 | tee build-size-output.txt
+
+      # ── Render micro-benchmark ───────────────────────────────────────
+      - name: React SSR render benchmark
+        working-directory: benchmarks
+        run: pnpm bench:render 2>&1 | tee render-bench-output.txt
+
+      # ── Ramp-up load test ──────────────────────────────────────────────
+      - name: Ramp-up load test (max sustainable QPS)
+        working-directory: benchmarks
+        run: |
+          pnpm bench:ramp -- --skip-build 2>&1 | tee ramp-output.txt
+
+          # Kill any leftover server processes
+          for port in 4000 4001 4002 4003; do
+            fuser -k "${port}/tcp" 2>/dev/null || true
+          done
+
+      # ── HTTP benchmark: N isolated runs ──────────────────────────────
+      - name: Run benchmarks (${{ inputs.runs || '1' }} rounds)
+        working-directory: benchmarks
+        env:
+          BENCH_RUNS: ${{ inputs.runs || '1' }}
+          BENCH_DURATION: ${{ inputs.duration || '30' }}
+        run: |
+          RUNS=${BENCH_RUNS}
+          echo "Running ${RUNS} benchmark rounds with ${BENCH_DURATION}s duration..."
+          echo ""
+
+          # Clean up old results
+          mkdir -p .results
+          rm -f .results/results-*.json
+
+          wait_ports_free() {
+            for attempt in $(seq 1 10); do
+              all_free=true
+              for port in 4000 4001 4002 4003; do
+                if fuser "${port}/tcp" 2>/dev/null; then
+                  all_free=false
+                  fuser -k "${port}/tcp" 2>/dev/null || true
+                fi
+              done
+              if $all_free; then return 0; fi
+              sleep 1
+            done
+            echo "Warning: ports may still be in use"
+          }
+
+          for i in $(seq 1 "$RUNS"); do
+            echo "══════════════════════════════════════════════════"
+            echo "  Round $i / $RUNS"
+            echo "══════════════════════════════════════════════════"
+
+            wait_ports_free
+
+            # Cooldown between runs to let CPU thermals stabilize
+            if [ "$i" -gt 1 ]; then
+              echo "Cooldown 5s..."
+              sleep 5
+            fi
+
+            # Run with --skip-build since we built once above
+            pnpm bench -- --skip-build --duration="${BENCH_DURATION}" 2>&1
+
+            echo ""
+          done
+
+      # ── Aggregate results ────────────────────────────────────────────
+      - name: Aggregate benchmark results
+        working-directory: benchmarks
+        run: |
+          npx tsx aggregate.ts --json --markdown 2>&1 | tee aggregate-output.txt
+
+      # ── Upload artifacts ─────────────────────────────────────────────
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results-${{ github.sha }}
+          path: |
+            benchmarks/.results/results-*.json
+            benchmarks/.results/ramp-results-*.json
+            benchmarks/.results/aggregated-results.json
+            benchmarks/.results/BENCHMARK-RESULTS.md
+            benchmarks/.results/RAMP-RESULTS.md
+            benchmarks/build-size-output.txt
+            benchmarks/render-bench-output.txt
+            benchmarks/aggregate-output.txt
+            benchmarks/ramp-output.txt
+          retention-days: 90
+
+      # ── Post PR comment ──────────────────────────────────────────────
+      - name: Post benchmark results to PR
+        if: github.event_name == 'pull_request' && (inputs.post_comment == true || inputs.post_comment == '')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const mdPath = 'benchmarks/.results/BENCHMARK-RESULTS.md';
+
+            if (!fs.existsSync(mdPath)) {
+              console.log('No markdown report found, skipping comment.');
+              return;
+            }
+
+            const md = fs.readFileSync(mdPath, 'utf-8');
+            const rampMd = fs.existsSync('benchmarks/.results/RAMP-RESULTS.md')
+              ? fs.readFileSync('benchmarks/.results/RAMP-RESULTS.md', 'utf-8')
+              : '';
+            const sizeOutput = fs.existsSync('benchmarks/build-size-output.txt')
+              ? fs.readFileSync('benchmarks/build-size-output.txt', 'utf-8')
+              : '';
+
+            const body = [
+              '<!-- benchmark-results -->',
+              md,
+              '',
+              rampMd,
+              '',
+              '<details>',
+              '<summary>Build Size</summary>',
+              '',
+              '```',
+              sizeOutput,
+              '```',
+              '</details>',
+              '',
+              `<sub>Commit: ${context.sha.slice(0, 8)} | [Workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})</sub>`,
+            ].join('\n');
+
+            // Find and update existing comment or create new one
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existing = comments.find(c =>
+              c.body?.includes('<!-- benchmark-results -->')
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }

@@ -6,6 +6,16 @@ import type { InlineConfig, Plugin } from 'vite'
 import type { ParetoConfig } from '../types'
 
 /**
+ * Load @vitejs/plugin-react via createRequire (works in both CJS and ESM contexts).
+ */
+export function loadReactPlugin(): Plugin {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  return createRequire(import.meta.url ?? __filename)(
+    '@vitejs/plugin-react',
+  ).default() as Plugin
+}
+
+/**
  * Create Vite config for the client bundle.
  * Handles React, CSS/Tailwind, code splitting, and manifest generation.
  */
@@ -23,13 +33,7 @@ export function createClientConfig(options: {
     root,
     mode: isDev ? 'development' : 'production',
     envPrefix: 'PARETO_',
-    plugins: [
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      createRequire(import.meta.url ?? __filename)(
-        '@vitejs/plugin-react',
-      ).default() as Plugin,
-      ...plugins,
-    ],
+    plugins: [loadReactPlugin(), ...plugins],
     build: {
       outDir,
       emptyOutDir: true,
@@ -69,19 +73,14 @@ export function createServerConfig(options: {
   const baseConfig: InlineConfig = {
     root,
     mode: 'production',
-    plugins: [
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      createRequire(import.meta.url ?? __filename)(
-        '@vitejs/plugin-react',
-      ).default() as Plugin,
-      ...plugins,
-    ],
+    plugins: [loadReactPlugin(), ...plugins],
     build: {
       outDir,
       emptyOutDir: true,
-      ssr: entry,
+      ssr: true,
       sourcemap: true,
       rollupOptions: {
+        input: entry,
         output: {
           format: 'cjs',
           entryFileNames: 'index.js',
@@ -89,7 +88,6 @@ export function createServerConfig(options: {
       },
     },
     ssr: {
-      // Externalize node_modules, bundle @paretojs/* and relative imports
       noExternal: [/^@paretojs\//],
     },
     define: {

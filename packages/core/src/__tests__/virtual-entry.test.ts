@@ -160,18 +160,42 @@ describe('generateUnifiedClientEntry', () => {
     expect(code).toContain("import NotFoundComponent from '/app/not-found.tsx'")
     expect(code).toContain('notFoundComponent: NotFoundComponent')
   })
+
+  it('includes errorComponent when errorPath is provided', () => {
+    const code = generateUnifiedClientEntry(
+      [mockRoute],
+      [],
+      undefined,
+      '/app/error.tsx',
+    )
+
+    expect(code).toContain("import ErrorComponent from '/app/error.tsx'")
+    expect(code).toContain('errorComponent: ErrorComponent')
+  })
+
+  it('includes both notFoundComponent and errorComponent when both paths are provided', () => {
+    const code = generateUnifiedClientEntry(
+      [mockRoute],
+      [],
+      '/app/not-found.tsx',
+      '/app/error.tsx',
+    )
+
+    expect(code).toContain("import NotFoundComponent from '/app/not-found.tsx'")
+    expect(code).toContain("import ErrorComponent from '/app/error.tsx'")
+    expect(code).toContain('notFoundComponent: NotFoundComponent')
+    expect(code).toContain('errorComponent: ErrorComponent')
+  })
 })
 
 describe('generateServerEntry with headPaths', () => {
   it('includes headPaths in route definitions', () => {
     const routeWithHeads: RouteDef = {
       ...mockRoute,
-      headPath: '/app/head.tsx',
       headPaths: ['/app/head.tsx'],
     }
     const code = generateServerEntry({ routes: [routeWithHeads] })
 
-    // head.tsx should be imported (mod index may vary based on registration order)
     expect(code).toContain("from '/app/head.tsx'")
     expect(code).toContain('headPaths:')
     expect(code).toContain('/app/head.tsx')
@@ -180,7 +204,6 @@ describe('generateServerEntry with headPaths', () => {
   it('registers all headPaths modules in moduleMap', () => {
     const routeWithMultipleHeads: RouteDef = {
       ...mockDynamicRoute,
-      headPath: '/app/blog/[slug]/head.tsx',
       headPaths: ['/app/head.tsx', '/app/blog/[slug]/head.tsx'],
     }
     const code = generateServerEntry({ routes: [routeWithMultipleHeads] })
@@ -200,6 +223,45 @@ describe('generateServerEntry with headPaths', () => {
 
     expect(code).toContain("from '/app/not-found.tsx'")
     expect(code).toContain("notFoundPath: '/app/not-found.tsx'")
+  })
+
+  it('includes errorPath in createRequestHandler when provided', () => {
+    const code = generateServerEntry({
+      routes: [mockRoute],
+      errorPath: '/app/error.tsx',
+    })
+
+    expect(code).toContain("from '/app/error.tsx'")
+    expect(code).toContain("errorPath: '/app/error.tsx'")
+  })
+
+  it('includes rootHeadPath in createRequestHandler when provided', () => {
+    const code = generateServerEntry({
+      routes: [mockRoute],
+      rootHeadPath: '/app/head.tsx',
+    })
+
+    expect(code).toContain("from '/app/head.tsx'")
+    expect(code).toContain("rootHeadPath: '/app/head.tsx'")
+  })
+
+  it('includes documentPath in createRequestHandler when provided', () => {
+    const code = generateServerEntry({
+      routes: [mockRoute],
+      documentPath: '/app/document.tsx',
+    })
+
+    expect(code).toContain("from '/app/document.tsx'")
+    expect(code).toContain("documentPath: '/app/document.tsx'")
+  })
+
+  it('registers document module in moduleMap', () => {
+    const code = generateServerEntry({
+      routes: [mockRoute],
+      documentPath: '/app/document.tsx',
+    })
+
+    expect(code).toContain("'/app/document.tsx':")
   })
 
   it('includes isResource flag in route definitions', () => {

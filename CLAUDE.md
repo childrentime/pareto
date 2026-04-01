@@ -1,3 +1,7 @@
+## Code Conventions
+
+- **No barrel files** — Do not create `index.ts` re-export files. Import directly from the source module (e.g. `from '../ndjson/reader'`, not `from '../ndjson'`). Barrel files add indirection without value.
+
 ## Design Context
 
 ### Users

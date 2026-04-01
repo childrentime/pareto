@@ -9,6 +9,8 @@ const ROUTE_FILES = {
   head: 'head.tsx',
   loader: 'loader.ts',
   notFound: 'not-found.tsx',
+  error: 'error.tsx',
+  document: 'document.tsx',
 } as const
 
 /**
@@ -40,12 +42,8 @@ function walkDir(
 ) {
   const entries = fs.readdirSync(currentDir, { withFileTypes: true })
 
-  const hasPage = entries.some(
-    (e) => e.isFile() && e.name === ROUTE_FILES.page,
-  )
-  const hasRoute = entries.some(
-    (e) => e.isFile() && e.name === ROUTE_FILES.route,
-  )
+  const hasPage = entries.some(e => e.isFile() && e.name === ROUTE_FILES.page)
+  const hasRoute = entries.some(e => e.isFile() && e.name === ROUTE_FILES.route)
 
   if (hasPage) {
     const route = buildRouteDef(baseDir, currentDir, parentSegments, false)
@@ -89,9 +87,9 @@ function buildRouteDef(
   }
 
   const isDynamic = segments.some(
-    (s) => isDynamicSegment(s) || isCatchAllSegment(s),
+    s => isDynamicSegment(s) || isCatchAllSegment(s),
   )
-  const isCatchAll = segments.some((s) => isCatchAllSegment(s))
+  const isCatchAll = segments.some(s => isCatchAllSegment(s))
 
   if (isResource) {
     // Resource route: route.ts only, no component/layout/loading/error/head
@@ -111,8 +109,8 @@ function buildRouteDef(
   }
 
   // Collect layout and head paths from root down to current dir
-  const layoutPaths = collectLayouts(baseDir, dir)
-  const headPaths = collectHeads(baseDir, dir)
+  const layoutPaths = collectAncestorFiles(baseDir, dir, ROUTE_FILES.layout)
+  const headPaths = collectAncestorFiles(baseDir, dir, ROUTE_FILES.head)
 
   return {
     path: urlPath,
@@ -121,7 +119,6 @@ function buildRouteDef(
     segments,
     componentPath: path.join(dir, ROUTE_FILES.page),
     layoutPaths,
-    headPath: filePath(ROUTE_FILES.head),
     headPaths,
     loaderPath: filePath(ROUTE_FILES.loader),
     isDynamic,
@@ -131,65 +128,36 @@ function buildRouteDef(
 }
 
 /**
- * Walk from baseDir to dir, collecting layout.tsx files along the way.
- * This gives us the nested layout chain for any route.
+ * Walk from baseDir to dir, collecting files with the given name along the way.
+ * Used for both layout.tsx and head.tsx ancestor chains.
  */
-function collectLayouts(baseDir: string, dir: string): string[] {
-  const layouts: string[] = []
+function collectAncestorFiles(
+  baseDir: string,
+  dir: string,
+  filename: string,
+): string[] {
+  const results: string[] = []
   let current = baseDir
 
-  // Always check baseDir itself
-  const rootLayout = path.join(baseDir, ROUTE_FILES.layout)
-  if (fs.existsSync(rootLayout)) {
-    layouts.push(rootLayout)
+  const rootFile = path.join(baseDir, filename)
+  if (fs.existsSync(rootFile)) {
+    results.push(rootFile)
   }
 
-  // Walk from baseDir to dir, checking each intermediate directory
   const relative = path.relative(baseDir, dir)
   if (relative) {
     const parts = relative.split(path.sep)
     for (const part of parts) {
       current = path.join(current, part)
       if (current === baseDir) continue
-      const layoutPath = path.join(current, ROUTE_FILES.layout)
-      if (fs.existsSync(layoutPath)) {
-        layouts.push(layoutPath)
+      const filePath = path.join(current, filename)
+      if (fs.existsSync(filePath)) {
+        results.push(filePath)
       }
     }
   }
 
-  return layouts
-}
-
-/**
- * Walk from baseDir to dir, collecting head.tsx files along the way.
- * This gives us the nested head chain for any route (similar to layouts).
- */
-function collectHeads(baseDir: string, dir: string): string[] {
-  const heads: string[] = []
-  let current = baseDir
-
-  // Always check baseDir itself
-  const rootHead = path.join(baseDir, ROUTE_FILES.head)
-  if (fs.existsSync(rootHead)) {
-    heads.push(rootHead)
-  }
-
-  // Walk from baseDir to dir, checking each intermediate directory
-  const relative = path.relative(baseDir, dir)
-  if (relative) {
-    const parts = relative.split(path.sep)
-    for (const part of parts) {
-      current = path.join(current, part)
-      if (current === baseDir) continue
-      const headPath = path.join(current, ROUTE_FILES.head)
-      if (fs.existsSync(headPath)) {
-        heads.push(headPath)
-      }
-    }
-  }
-
-  return heads
+  return results
 }
 
 /**
@@ -197,6 +165,31 @@ function collectHeads(baseDir: string, dir: string): string[] {
  */
 export function findNotFound(appDir: string): string | undefined {
   const p = path.join(appDir, ROUTE_FILES.notFound)
+  return fs.existsSync(p) ? p : undefined
+}
+
+/**
+ * Find error.tsx at the app root level.
+ */
+export function findError(appDir: string): string | undefined {
+  const p = path.join(appDir, ROUTE_FILES.error)
+  return fs.existsSync(p) ? p : undefined
+}
+
+/**
+ * Find head.tsx at the app root level (used for 404/error pages that have no matched route).
+ */
+export function findRootHead(appDir: string): string | undefined {
+  const p = path.join(appDir, ROUTE_FILES.head)
+  return fs.existsSync(p) ? p : undefined
+}
+
+/**
+ * Find document.tsx at the app root level.
+ * When present, its `getDocumentProps` export controls `<html>` attributes.
+ */
+export function findDocument(appDir: string): string | undefined {
+  const p = path.join(appDir, ROUTE_FILES.document)
   return fs.existsSync(p) ? p : undefined
 }
 
@@ -231,7 +224,7 @@ function buildPattern(segments: string[]): {
     return { pattern: /^\/$/, paramNames: [] }
   }
 
-  const patternParts = segments.map((segment) => {
+  const patternParts = segments.map(segment => {
     if (isCatchAllSegment(segment)) {
       const name = segment.slice(4, -1)
       paramNames.push(name)

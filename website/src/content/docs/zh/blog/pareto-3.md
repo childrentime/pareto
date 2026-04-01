@@ -54,6 +54,8 @@ Pareto 3.0 要求 **React 19**。你可以使用最新的 React 特性：
 | `loader.ts` | 独立的 loader 文件，用于服务端数据获取 |
 | `head.tsx` | 路由级 `<title>` 和 meta 标签 |
 | `not-found.tsx` | 404 页面（仅限根级） |
+| `error.tsx` | 错误页面 — 捕获 loader 和渲染错误 |
+| `document.tsx` | [文档定制](/zh/concepts/document-customization/) — `getDocumentProps()` 设置 `<html>` 属性 |
 | `route.ts` | 资源路由（JSON API，无 HTML） |
 
 **新增：`loader.ts`** — 你现在可以在独立文件中定义 loader，而不需要从 `page.tsx` 中导出。这样可以将数据获取逻辑与组件分离：
@@ -67,7 +69,7 @@ export function loader(ctx: LoaderContext) {
 }
 ```
 
-**变更：错误处理** — 错误处理现在通过 `ParetoErrorBoundary` 组件实现，而不是 `error.tsx` 约定文件。这让你更灵活 — 在组件树中需要的地方精确放置错误边界：
+**新增：`error.tsx`** — 在应用根目录创建 `error.tsx`，自定义 loader 抛出错误或渲染错误未被 `ParetoErrorBoundary` 捕获时的错误页面。对于组件级的错误隔离，可在组件树中任意位置使用 `ParetoErrorBoundary`：
 
 ```tsx
 import { ParetoErrorBoundary } from '@paretojs/core'
@@ -93,7 +95,7 @@ const { useStore, getState, setState } = defineStore((set) => ({
 }))
 ```
 
-Store API 支持直接解构、通过 `dehydrate()` / `hydrateStores()` 实现 SSR 序列化，以及 Context 作用域的 Store 用于每请求隔离。
+Store API 支持直接解构、自动 SSR 序列化，以及 Context 作用域的 Store 用于每请求隔离。
 
 ## 安全头
 
@@ -107,7 +109,7 @@ const app = express()
 app.use(securityHeaders())
 ```
 
-自动设置 `X-Content-Type-Options`、`X-Frame-Options`、`X-XSS-Protection`、`Referrer-Policy` 和 `Permissions-Policy` 头。
+自动设置 `X-Content-Type-Options`、`X-Frame-Options`、`Referrer-Policy`、`Permissions-Policy`、`Strict-Transport-Security` 和 `Cross-Origin-Opener-Policy` 头。
 
 ## CLI 变更
 
@@ -123,7 +125,7 @@ pareto start   # 启动生产服务器
 
 1. **更新依赖** — 安装 `@paretojs/core@3` 并更新到 React 19。
 2. **移除 Rspack 配置** — 删除自定义的 Rspack 配置文件，改用 `pareto.config.ts` 中的 `configureVite()`。
-3. **替换 `error.tsx`** — 移除 `error.tsx` 文件，在布局/页面中使用 `ParetoErrorBoundary` 代替。
+3. **更新错误处理** — `error.tsx` 现在是可选的，提供应用级错误页面。在布局/页面中使用 `ParetoErrorBoundary` 进行组件级错误隔离。
 4. **更新导入** — `@paretojs/core` 的 API 大体不变，但请对照 [API 参考](/zh/api/core/) 检查导入。
 5. **测试你的 loader** — Loader 行为未变，但需要验证数据获取在 Vite 开发服务器下正常工作。
 

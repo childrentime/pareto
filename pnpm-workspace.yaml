@@ -1,6 +1,8 @@
 packages:
   - 'packages/*'
   - 'examples'
+  - 'example-custom-server'
+  - 'benchmarks'
   - 'benchmarks/*'
   - 'website'
   - '!examples/react18'

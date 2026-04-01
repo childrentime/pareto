@@ -1,6 +1,6 @@
 ---
 title: 状态管理
-description: 基于 Immer 的内置响应式 Store，支持 SSR 序列化。
+description: 基于 Immer 的内置响应式 Store，支持按属性订阅。
 ---
 
 Pareto 内置了基于 Immer 的状态管理方案。无需额外依赖。
@@ -78,27 +78,6 @@ function useOrderTotal() {
 
 该 hook 通过代理 getter 订阅 `items`。当 `items` 变化时，组件重渲染并重新计算总额。不需要 `subscribe` 或 `useSyncExternalStore` — 只需 `useStore()` 加普通 JavaScript。
 
-## SSR 序列化是怎样工作的？
-
-对于 Context Store，SSR 水合是自动的。框架将 loader 数据序列化到 HTML 中，客户端通过 `useLoaderData()` 读取。将数据传递给 `<Provider initialData={data}>`，store 就会用服务端数据初始化，无需额外配置：
-
-```tsx
-export function loader(ctx: LoaderContext) {
-  return { products: getProducts() }
-}
-
-export default function Page() {
-  const data = useLoaderData()
-  return (
-    <Provider initialData={data}>
-      <ProductList />
-    </Provider>
-  )
-}
-```
-
-全局 Store（`defineStore`）仅在客户端运行 — 每次渲染时使用默认状态初始化。如需从服务端数据水合全局 Store，可以使用 `@paretojs/core/node` 的 `dehydrate()` 和 `@paretojs/core/store` 的 `hydrateStores()`。
-
 ## 什么是 Context Store？
 
 对于按请求隔离的状态（SSR 安全），使用 `defineContextStore`：
@@ -122,4 +101,18 @@ function App({ user }) {
     </Provider>
   )
 }
+
+function Dashboard() {
+  const { user, setUser } = useStore()
+  // ...
+}
 ```
+
+## 何时使用全局 Store 与 Context Store？
+
+- **全局 Store（`defineStore`）** — 适合不随请求变化的客户端状态：UI 主题、侧边栏开关、客户端缓存。在服务端，每次请求的初始状态相同，因此不存在跨请求数据污染的风险。
+- **Context Store（`defineContextStore`）** — 适合按请求隔离的状态：当前用户、认证令牌、按请求的 Feature Flag。因为 Context Store 作用域在 Provider 内，每次 SSR 请求都有自己的独立实例。
+
+如果不确定，从 `defineContextStore` 开始。它始终是 SSR 安全的。如果状态确实是共享且与请求无关的，之后可以切换到全局 Store。
+
+完整的 API 参考、类型签名和水合细节，请参阅 [Store API 页面](/zh/api/store/)。

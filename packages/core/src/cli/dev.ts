@@ -2,7 +2,8 @@ import express from 'express'
 import http from 'http'
 import net from 'net'
 import path from 'path'
-import { loadApp, loadConfig, resolveAppDir } from '../config'
+import { loadApp } from '../config/app'
+import { loadConfig, resolveAppDir } from '../config/load'
 import {
   findGlobalCss,
   paretoVirtualEntry,
@@ -50,10 +51,11 @@ export async function dev() {
 
   // Dynamic import to avoid CJS→ESM warning (vite is pure ESM)
   const { createServer: createViteServer } = await import('vite')
-  const react = (await import('@vitejs/plugin-react')).default
 
-  // Resolve @paretojs/core source aliases
-  const { getCoreSourceAliases } = await import('../config/vite')
+  // Resolve @paretojs/core source aliases and load React plugin
+  const { getCoreSourceAliases, loadReactPlugin } = await import(
+    '../config/vite'
+  )
   const aliases = getCoreSourceAliases()
 
   // Create Vite dev server in middleware mode
@@ -64,8 +66,13 @@ export async function dev() {
       hmr: { server: httpServer },
     },
     plugins: [
-      react(),
-      paretoVirtualEntry({ appDir, globalCssPaths, isDev: true }),
+      loadReactPlugin(),
+      paretoVirtualEntry({
+        appDir,
+        globalCssPaths,
+        isDev: true,
+        wkWebViewFlushHint: config.wkWebViewFlushHint,
+      }),
     ],
     resolve: { alias: aliases },
     appType: 'custom',

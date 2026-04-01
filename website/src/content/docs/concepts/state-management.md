@@ -1,9 +1,9 @@
 ---
 title: State Management
-description: Built-in reactive stores with Immer mutations and SSR serialization.
+description: Built-in reactive stores with Immer mutations and per-property subscriptions.
 ---
 
-Pareto includes a built-in state management solution powered by Immer. No extra dependencies needed. Stores are reactive, support direct destructuring, and serialize automatically for SSR hydration.
+Pareto includes a built-in state management solution powered by Immer. No extra dependencies needed. Stores are reactive and support direct destructuring with per-property subscriptions.
 
 ## defineStore
 
@@ -77,27 +77,6 @@ function useOrderTotal() {
 ```
 
 The hook subscribes to `items` via the proxy getter. When `items` changes, the component re-renders and the total is recomputed. No need for `subscribe` or `useSyncExternalStore` — just `useStore()` and plain JavaScript.
-
-## How does SSR serialization work?
-
-For context stores, SSR hydration is automatic. The loader data is serialized by the framework into the HTML, and on the client `useLoaderData()` reads it back. Pass it to `<Provider initialData={data}>` and the store initializes with the server-side data — no extra setup:
-
-```tsx
-export function loader(ctx: LoaderContext) {
-  return { products: getProducts() }
-}
-
-export default function Page() {
-  const data = useLoaderData()
-  return (
-    <Provider initialData={data}>
-      <ProductList />
-    </Provider>
-  )
-}
-```
-
-Global stores (`defineStore`) are client-only — they initialize with default state on every render. If you need to hydrate a global store from server data, `dehydrate()` and `hydrateStores()` are available from `@paretojs/core/node` and `@paretojs/core/store`.
 
 ## What are context stores?
 

@@ -1,0 +1,15 @@
+results-*.json
+ramp-results-*.json
+aggregated-results.json
+BENCHMARK-RESULTS.md
+RAMP-RESULTS.md
+*-output.txt
+node_modules/
+
+# Build outputs
+pareto/.pareto/
+nextjs/.next/
+remix/build/
+tanstack/.output/
+tanstack/.nitro/
+tanstack/node_modules/

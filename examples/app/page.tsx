@@ -76,7 +76,7 @@ export default function IndexPage() {
         </p>
         <div className="flex flex-wrap items-center gap-4">
           <a
-            href="https://github.com/childrentime/pareto"
+            href="https://paretojs.tech/guides/quick-start/"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center h-11 px-6 rounded-lg bg-stone-900 dark:bg-stone-100 text-stone-50 dark:text-stone-900 text-sm font-semibold hover:bg-stone-700 dark:hover:bg-stone-300 transition-colors"

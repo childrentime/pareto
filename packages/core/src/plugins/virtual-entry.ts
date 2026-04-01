@@ -4,8 +4,15 @@ import type { Plugin, ViteDevServer } from 'vite'
 import {
   generateServerEntry,
   generateUnifiedClientEntry,
+  toImportPath,
 } from '../entry/generate'
-import { findNotFound, scanRoutes } from '../router/route-scanner'
+import {
+  findDocument,
+  findError,
+  findNotFound,
+  findRootHead,
+  scanRoutes,
+} from '../router/route-scanner'
 import type { RouteDef, RouteManifest } from '../types'
 
 export const VIRTUAL_SERVER_ENTRY = 'virtual:pareto/server-entry'
@@ -26,11 +33,8 @@ export function findGlobalCss(appDir: string): string[] {
   return candidates.map(f => path.join(appDir, f)).filter(f => fs.existsSync(f))
 }
 
-/**
- * Convert an absolute file path to a URL relative to project root.
- */
 function toRootRelativeUrl(filePath: string): string {
-  return '/' + path.relative(process.cwd(), filePath).replace(/\\/g, '/')
+  return '/' + toImportPath(path.relative(process.cwd(), filePath))
 }
 
 export interface VirtualEntryOptions {
@@ -43,6 +47,8 @@ export interface VirtualEntryOptions {
   cssUrls?: string[]
   /** Per-route JS/CSS manifest (from Vite manifest, for production builds) */
   routeManifest?: RouteManifest
+  /** Forward wkWebViewFlushHint from ParetoConfig */
+  wkWebViewFlushHint?: boolean
 }
 
 /**
@@ -58,13 +64,20 @@ export function paretoVirtualEntry(options: VirtualEntryOptions): Plugin {
     clientEntryUrls: optClientEntryUrls,
     cssUrls: optCssUrls,
     routeManifest: optRouteManifest,
+    wkWebViewFlushHint = false,
   } = options
   let routes: RouteDef[] = []
   let notFoundPath: string | undefined
+  let errorPath: string | undefined
+  let rootHeadPath: string | undefined
+  let documentPath: string | undefined
 
   function rescanRoutes() {
     routes = scanRoutes(appDir)
     notFoundPath = findNotFound(appDir)
+    errorPath = findError(appDir)
+    rootHeadPath = findRootHead(appDir)
+    documentPath = findDocument(appDir)
   }
 
   return {
@@ -99,12 +112,21 @@ export function paretoVirtualEntry(options: VirtualEntryOptions): Plugin {
           globalCssPaths,
           cssUrls,
           notFoundPath,
+          errorPath,
+          rootHeadPath,
+          documentPath,
           routeManifest: optRouteManifest,
+          wkWebViewFlushHint,
         })
       }
 
       if (id === VIRTUAL_CLIENT_ENTRY) {
-        return generateUnifiedClientEntry(routes, globalCssPaths, notFoundPath)
+        return generateUnifiedClientEntry(
+          routes,
+          globalCssPaths,
+          notFoundPath,
+          errorPath,
+        )
       }
     },
 

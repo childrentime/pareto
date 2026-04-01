@@ -23,6 +23,7 @@ interface ParetoConfig {
   appDir?: string
   outDir?: string
   configureVite?: (config: UserConfig, context: { isServer: boolean }) => UserConfig
+  wkWebViewFlushHint?: boolean
 }
 ```
 
@@ -35,6 +36,10 @@ The directory containing your route files. Defaults to `app`.
 ### `outDir`
 
 The output directory for production builds. Defaults to `.pareto`.
+
+### `wkWebViewFlushHint`
+
+Inject a hidden element with 200+ zero-width characters into the HTML shell to force iOS WKWebView to begin rendering before the stream completes. WebKit delays first paint until visible text exceeds 200 characters, which can cause a white flash for minimal-text pages loaded inside native iOS apps. Has no visual effect and is ignored by screen readers. Only relevant for WKWebView — Safari and Chrome browsers are not affected. Defaults to `false`.
 
 ### `configureVite`
 

@@ -10,3 +10,12 @@ dist-bin
 .env.local
 .env.*.local
 .gstack/
+
+# Astro cache
+.astro/
+
+# Generated files
+website/public/llms.txt
+website/public/.well-known/llms.txt
+packages/core/docs/
+benchmarks/.results/

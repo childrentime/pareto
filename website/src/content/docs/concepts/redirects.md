@@ -117,4 +117,4 @@ This renders for both unmatched URLs and programmatic `notFound()` calls, with a
 
 - [Error Handling](/concepts/error-handling/) — How `ParetoErrorBoundary` works and when to use it vs. `not-found.tsx`.
 - [File-Based Routing](/concepts/routing/) — Where `not-found.tsx` fits in the route convention.
-- [Resource Routes](/concepts/resource-routes/) — Using `redirect()` and `notFound()` in API endpoints.
+- [Resource Routes](/concepts/resource-routes/) — JSON API endpoints via `route.ts`.

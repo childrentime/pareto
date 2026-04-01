@@ -1,101 +1,127 @@
 ---
 title: Head Management
-description: Per-route title and meta tags via head.tsx with automatic merging.
+description: Per-route title, meta tags, and scripts via head.tsx — a React component with full JSX support.
 ---
 
-Each route can export a `head()` function from `head.tsx` to set `<title>` and meta tags. Head descriptors are defined at each level of the route tree and automatically merged from root to page, so you set site-wide defaults once and override per-route as needed.
+Each route can export a default React component from `head.tsx` to set `<title>`, meta tags, scripts, and other head elements. Head components are defined at each level of the route tree and rendered from root to page, so you set site-wide defaults once and override per-route as needed.
 
 ## head.tsx
 
+Head files export a default React component that returns JSX. React 19 automatically hoists `<title>`, `<meta>`, and `<link>` tags into the document `<head>`.
+
 ```tsx
 // app/head.tsx (root — applies to all pages)
-import type { HeadDescriptor } from '@paretojs/core'
-
-export function head(): HeadDescriptor {
-  return {
-    title: 'My App',
-    meta: [
-      { name: 'description', content: 'My awesome app.' },
-    ],
-  }
+export default function Head() {
+  return (
+    <>
+      <title>My App</title>
+      <meta name="description" content="My awesome app." />
+    </>
+  )
 }
 ```
 
 ```tsx
 // app/blog/head.tsx (overrides title for /blog)
-export function head(): HeadDescriptor {
-  return {
-    title: 'Blog — My App',
-    meta: [
-      { name: 'description', content: 'Read our latest posts.' },
-    ],
-  }
+export default function Head() {
+  return (
+    <>
+      <title>Blog — My App</title>
+      <meta name="description" content="Read our latest posts." />
+    </>
+  )
 }
 ```
 
-## HeadDescriptor
+## HeadProps
+
+Head components receive loader data and route params as props:
 
 ```tsx
-interface HeadDescriptor {
-  title?: string
-  meta?: Record<string, string>[]
-  link?: Record<string, string>[]
+import type { HeadProps } from '@paretojs/core'
+
+interface HeadProps {
+  loaderData: unknown
+  params: Record<string, string>
 }
 ```
 
-## Merging behavior
+## Rendering behavior
 
-Head descriptors merge from root to page:
-- **title**: last one wins (deepest route overrides)
-- **meta**: deduplicated by `name` or `property` (deepest wins)
-- **link**: deduplicated by `rel` + `href`
+Head components render from root to page. When multiple components render the same tag, the browser uses the last one — so the deepest route's `<title>` wins automatically.
 
-This means your root `head.tsx` can define defaults (charset, viewport, site-wide meta), and individual routes override only what they need. You do not have to repeat the full set of tags on every page.
+This means your root `head.tsx` can define defaults (site-wide meta, scripts), and individual routes override only what they need.
+
+## Inline scripts
+
+You can include inline scripts directly in head.tsx. This is useful for things like dark mode initialization that must run before paint:
+
+```tsx
+export default function Head() {
+  return (
+    <>
+      <title>My App</title>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `(function(){
+            try {
+              var t = localStorage.getItem('theme');
+              if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme:dark)').matches))
+                document.documentElement.classList.add('dark')
+            } catch(e) {}
+          })()`,
+        }}
+      />
+    </>
+  )
+}
+```
+
+Note: inline scripts are rendered in the `<head>` during SSR but are **not** hoisted by React 19 during client-side navigation. This is fine for initialization scripts that only need to run once on page load.
 
 ## OG and Twitter card meta tags
 
-Use the `property` key for Open Graph tags and the `name` key for Twitter cards:
+Use the `property` attribute for Open Graph tags and the `name` attribute for Twitter cards:
 
 ```tsx
-export function head(): HeadDescriptor {
-  return {
-    title: 'My Blog Post — My App',
-    meta: [
-      { name: 'description', content: 'A deep dive into streaming SSR.' },
-      // Open Graph
-      { property: 'og:title', content: 'My Blog Post' },
-      { property: 'og:description', content: 'A deep dive into streaming SSR.' },
-      { property: 'og:image', content: 'https://example.com/og-image.png' },
-      { property: 'og:type', content: 'article' },
-      // Twitter Card
-      { name: 'twitter:card', content: 'summary_large_image' },
-      { name: 'twitter:title', content: 'My Blog Post' },
-      { name: 'twitter:description', content: 'A deep dive into streaming SSR.' },
-      { name: 'twitter:image', content: 'https://example.com/og-image.png' },
-    ],
-  }
+export default function Head() {
+  return (
+    <>
+      <title>My Blog Post — My App</title>
+      <meta name="description" content="A deep dive into streaming SSR." />
+      {/* Open Graph */}
+      <meta property="og:title" content="My Blog Post" />
+      <meta property="og:description" content="A deep dive into streaming SSR." />
+      <meta property="og:image" content="https://example.com/og-image.png" />
+      <meta property="og:type" content="article" />
+      {/* Twitter Card */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="My Blog Post" />
+      <meta name="twitter:description" content="A deep dive into streaming SSR." />
+      <meta name="twitter:image" content="https://example.com/og-image.png" />
+    </>
+  )
 }
 ```
 
-Because meta tags are deduplicated by `name` or `property`, a deeper route's OG tags automatically replace those set by a parent. This makes it straightforward to define site-wide fallback OG images in the root `head.tsx` and override them on specific pages.
-
 ## Dynamic head based on loader data
 
-The `head()` function receives the loader data for its route, so you can set titles and meta tags based on server-fetched content:
+The Head component receives the loader data for its route, so you can set titles and meta tags based on server-fetched content:
 
 ```tsx
 // app/blog/[slug]/head.tsx
-import type { HeadDescriptor } from '@paretojs/core'
+import type { HeadProps } from '@paretojs/core'
 
-export function head({ loaderData, params }: { loaderData: { post: { title: string; excerpt: string } }; params: Record<string, string> }): HeadDescriptor {
-  return {
-    title: `${loaderData.post.title} — My App`,
-    meta: [
-      { name: 'description', content: loaderData.post.excerpt },
-      { property: 'og:title', content: loaderData.post.title },
-      { property: 'og:description', content: loaderData.post.excerpt },
-    ],
-  }
+export default function Head({ loaderData, params }: HeadProps) {
+  const post = (loaderData as { post: { title: string; excerpt: string } }).post
+  return (
+    <>
+      <title>{`${post.title} — My App`}</title>
+      <meta name="description" content={post.excerpt} />
+      <meta property="og:title" content={post.title} />
+      <meta property="og:description" content={post.excerpt} />
+    </>
+  )
 }
 ```
 
@@ -103,26 +129,26 @@ This pattern is essential for dynamic pages like blog posts, product pages, or u
 
 ## Adding external resources with link
 
-Use the `link` array to add stylesheets, favicons, or preload hints:
+Use `<link>` tags for stylesheets, favicons, or preload hints:
 
 ```tsx
-export function head(): HeadDescriptor {
-  return {
-    title: 'My App',
-    link: [
-      { rel: 'icon', href: '/favicon.ico' },
-      { rel: 'canonical', href: 'https://example.com/' },
-      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-    ],
-  }
+export default function Head() {
+  return (
+    <>
+      <title>My App</title>
+      <link rel="icon" href="/favicon.ico" />
+      <link rel="canonical" href="https://example.com/" />
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+    </>
+  )
 }
 ```
 
 ## Client-side navigation
 
-When navigating between pages, the title and meta tags update automatically — no full page reload needed. Pareto diffs the outgoing and incoming head descriptors and patches the DOM accordingly.
+During client-side navigation, Head components are lazy-loaded and rendered into the component tree. React 19 automatically hoists `<title>`, `<meta>`, and `<link>` tags into the document `<head>` — no manual DOM manipulation needed.
 
 ## Related
 
 - [File-Based Routing](/concepts/routing/) — Where to place `head.tsx` files in the route tree.
-- [@paretojs/core API](/api/core/) — `HeadDescriptor` type reference and `mergeHeadDescriptors` helper.
+- [@paretojs/core API](/api/core/) — `HeadProps` and `HeadComponent` type reference.

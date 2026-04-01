@@ -122,3 +122,27 @@ function ErrorFallback({ error }: { error: Error }) {
   )
 }
 ```
+
+## 应用级错误页面
+
+对于未被任何 `ParetoErrorBoundary` 捕获的错误，创建 `app/error.tsx` 来显示自定义错误页面：
+
+```tsx
+// app/error.tsx
+export default function ErrorPage({ error }: { error: Error }) {
+  return (
+    <div>
+      <h1>出错了</h1>
+      <p>{error.message}</p>
+    </div>
+  )
+}
+```
+
+这是可选的 — 如果没有 `error.tsx`，Pareto 会显示内置的默认回退。使用 `ParetoErrorBoundary` 进行细粒度的组件级错误隔离，使用 `error.tsx` 作为兜底错误页面。
+
+## 相关
+
+- [重定向与 404](/zh/concepts/redirects/) — 使用 `notFound()` 处理预期的资源不存在情况。
+- [流式 SSR](/zh/concepts/streaming/) — 被拒绝的延迟 Promise 会被最近的 `ParetoErrorBoundary` 捕获。
+- [@paretojs/core API](/zh/api/core/) — `ParetoErrorBoundary` 的完整 API 参考。

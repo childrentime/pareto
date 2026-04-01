@@ -1,10 +1,12 @@
 import { createContext, useContext } from 'react'
 
+const NO_LOADER_DATA = Symbol('NO_LOADER_DATA')
+
 /**
  * Context that holds loader data for the current route segment.
  * Each segment in the nested layout chain gets its own provider.
  */
-export const LoaderDataContext = createContext<unknown>(undefined)
+export const LoaderDataContext = createContext<unknown>(NO_LOADER_DATA)
 
 /**
  * Access the loader data for the current route segment.
@@ -22,7 +24,7 @@ export const LoaderDataContext = createContext<unknown>(undefined)
  */
 export function useLoaderData<T = unknown>(): T {
   const data = useContext(LoaderDataContext)
-  if (data === undefined) {
+  if (data === NO_LOADER_DATA) {
     throw new Error(
       'useLoaderData must be used inside a route component. ' +
         'Make sure the component is rendered by the Pareto router.',

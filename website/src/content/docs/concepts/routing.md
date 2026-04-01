@@ -16,6 +16,8 @@ Each directory in your `app/` folder can contain special convention files that c
 | `loader.ts` | Separate loader file for server-side data fetching |
 | `head.tsx` | Per-route [`<title>` and meta tags](/concepts/head-management/) |
 | `not-found.tsx` | 404 page (root level only) |
+| `error.tsx` | Error page — catches loader and render errors (root level only) |
+| `document.tsx` | [Document customization](/concepts/document-customization/) — `getDocumentProps()` for `<html>` attributes (root level only) |
 | `route.ts` | [Resource route](/concepts/resource-routes/) (JSON API, no HTML) |
 
 ## How does file-to-URL mapping work?

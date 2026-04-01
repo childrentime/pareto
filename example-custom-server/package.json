@@ -1,0 +1,27 @@
+{
+  "name": "pareto-example-custom-server",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "pareto dev",
+    "build": "NODE_ENV=production pareto build",
+    "start": "NODE_ENV=production pareto start",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@paretojs/core": "workspace:*",
+    "@reactuses/core": "^6.3.0",
+    "express": "^4.21.0",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/express": "^5.0.0",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.0"
+  }
+}

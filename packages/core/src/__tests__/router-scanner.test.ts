@@ -1,8 +1,14 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import fs from 'fs'
-import path from 'path'
 import os from 'os'
-import { scanRoutes, findNotFound } from '../router/route-scanner'
+import path from 'path'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import {
+  findDocument,
+  findError,
+  findNotFound,
+  findRootHead,
+  scanRoutes,
+} from '../router/route-scanner'
 
 let tmpDir: string
 
@@ -14,7 +20,10 @@ afterEach(() => {
   fs.rmSync(tmpDir, { recursive: true })
 })
 
-function createFile(relativePath: string, content = 'export default function(){}') {
+function createFile(
+  relativePath: string,
+  content = 'export default function(){}',
+) {
   const fullPath = path.join(tmpDir, relativePath)
   fs.mkdirSync(path.dirname(fullPath), { recursive: true })
   fs.writeFileSync(fullPath, content)
@@ -28,7 +37,7 @@ describe('scanRoutes', () => {
     const routes = scanRoutes(tmpDir)
     expect(routes).toHaveLength(2)
 
-    const paths = routes.map((r) => r.path)
+    const paths = routes.map(r => r.path)
     expect(paths).toContain('/home')
     expect(paths).toContain('/about')
   })
@@ -68,28 +77,42 @@ describe('scanRoutes', () => {
     const routes = scanRoutes(tmpDir)
     expect(routes).toHaveLength(2)
 
-    const paths = routes.map((r) => r.path)
+    const paths = routes.map(r => r.path)
     expect(paths).toContain('/pricing')
     expect(paths).toContain('/about')
     // No "(marketing)" in the URL
-    expect(paths.every((p) => !p.includes('marketing'))).toBe(true)
+    expect(paths.every(p => !p.includes('marketing'))).toBe(true)
   })
 
   it('should collect layout paths from parent directories', () => {
-    createFile('layout.tsx', 'export default function Root({children}){return children}')
-    createFile('dashboard/layout.tsx', 'export default function DashLayout({children}){return children}')
+    createFile(
+      'layout.tsx',
+      'export default function Root({children}){return children}',
+    )
+    createFile(
+      'dashboard/layout.tsx',
+      'export default function DashLayout({children}){return children}',
+    )
     createFile('dashboard/settings/page.tsx')
 
     const routes = scanRoutes(tmpDir)
     expect(routes).toHaveLength(1)
     expect(routes[0].layoutPaths).toHaveLength(2)
     expect(routes[0].layoutPaths[0]).toContain('layout.tsx')
-    expect(routes[0].layoutPaths[1]).toContain(path.join('dashboard', 'layout.tsx'))
+    expect(routes[0].layoutPaths[1]).toContain(
+      path.join('dashboard', 'layout.tsx'),
+    )
   })
 
   it('should collect headPaths from parent directories', () => {
-    createFile('head.tsx', 'export function head() { return { title: "Root" } }')
-    createFile('blog/head.tsx', 'export function head() { return { title: "Blog" } }')
+    createFile(
+      'head.tsx',
+      'export function head() { return { title: "Root" } }',
+    )
+    createFile(
+      'blog/head.tsx',
+      'export function head() { return { title: "Blog" } }',
+    )
     createFile('blog/page.tsx')
 
     const routes = scanRoutes(tmpDir)
@@ -106,13 +129,13 @@ describe('scanRoutes', () => {
     expect(routes[0].headPaths).toHaveLength(0)
   })
 
-  it('should set headPath for co-located head.tsx', () => {
+  it('should set headPaths for co-located head.tsx', () => {
     createFile('home/page.tsx')
     createFile('home/head.tsx')
 
     const routes = scanRoutes(tmpDir)
-    expect(routes[0].headPath).toBeTruthy()
     expect(routes[0].headPaths).toHaveLength(1)
+    expect(routes[0].headPaths[0]).toContain('head.tsx')
   })
 })
 
@@ -128,7 +151,54 @@ describe('findNotFound', () => {
     const result = findNotFound(tmpDir)
     expect(result).toBeUndefined()
   })
+})
 
+describe('findError', () => {
+  it('should find error.tsx at app root', () => {
+    createFile('error.tsx', 'export default function ErrorPage({ error }) {}')
+    const result = findError(tmpDir)
+    expect(result).toBeTruthy()
+    expect(result).toContain('error.tsx')
+  })
+
+  it('should return undefined when error.tsx does not exist', () => {
+    const result = findError(tmpDir)
+    expect(result).toBeUndefined()
+  })
+})
+
+describe('findRootHead', () => {
+  it('should find head.tsx at app root', () => {
+    createFile('head.tsx', 'export default function Head() { return null }')
+    const result = findRootHead(tmpDir)
+    expect(result).toBeTruthy()
+    expect(result).toContain('head.tsx')
+  })
+
+  it('should return undefined when head.tsx does not exist', () => {
+    const result = findRootHead(tmpDir)
+    expect(result).toBeUndefined()
+  })
+})
+
+describe('findDocument', () => {
+  it('should find document.tsx at app root', () => {
+    createFile(
+      'document.tsx',
+      'export function getDocumentProps() { return { lang: "en" } }',
+    )
+    const result = findDocument(tmpDir)
+    expect(result).toBeTruthy()
+    expect(result).toContain('document.tsx')
+  })
+
+  it('should return undefined when document.tsx does not exist', () => {
+    const result = findDocument(tmpDir)
+    expect(result).toBeUndefined()
+  })
+})
+
+describe('route sorting and resource routes', () => {
   it('should sort: static first, dynamic second, catch-all last', () => {
     createFile('about/page.tsx')
     createFile('[id]/page.tsx')
@@ -182,6 +252,19 @@ describe('findNotFound', () => {
     const routes = scanRoutes(tmpDir)
     expect(routes).toHaveLength(1)
     expect(routes[0]).not.toHaveProperty('actionPath')
+  })
+
+  it('should handle optional catch-all segments [[...slug]]', () => {
+    createFile('docs/[[...slug]]/page.tsx')
+
+    const routes = scanRoutes(tmpDir)
+    expect(routes).toHaveLength(1)
+    expect(routes[0].isDynamic).toBe(true)
+    expect(routes[0].isCatchAll).toBe(false)
+    expect(routes[0].paramNames).toContain('slug')
+    expect(routes[0].path).toContain(':slug*')
+    expect(routes[0].pattern.test('/docs/')).toBe(true)
+    expect(routes[0].pattern.test('/docs/a/b/c')).toBe(true)
   })
 
   it('should skip hidden directories and node_modules', () => {

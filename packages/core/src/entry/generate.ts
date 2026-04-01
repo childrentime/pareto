@@ -1,7 +1,5 @@
 import type { RouteDef } from '../types'
 
-export { scanRoutes } from '../router/route-scanner'
-
 /**
  * Convert a route path to a safe identifier name for generated code.
  */
@@ -13,7 +11,7 @@ function routePathToName(routePath: string): string {
 /**
  * Normalize a file path to use forward slashes (for import statements).
  */
-function toImportPath(filePath: string): string {
+export function toImportPath(filePath: string): string {
   return filePath.replace(/\\/g, '/')
 }
 
@@ -30,7 +28,11 @@ export function generateServerEntry(options: {
   globalCssPaths?: string[]
   cssUrls?: string[]
   notFoundPath?: string
+  errorPath?: string
+  rootHeadPath?: string
+  documentPath?: string
   routeManifest?: { routes: Record<string, unknown> }
+  wkWebViewFlushHint?: boolean
 }): string {
   const {
     routes,
@@ -38,7 +40,11 @@ export function generateServerEntry(options: {
     globalCssPaths = [],
     cssUrls = [],
     notFoundPath,
+    errorPath,
+    rootHeadPath,
+    documentPath,
     routeManifest,
+    wkWebViewFlushHint = false,
   } = options
 
   // Collect all unique module paths and deduplicate imports
@@ -57,14 +63,28 @@ export function generateServerEntry(options: {
   for (const route of routes) {
     ensureModule(route.componentPath)
     if (route.loaderPath) ensureModule(route.loaderPath)
-    if (route.headPath) ensureModule(route.headPath)
-    for (const hp of route.headPaths ?? []) ensureModule(hp)
+    for (const hp of route.headPaths) ensureModule(hp)
     for (const lp of route.layoutPaths) ensureModule(lp)
   }
 
   // Register not-found module if available
   if (notFoundPath) {
     ensureModule(notFoundPath)
+  }
+
+  // Register error module if available
+  if (errorPath) {
+    ensureModule(errorPath)
+  }
+
+  // Register root head module if available (used for 404/error pages)
+  if (rootHeadPath) {
+    ensureModule(rootHeadPath)
+  }
+
+  // Register document module if available (provides getDocumentProps)
+  if (documentPath) {
+    ensureModule(documentPath)
   }
 
   // Generate import statements
@@ -80,9 +100,6 @@ export function generateServerEntry(options: {
   // Generate route definitions (RouteDef-compatible)
   const routeDefs = routes.map(route => {
     const optional = [
-      route.headPath && `headPath: '${toImportPath(route.headPath)}'`,
-      route.headPaths?.length &&
-        `headPaths: ${JSON.stringify(route.headPaths.map(toImportPath))}`,
       route.loaderPath && `loaderPath: '${toImportPath(route.loaderPath)}'`,
     ]
       .filter(Boolean)
@@ -96,6 +113,7 @@ export function generateServerEntry(options: {
     segments: ${JSON.stringify(route.segments)},
     componentPath: '${toImportPath(route.componentPath)}',
     layoutPaths: ${JSON.stringify(route.layoutPaths.map(toImportPath))},
+    headPaths: ${JSON.stringify(route.headPaths.map(toImportPath))},
 ${optional}
     isDynamic: ${route.isDynamic},
     isCatchAll: ${route.isCatchAll},
@@ -124,7 +142,7 @@ export default createRequestHandler({
   manifest: ${routeManifest ? JSON.stringify(routeManifest) : '{ routes: {} }'},
   requireModule: (p) => moduleMap[p],
   clientEntry: ${JSON.stringify(clientEntryUrls)},
-  cssUrls: ${JSON.stringify(cssUrls)},${notFoundPath ? `\n  notFoundPath: '${toImportPath(notFoundPath)}',` : ''}
+  cssUrls: ${JSON.stringify(cssUrls)},${notFoundPath ? `\n  notFoundPath: '${toImportPath(notFoundPath)}',` : ''}${errorPath ? `\n  errorPath: '${toImportPath(errorPath)}',` : ''}${rootHeadPath ? `\n  rootHeadPath: '${toImportPath(rootHeadPath)}',` : ''}${documentPath ? `\n  documentPath: '${toImportPath(documentPath)}',` : ''}${wkWebViewFlushHint ? `\n  wkWebViewFlushHint: true,` : ''}
 });
 `
 }
@@ -138,6 +156,7 @@ export function generateUnifiedClientEntry(
   routes: RouteDef[],
   globalCssPaths: string[] = [],
   notFoundPath?: string,
+  errorPath?: string,
 ): string {
   const lazyImports: string[] = []
   const routeMap: string[] = []
@@ -174,8 +193,13 @@ export function generateUnifiedClientEntry(
       lp => layoutPathMap.get(toImportPath(lp))!,
     )
 
+    const headLoadersStr =
+      route.headPaths.length > 0
+        ? `, headLoaders: [${route.headPaths.map(hp => `() => import('${toImportPath(hp)}')`).join(', ')}]`
+        : ''
+
     routeMap.push(
-      `  { path: '${route.path}', load: ${varName}, name: '${name}', hasLoader: ${!!route.loaderPath || 'false'}, paramNames: ${JSON.stringify(route.paramNames)}, layouts: [${layouts.join(', ')}] }`,
+      `  { path: '${route.path}', load: ${varName}, name: '${name}', hasLoader: ${!!route.loaderPath || 'false'}, paramNames: ${JSON.stringify(route.paramNames)}, layouts: [${layouts.join(', ')}]${headLoadersStr} }`,
     )
   })
 
@@ -184,14 +208,24 @@ export function generateUnifiedClientEntry(
   const notFoundImport = notFoundPath
     ? `import NotFoundComponent from '${toImportPath(notFoundPath)}';`
     : ''
-  const notFoundArg = notFoundPath
-    ? ', { notFoundComponent: NotFoundComponent }'
+  const errorImport = errorPath
+    ? `import ErrorComponent from '${toImportPath(errorPath)}';`
     : ''
+
+  const optionsEntries = [
+    notFoundPath && 'notFoundComponent: NotFoundComponent',
+    errorPath && 'errorComponent: ErrorComponent',
+  ].filter(Boolean)
+  const optionsArg = optionsEntries.length
+    ? `, { ${optionsEntries.join(', ')} }`
+    : ''
+
+  const extraImports = [notFoundImport, errorImport].filter(Boolean).join('\n')
 
   return `// Auto-generated by @paretojs/core -- do not edit
 import { startClient } from '@paretojs/core/client';
 ${allImports.join('\n')}
-${notFoundImport ? notFoundImport + '\n' : ''}${cssImports.length > 0 ? '\n' + cssImports.join('\n') : ''}
+${extraImports ? extraImports + '\n' : ''}${cssImports.length > 0 ? '\n' + cssImports.join('\n') : ''}
 
 ${lazyImports.join('\n')}
 
@@ -199,17 +233,6 @@ const routes = [
 ${routeMap.join(',\n')}
 ];
 
-startClient(routes${notFoundArg});
-`
-}
-
-/**
- * Generate a per-page client entry for initial hydration.
- */
-export function generateClientEntry(route: RouteDef): string {
-  return `// Auto-generated by @paretojs/core -- do not edit
-import { hydrateApp } from '@paretojs/core/client';
-import * as PageModule from '${toImportPath(route.componentPath)}';
-hydrateApp(PageModule);
+startClient(routes${optionsArg});
 `
 }

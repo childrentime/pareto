@@ -82,3 +82,15 @@ export default function RootLayout({ children }: PropsWithChildren) {
 npm run build   # 构建
 npm run start   # 启动生产服务器
 ```
+
+## 下一步
+
+应用运行后，探索核心概念：
+
+- **[基于文件的路由](/zh/concepts/routing/)** — 了解 `page.tsx`、`layout.tsx`、`loader.ts`、动态路由和通配路由的约定。
+- **[流式 SSR](/zh/concepts/streaming/)** — 使用 `defer()` 和 `<Await>` 流式传输慢数据，不阻塞首屏加载。
+- **[状态管理](/zh/concepts/state-management/)** — 使用 `defineStore()` 和 `defineContextStore()` 管理全局和按请求的状态。
+- **[Head 管理](/zh/concepts/head-management/)** — 通过 `head.tsx` 为每个路由设置 `<title>` 和 meta 标签。
+- **[错误处理](/zh/concepts/error-handling/)** — 使用 `ParetoErrorBoundary` 在布局和页面中捕获渲染错误。
+- **[资源路由](/zh/concepts/resource-routes/)** — 使用 `route.ts` 创建 JSON API 端点。
+- **[配置](/zh/api/config/)** — 通过 `pareto.config.ts` 自定义 Express 服务器、Vite 构建和 CLI 选项。

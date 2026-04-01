@@ -1,6 +1,7 @@
-import path from 'path'
 import fs from 'fs'
-import { loadConfig, resolveOutDir } from '../config'
+import { createRequire } from 'module'
+import path from 'path'
+import { loadConfig, resolveOutDir } from '../config/load'
 
 export async function start() {
   const cwd = process.cwd()
@@ -15,6 +16,6 @@ export async function start() {
     process.exit(1)
   }
 
-  // The production server entry handles its own graceful shutdown
-  require(serverEntry)
+  const _require = createRequire(import.meta.url ?? __filename)
+  _require(serverEntry)
 }

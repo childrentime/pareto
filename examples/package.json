@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@paretojs/core": "workspace:*",
+    "@reactuses/core": "^6.3.0",
     "express": "^4.21.0",
     "react": "catalog:",
     "react-dom": "catalog:"

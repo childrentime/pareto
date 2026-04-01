@@ -1,4 +1,5 @@
 import { use } from 'react'
+import serialize from 'serialize-javascript'
 
 interface DeferredScriptProps {
   dataKey: string
@@ -12,17 +13,19 @@ interface DeferredScriptProps {
  */
 export function DeferredScript({ dataKey, promise }: DeferredScriptProps) {
   const data = use(promise)
-  const serialized = JSON.stringify(data)
+  const serializedKey = serialize(dataKey, { isJSON: true })
+  const serializedData = serialize(data, { isJSON: true })
 
   return (
     <script
       suppressHydrationWarning
       dangerouslySetInnerHTML={{
-        __html: `(function(){` +
+        __html:
+          `(function(){` +
           `var d=window.__ROUTE_DATA__;` +
           `if(!d)d=window.__ROUTE_DATA__={};` +
-          `d[${JSON.stringify(dataKey)}]=${serialized};` +
-          `var e=new CustomEvent("pareto:deferred",{detail:${JSON.stringify(dataKey)}});` +
+          `d[${serializedKey}]=${serializedData};` +
+          `var e=new CustomEvent("pareto:deferred",{detail:${serializedKey}});` +
           `document.dispatchEvent(e);` +
           `})()`,
       }}

@@ -1,176 +1,93 @@
-# Pareto
+<p align="center">
+  <a href="https://paretojs.tech">
+    <h1 align="center">Pareto</h1>
+  </a>
+</p>
 
-Lightweight React SSR framework built on Vite — streaming, file-based routing, client-side navigation, and built-in state management.
+<p align="center">
+  Lightweight, streaming-first React SSR framework built on Vite.
+</p>
 
-## Quick Start
+<p align="center">
+  <a href="https://paretojs.tech/guides/introduction">Documentation</a>
+  ·
+  <a href="https://github.com/childrentime/pareto/blob/main/CHANGELOG.md">Changelog</a>
+  ·
+  <a href="https://github.com/childrentime/pareto/issues">Issues</a>
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@paretojs/core"><img src="https://img.shields.io/npm/v/@paretojs/core.svg" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/@paretojs/core"><img src="https://img.shields.io/npm/dm/@paretojs/core.svg" alt="npm downloads"></a>
+  <a href="https://github.com/childrentime/pareto/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@paretojs/core.svg" alt="license"></a>
+</p>
+
+## Getting Started
+
+Visit [https://paretojs.tech/guides/introduction](https://paretojs.tech/guides/introduction) to get started with Pareto.
+
+## What is Pareto?
+
+Pareto is a lightweight React SSR framework that prioritizes streaming. Built on Vite for instant dev starts, it provides file-based routing, NDJSON streaming for client navigation, per-route head management via React components, and Immer-powered state with automatic SSR hydration.
 
 ```bash
 npx create-pareto my-app
-cd my-app
-npm install
-npm run dev
+cd my-app && npm install && npm run dev
 ```
 
-Or with pnpm:
+## Performance
 
-```bash
-pnpm create pareto my-app
-```
+Pareto is built for throughput. In CI benchmarks against Next.js, React Router, and TanStack Start on identical hardware (Node 22, Ubuntu, 4 CPUs):
+
+| Scenario | Pareto | Next.js | React Router | TanStack Start |
+|---|---:|---:|---:|---:|
+| **Data Loading** | **2,733/s** | 293/s | 955/s | 1,386/s |
+| **Streaming SSR** | **247/s** | 236/s | 247/s | 247/s |
+| **API / JSON** | **3,675/s** | 2,212/s | 1,950/s | — |
+| **Static SSR** | 2,224/s | **3,328/s** | 997/s | 2,009/s |
+
+Under ramp-up load (1→1000 concurrent connections), Pareto sustains the highest QPS before hitting the p99 < 500ms threshold:
+
+| Scenario | Pareto | Next.js | React Router | TanStack Start |
+|---|---:|---:|---:|---:|
+| **Data Loading** | **2,735/s** | 331/s | 1,044/s | 1,458/s |
+| **Streaming SSR** | **2,022/s** | 310/s | 807/s | 960/s |
+| **API / JSON** | **3,556/s** | 1,419/s | 1,912/s | — |
+
+Client JS sent to the browser: **62 KB** gzipped (vs Next.js 233 KB, React Router 100 KB, TanStack Start 101 KB).
+
+In practice: a data-loading page serving 2,000 req/s at peak needs **1 Pareto server** vs **6 Next.js instances**. For streaming SSR, it's 1 vs 7.
+
+> Benchmark details: [PR #12](https://github.com/childrentime/pareto/pull/12)
 
 ## Features
 
-- **SSR & Streaming** — Server-render pages instantly. Use `defer()` to stream slow data through Suspense boundaries.
-- **File-Based Routing** — `page.tsx`, `layout.tsx`, `loader.ts`, `head.tsx`, `not-found.tsx` conventions.
-- **Dynamic Routes** — `[param]`, `[...slug]`, `[[...optional]]` segments for dynamic URL matching.
-- **Route Groups** — `(groupName)` directories to organize routes without affecting the URL.
-- **Client-Side Navigation** — `<Link>` component and `useRouter()` hook for SPA-style navigation with prefetching.
-- **State Management** — Reactive stores powered by Immer. `defineStore()` and `defineContextStore()` with SSR hydration.
-- **Head Management** — Per-route `<title>` and meta tags via `head.tsx`. Nested heads merge automatically.
-- **Resource Routes** — `route.ts` files return JSON directly (no HTML rendering).
-- **Redirect & 404** — `throw redirect('/login')` and `throw notFound()` in loaders.
-- **Security Headers** — Built-in OWASP baseline security headers middleware.
-- **Environment Variables** — `.env` / `.env.local` / `.env.{mode}` support out of the box.
+- **Streaming SSR** — `renderToPipeableStream` with `defer()` for progressive data delivery through Suspense
+- **Vite-powered** — Instant dev starts, React Fast Refresh, native ESM in development
+- **File-based routing** — `page.tsx` · `layout.tsx` · `loader.ts` · `head.tsx` · `document.tsx` · `not-found.tsx`
+- **Client navigation** — SPA-feel `<Link>` with prefetching, backed by NDJSON streaming
+- **Head management** — Per-route `head.tsx` React components with nested merge and deduplication
+- **State management** — Immer-powered `defineStore()` and `defineContextStore()` with automatic SSR hydration
+- **TypeScript-first** — Full type safety across loaders, pages, and configuration
+- **Security headers** — Built-in OWASP baseline middleware
 
-## Project Structure
+## Documentation
 
-```
-app/
-  layout.tsx          # Root layout (wraps all pages)
-  page.tsx            # Homepage (/)
-  head.tsx            # Root head tags
-  not-found.tsx       # 404 page
-  blog/
-    layout.tsx        # Blog layout (nests inside root)
-    page.tsx          # /blog
-    head.tsx          # Blog head tags
-    [slug]/
-      page.tsx        # /blog/:slug
-      loader.ts       # Data loader for blog post
-      head.tsx        # Dynamic head tags
-  (auth)/
-    login/
-      page.tsx        # /login (group doesn't add URL segment)
-  api/time/
-    route.ts          # /api/time (JSON endpoint)
-```
+Visit [paretojs.tech](https://paretojs.tech) to view the full documentation.
 
-### Route File Conventions
+## Packages
 
-| File | Purpose |
-|---|---|
-| `page.tsx` | Page component — makes a directory a route |
-| `layout.tsx` | Layout wrapper — nests around child routes |
-| `loader.ts` | Server-side data loader |
-| `head.tsx` | `<title>` and `<meta>` tags for the route |
-| `route.ts` | Resource route — returns raw data (no HTML) |
-| `not-found.tsx` | 404 page (app root only) |
+- [`@paretojs/core`](./packages/core) — Core framework
+- [`create-pareto`](./packages/create-pareto) — Project scaffolding CLI
 
-## Loader & Streaming
+## Community
 
-```tsx
-// app/dashboard/loader.ts
-import { defer } from '@paretojs/core'
+- [GitHub Issues](https://github.com/childrentime/pareto/issues) — Bug reports and feature requests
+- [GitHub Discussions](https://github.com/childrentime/pareto/discussions) — Questions and ideas
 
-export async function loader({ req, params }) {
-  const stats = await db.getStats()
-  return defer({
-    stats,                        // available immediately
-    feed: db.getFeed(),           // streams later
-    comments: db.getComments(),   // streams later
-  })
-}
+## Contributing
 
-// app/dashboard/page.tsx
-import { useLoaderData, Await } from '@paretojs/core'
-
-export default function Page() {
-  const { stats, feed } = useLoaderData()
-  return (
-    <div>
-      <h1>{stats.total} items</h1>
-      <Await resolve={feed} fallback={<Skeleton />}>
-        {(data) => <Feed items={data} />}
-      </Await>
-    </div>
-  )
-}
-```
-
-## Client-Side Navigation
-
-```tsx
-import { Link, useRouter } from '@paretojs/core'
-
-// Declarative navigation with prefetching
-<Link href="/about">About</Link>
-<Link href="/blog/hello" prefetch="viewport">Read Post</Link>
-<Link href="/login" replace>Login</Link>
-
-// Programmatic navigation
-function MyComponent() {
-  const { push, replace, back, pathname, isNavigating, prefetch } = useRouter()
-  return <button onClick={() => push('/dashboard')}>Go</button>
-}
-```
-
-Prefetch strategies: `hover` (default), `viewport`, `none`.
-
-## State Management
-
-```tsx
-import { defineStore } from '@paretojs/core/store'
-
-const counterStore = defineStore((set) => ({
-  count: 0,
-  increment: () => set((draft) => { draft.count++ }),
-}))
-
-// Use anywhere — supports direct destructuring
-const { count, increment } = counterStore.useStore()
-```
-
-Stores are automatically serialized during SSR and hydrated on the client.
-
-## Head Management
-
-```tsx
-// app/blog/[slug]/head.tsx
-import type { HeadFunction } from '@paretojs/core'
-
-export const head: HeadFunction = ({ loaderData, params }) => ({
-  title: loaderData.post.title,
-  meta: [
-    { name: 'description', content: loaderData.post.summary },
-    { property: 'og:title', content: loaderData.post.title },
-  ],
-})
-```
-
-Nested `head.tsx` files merge automatically — child values override parent values.
-
-## Configuration
-
-```ts
-// pareto.config.ts
-import type { ParetoConfig } from '@paretojs/core'
-
-export default {
-  appDir: 'app',        // default: 'app'
-  outDir: '.pareto',    // default: '.pareto'
-  configureVite: (config, { isServer }) => ({
-    ...config,
-    // Custom Vite configuration
-  }),
-} satisfies ParetoConfig
-```
-
-## CLI
-
-```bash
-pareto dev      # Start dev server with HMR
-pareto build    # Build for production (client + server)
-pareto start    # Start production server
-```
+Contributions are welcome. Please open an issue first to discuss what you would like to change.
 
 ## License
 

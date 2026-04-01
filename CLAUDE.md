@@ -5,6 +5,13 @@
 - For `create-pareto`, run `pnpm templates` before publishing to regenerate templates with resolved `workspace:*` and `catalog:` versions.
 - Full command: `pnpm publish --access public --no-git-checks --registry https://registry.npmjs.org`
 
+## External Blog Posts
+
+- Blog posts for external platforms (掘金, Medium, dev.to) live in `blog-external/`.
+- Naming convention: `{topic}-{platform}.md` (e.g. `benchmarks-devto.md`, `benchmarks-juejin.md`).
+- dev.to posts include frontmatter (`published`, `tags`, `canonical_url`). Medium and 掘金 are plain markdown.
+- Always set `canonical_url` to the paretojs.tech blog post to avoid SEO duplication.
+
 ## Code Conventions
 
 - **No barrel files** — Do not create `index.ts` re-export files. Import directly from the source module (e.g. `from '../ndjson/reader'`, not `from '../ndjson'`). Barrel files add indirection without value.

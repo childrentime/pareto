@@ -19,6 +19,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
             <NavLink href="/store">Store</NavLink>
             <NavLink href="/error-demo">Errors</NavLink>
             <NavLink href="/redirect-demo">Redirect</NavLink>
+            <NavLink href="/hooks">Hooks</NavLink>
             <a
               href="https://github.com/childrentime/pareto"
               target="_blank"

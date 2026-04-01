@@ -25,6 +25,12 @@ export default function RootLayout({ children }: PropsWithChildren) {
             >
               About
             </Link>
+            <Link
+              href="/hooks"
+              className="text-sm text-stone-500 hover:text-stone-900 transition-colors"
+            >
+              Hooks
+            </Link>
             <a
               href="/custom-api/health"
               target="_blank"

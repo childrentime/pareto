@@ -1,3 +1,10 @@
+## Publishing
+
+- **Always use `pnpm publish`**, never `npm publish`. This repo uses pnpm's `catalog:` protocol in peerDependencies — `npm publish` ships the raw `catalog:` string, which breaks installs for users.
+- Add `--registry https://registry.npmjs.org` since the local `.npmrc` points to npmmirror.
+- For `create-pareto`, run `pnpm templates` before publishing to regenerate templates with resolved `workspace:*` and `catalog:` versions.
+- Full command: `pnpm publish --access public --no-git-checks --registry https://registry.npmjs.org`
+
 ## Code Conventions
 
 - **No barrel files** — Do not create `index.ts` re-export files. Import directly from the source module (e.g. `from '../ndjson/reader'`, not `from '../ndjson'`). Barrel files add indirection without value.

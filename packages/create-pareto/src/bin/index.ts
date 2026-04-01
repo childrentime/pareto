@@ -63,7 +63,8 @@ function canSafelyOverwrite(dir: string): boolean {
 }
 
 async function main() {
-  let targetDir = ''
+  const argProjectName = process.argv[2]
+  let targetDir = argProjectName ?? ''
   const defaultProjectName = 'pareto-project'
 
   const templateRoot = path.join(__dirname, '../templates')
@@ -78,7 +79,7 @@ async function main() {
       [
         {
           name: 'projectName',
-          type: 'text',
+          type: argProjectName ? null : 'text',
           message: 'What is your project named?',
           initial: defaultProjectName,
           onState: state =>

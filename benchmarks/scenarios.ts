@@ -13,6 +13,7 @@ export interface Framework {
   buildCmd: string
   startCmd: string
   startEnv: Record<string, string>
+  skipScenarios?: string[]
 }
 
 export const scenarios: Scenario[] = [
@@ -66,6 +67,15 @@ export const frameworks: Framework[] = [
     buildCmd: 'pnpm build',
     startCmd: 'pnpm start',
     startEnv: { PORT: '4002', NODE_ENV: 'production' },
+  },
+  {
+    name: 'TanStack Start',
+    dir: 'tanstack',
+    port: 4003,
+    buildCmd: 'pnpm build',
+    startCmd: 'pnpm start',
+    startEnv: { PORT: '4003', NODE_ENV: 'production' },
+    skipScenarios: ['API / JSON'],
   },
 ]
 

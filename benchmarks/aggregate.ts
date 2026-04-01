@@ -242,8 +242,8 @@ function printAggregatedReport(report: AggregatedReport): void {
     }
   }
 
-  // Throughput
-  console.log('\n  Throughput — median — higher is better')
+  // Response size (throughput / rps)
+  console.log('\n  Avg response size — lower is better')
   console.log()
   console.log(
     '  ' +
@@ -257,8 +257,9 @@ function printAggregatedReport(report: AggregatedReport): void {
       const r = report.results.find(
         res => res.framework === fw && res.scenario === sc,
       )
-      if (!r) return pad('—', colWidth, 'right')
-      return pad(fmtBytes(r.throughput.median) + '/s', colWidth, 'right')
+      if (!r || !r.rps.median) return pad('—', colWidth, 'right')
+      const bytesPerReq = r.throughput.median / r.rps.median
+      return pad(fmtBytes(bytesPerReq), colWidth, 'right')
     })
     console.log('  ' + pad(sc, 16) + row.join(''))
   }
@@ -366,6 +367,24 @@ function generateMarkdown(report: AggregatedReport): string {
       })
       lines.push(`| ${sc} | ${cells.join(' | ')} |`)
     }
+  }
+
+  lines.push('', '### Avg Response Size (lower is better)', '')
+  lines.push(
+    `| Scenario | ${frameworkNames.join(' | ')} |`,
+    `|---|${frameworkNames.map(() => '---:').join('|')}|`,
+  )
+
+  for (const sc of scenarioNames) {
+    const cells = frameworkNames.map(fw => {
+      const r = report.results.find(
+        res => res.framework === fw && res.scenario === sc,
+      )
+      if (!r || !r.rps.median) return '—'
+      const bytesPerReq = r.throughput.median / r.rps.median
+      return fmtBytes(bytesPerReq)
+    })
+    lines.push(`| ${sc} | ${cells.join(' | ')} |`)
   }
 
   return lines.join('\n')

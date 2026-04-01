@@ -38,6 +38,10 @@ const buildOutputDirs: Record<string, { client: string; server: string }> = {
     client: 'remix/build/client',
     server: 'remix/build/server',
   },
+  tanstack: {
+    client: 'tanstack/.output/public',
+    server: 'tanstack/.output/server',
+  },
 }
 
 function getGzipSize(filePath: string): number {

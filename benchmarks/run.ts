@@ -247,6 +247,10 @@ async function main() {
       log(`--- ${scenario.name}: ${scenario.description} ---`)
 
       for (const fw of activeFrameworks) {
+        if (fw.skipScenarios?.includes(scenario.name)) {
+          log(`Skipping ${fw.name} (not supported)`)
+          continue
+        }
         const url = `http://127.0.0.1:${fw.port}${scenario.path}`
         log(`Benchmarking ${fw.name} @ ${url}`)
 
@@ -276,6 +280,7 @@ async function main() {
 
     for (const scenario of scenarios) {
       for (const fw of activeFrameworks) {
+        if (fw.skipScenarios?.includes(scenario.name)) continue
         const url = `http://127.0.0.1:${fw.port}${scenario.path}`
         log(`TTFB ${fw.name} @ ${url}`)
 

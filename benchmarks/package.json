@@ -10,9 +10,10 @@
     "bench:remix": "tsx run.ts --only remix",
     "bench:render": "tsx render-bench.tsx",
     "bench:size": "tsx build-size.ts",
+    "bench:ramp": "tsx ramp.ts",
     "bench:all": "tsx run.ts && tsx render-bench.tsx && tsx build-size.ts --skip-build",
     "bench:aggregate": "tsx aggregate.ts",
-    "build:all": "pnpm --filter ./pareto build && pnpm --filter ./nextjs build && pnpm --filter ./remix build"
+    "build:all": "pnpm --filter ./pareto build && pnpm --filter ./nextjs build && pnpm --filter ./remix build && pnpm --filter ./tanstack build"
   },
   "devDependencies": {
     "autocannon": "^8.0.0",

@@ -182,8 +182,10 @@ export function printReport(
     }
   }
 
-  // Throughput table
-  console.log('\n  Throughput avg (higher is better)')
+  // Response size table (throughput / rps = bytes per response)
+  console.log(
+    '\n  Avg response size (lower is better — less bytes per request)',
+  )
   console.log()
 
   const tpHeader =
@@ -198,8 +200,9 @@ export function printReport(
       const r = results.find(
         res => res.framework === fw && res.scenario === scenario.name,
       )
-      if (!r) return pad('—', colWidth, 'right')
-      return pad(fmtBytes(r.throughput.average) + '/s', colWidth, 'right')
+      if (!r || !r.requests.average) return pad('—', colWidth, 'right')
+      const bytesPerReq = r.throughput.average / r.requests.average
+      return pad(fmtBytes(bytesPerReq), colWidth, 'right')
     })
     console.log('  ' + pad(scenario.name, 16) + row.join(''))
   }

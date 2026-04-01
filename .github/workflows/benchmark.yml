@@ -6,9 +6,9 @@ on:
       runs:
         description: 'Number of benchmark runs (more = more stable)'
         required: false
-        default: '5'
+        default: '1'
         type: choice
-        options: ['3', '5', '7']
+        options: ['1', '3', '5', '7']
       duration:
         description: 'Seconds per benchmark scenario'
         required: false
@@ -33,9 +33,12 @@ env:
 
 jobs:
   benchmark:
-    name: SSR Benchmark (${{ inputs.runs || '5' }} runs)
+    name: SSR Benchmark (${{ inputs.runs || '1' }} runs)
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
@@ -84,11 +87,22 @@ jobs:
         working-directory: benchmarks
         run: pnpm bench:render 2>&1 | tee render-bench-output.txt
 
+      # ── Ramp-up load test ──────────────────────────────────────────────
+      - name: Ramp-up load test (max sustainable QPS)
+        working-directory: benchmarks
+        run: |
+          pnpm bench:ramp -- --skip-build 2>&1 | tee ramp-output.txt
+
+          # Kill any leftover server processes
+          for port in 4000 4001 4002 4003; do
+            fuser -k "${port}/tcp" 2>/dev/null || true
+          done
+
       # ── HTTP benchmark: N isolated runs ──────────────────────────────
-      - name: Run benchmarks (${{ inputs.runs || '5' }} rounds)
+      - name: Run benchmarks (${{ inputs.runs || '1' }} rounds)
         working-directory: benchmarks
         env:
-          BENCH_RUNS: ${{ inputs.runs || '5' }}
+          BENCH_RUNS: ${{ inputs.runs || '1' }}
           BENCH_DURATION: ${{ inputs.duration || '10' }}
         run: |
           RUNS=${BENCH_RUNS}
@@ -101,7 +115,7 @@ jobs:
           wait_ports_free() {
             for attempt in $(seq 1 10); do
               all_free=true
-              for port in 4000 4001 4002; do
+              for port in 4000 4001 4002 4003; do
                 if fuser "${port}/tcp" 2>/dev/null; then
                   all_free=false
                   fuser -k "${port}/tcp" 2>/dev/null || true
@@ -130,7 +144,7 @@ jobs:
             pnpm bench -- --skip-build --duration="${BENCH_DURATION}" 2>&1
 
             # Kill any leftover server processes
-            for port in 4000 4001 4002; do
+            for port in 4000 4001 4002 4003; do
               fuser -k "${port}/tcp" 2>/dev/null || true
             done
 
@@ -150,11 +164,14 @@ jobs:
           name: benchmark-results-${{ github.sha }}
           path: |
             benchmarks/results-*.json
+            benchmarks/ramp-results-*.json
             benchmarks/aggregated-results.json
             benchmarks/BENCHMARK-RESULTS.md
+            benchmarks/RAMP-RESULTS.md
             benchmarks/build-size-output.txt
             benchmarks/render-bench-output.txt
             benchmarks/aggregate-output.txt
+            benchmarks/ramp-output.txt
           retention-days: 90
 
       # ── Post PR comment ──────────────────────────────────────────────
@@ -172,6 +189,9 @@ jobs:
             }
 
             const md = fs.readFileSync(mdPath, 'utf-8');
+            const rampMd = fs.existsSync('benchmarks/RAMP-RESULTS.md')
+              ? fs.readFileSync('benchmarks/RAMP-RESULTS.md', 'utf-8')
+              : '';
             const sizeOutput = fs.existsSync('benchmarks/build-size-output.txt')
               ? fs.readFileSync('benchmarks/build-size-output.txt', 'utf-8')
               : '';
@@ -179,6 +199,8 @@ jobs:
             const body = [
               '<!-- benchmark-results -->',
               md,
+              '',
+              rampMd,
               '',
               '<details>',
               '<summary>Build Size</summary>',

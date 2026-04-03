@@ -5,15 +5,47 @@
 - For `create-pareto`, run `pnpm templates` before publishing to regenerate templates with resolved `workspace:*` and `catalog:` versions.
 - Full command: `pnpm publish --access public --no-git-checks --registry https://registry.npmjs.org`
 
-## External Blog Posts
+## External Blog Publishing
 
-- Blog posts for external platforms (掘金, Medium, dev.to) live in `blog-external/`.
-- Naming convention: `{topic}-{platform}.md` (e.g. `benchmarks-devto.md`, `benchmarks-juejin.md`).
-- dev.to posts include frontmatter (`published`, `tags`, `canonical_url`). Medium and 掘金 are plain markdown.
-- Always set `canonical_url` to the paretojs.tech blog post to avoid SEO duplication.
-- **dev.to**: API key in `.env` as `DEV_TO_API_KEY`. Publish via `curl -X POST https://dev.to/api/articles` with `api-key` header.
-- **Medium**: Use the `/medium-push` skill — reads markdown file and pushes to Medium editor via Chrome extension bridge.
-- **掘金**: Manual copy-paste from the `*-juejin.md` file.
+### Directory structure
+
+External platform copies are stored in `blog-external/` with sequential numbering:
+
+```
+blog-external/
+  post-N-{slug}/
+    medium.md   # English, no frontmatter (for Medium push skill)
+    devto.md    # English, with dev.to frontmatter (published: false)
+    juejin.md   # Chinese (simplified), no frontmatter (user copies manually)
+```
+
+### File formats
+
+- **dev.to**: YAML frontmatter with `published: false`, `tags`, `canonical_url` pointing to paretojs.tech blog post to avoid SEO duplication.
+- **Medium**: Plain markdown, no frontmatter. Starts with `# Title`.
+- **掘金 (Juejin)**: Plain markdown in Chinese, no frontmatter.
+
+### Publishing workflow
+
+After writing blog posts, always:
+
+1. Create `blog-external/post-N-{slug}/` with `medium.md`, `devto.md`, `juejin.md`
+2. **Only publish the first post** of each batch to all 3 platforms:
+   - **Medium**: Use the `/medium-push` skill with the `medium.md` file
+   - **dev.to**: POST via API using `DEVTO_API_KEY` from `.env` (set `published: false` as draft)
+   - **Juejin (掘金)**: Tell user to copy from `juejin.md` (no API available)
+3. The remaining posts are saved in `blog-external/` for future publishing
+
+### dev.to API
+
+```bash
+curl -s -X POST https://dev.to/api/articles \
+  -H "api-key: $DEVTO_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"article": {"title": "...", "body_markdown": "...", "published": false, "tags": ["react","javascript","ssr","webdev"]}}'
+```
+
+API key is in `.env` as `DEVTO_API_KEY`.
 
 ## Code Conventions
 

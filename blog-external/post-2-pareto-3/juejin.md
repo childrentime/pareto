@@ -81,14 +81,10 @@ import { ParetoErrorBoundary } from '@paretojs/core'
 ```tsx
 import { defineStore } from '@paretojs/core/store'
 
-const { useStore, getState, setState } = defineStore('counter', {
-  state: () => ({ count: 0 }),
-  actions: {
-    increment(state) {
-      state.count += 1  // Immer 使这变成不可变更新
-    },
-  },
-})
+const { useStore, getState, setState } = defineStore((set) => ({
+  count: 0,
+  increment: () => set((d) => { d.count += 1 }),  // Immer 使这变成不可变更新
+}))
 ```
 
 支持直接解构：`const { count, increment } = counterStore.useStore()`。SSR 序列化是自动的 — 无需手动写水合代码。

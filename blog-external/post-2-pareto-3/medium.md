@@ -81,14 +81,10 @@ import { ParetoErrorBoundary } from '@paretojs/core'
 ```tsx
 import { defineStore } from '@paretojs/core/store'
 
-const { useStore, getState, setState } = defineStore('counter', {
-  state: () => ({ count: 0 }),
-  actions: {
-    increment(state) {
-      state.count += 1  // Immer makes this immutable
-    },
-  },
-})
+const { useStore, getState, setState } = defineStore((set) => ({
+  count: 0,
+  increment: () => set((d) => { d.count += 1 }),  // Immer makes this immutable
+}))
 ```
 
 Direct destructuring works: `const { count, increment } = counterStore.useStore()`. SSR serialization is automatic — no hydration code needed.

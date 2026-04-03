@@ -7,6 +7,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'Pareto',
+			pagefind: true,
 			favicon: '/favicon.png',
 			lastUpdated: true,
 			description: 'Lightweight React SSR framework with streaming, file-based routing, and built-in state management.',

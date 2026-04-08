@@ -62,6 +62,7 @@ export async function dev() {
   // vite.config.ts (loaded automatically by Vite from the project root).
   // Users customize Vite via standard vite.config.ts — no framework hook needed.
   const paretoConfig = {
+    envPrefix: 'PARETO_',
     server: {
       middlewareMode: true as const,
       hmr: { server: httpServer },

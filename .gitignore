@@ -19,3 +19,7 @@ website/public/llms.txt
 website/public/.well-known/llms.txt
 packages/core/docs/
 benchmarks/.results/
+
+# Playwright output
+test-results/
+playwright-report/

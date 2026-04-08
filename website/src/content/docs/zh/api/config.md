@@ -22,7 +22,6 @@ export default config
 interface ParetoConfig {
   appDir?: string
   outDir?: string
-  configureVite?: (config: UserConfig, context: { isServer: boolean }) => UserConfig
   wkWebViewFlushHint?: boolean
 }
 ```
@@ -41,34 +40,46 @@ interface ParetoConfig {
 
 在 HTML 骨架中注入一个包含 200+ 零宽字符的隐藏元素，强制 iOS WKWebView 在流完成前开始渲染。WebKit 在可见文本超过 200 个字符之前会延迟首次绘制，这可能导致在原生 iOS 应用中加载文本较少的页面时出现白屏闪烁。无视觉效果，屏幕阅读器会忽略。仅影响 WKWebView — Safari 和 Chrome 浏览器不受影响。默认为 `false`。
 
-### `configureVite`
+## 自定义 Vite 配置
 
-扩展 Vite 配置。该函数接收当前 Vite 配置和一个 `env` 对象，指示构建目标是服务端还是客户端。返回修改后的配置：
+Pareto 原生使用 Vite。要自定义 Vite，在项目根目录创建标准的 `vite.config.ts` 即可 — Pareto 在 dev 和 build 模式下都会自动加载并合并该配置。
 
 ```tsx
-const config: ParetoConfig = {
-  configureVite(config, { isServer }) {
-    config.plugins.push(myPlugin())
+// vite.config.ts
+import { defineConfig } from 'vite'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
-    if (isServer) {
-      config.ssr = {
-        ...config.ssr,
-        external: ['heavy-library'],
-      }
-    }
-
-    return config
+export default defineConfig({
+  plugins: [tsconfigPaths()],
+  resolve: {
+    alias: { '@': '/src' },
   },
-}
+  ssr: {
+    noExternal: ['some-esm-only-pkg'],
+    external: ['heavy-library'],
+  },
+})
 ```
 
-`configureVite` 的使用场景：
+要针对客户端或服务端构建分别配置，使用 Vite 原生的 `isSsrBuild` 参数：
 
-- 添加 Vite 插件（Tailwind、SVG 导入等）
-- 自定义构建输出目录
+```tsx
+export default defineConfig(({ isSsrBuild, command }) => ({
+  plugins: [
+    // 仅客户端插件
+    !isSsrBuild && clientOnlyPlugin(),
+  ].filter(Boolean),
+}))
+```
+
+使用场景：
+
+- 添加 Vite 插件（Tailwind、SVG 导入、tsconfig-paths 等）
 - 配置 SSR externals（仅 Node.js 的包）
 - 添加路径别名（`resolve.alias`）
 - 修改开发服务器代理设置
+
+完整配置项见 [Vite 配置参考](https://vite.dev/config/)。
 
 ## 环境变量
 

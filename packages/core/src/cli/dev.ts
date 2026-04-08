@@ -58,11 +58,13 @@ export async function dev() {
   )
   const aliases = getCoreSourceAliases()
 
-  // Create Vite dev server in middleware mode
-  const vite = await createViteServer({
-    root: cwd,
+  // Pareto's internal Vite config. This is merged with the user's
+  // vite.config.ts (loaded automatically by Vite from the project root).
+  // Users customize Vite via standard vite.config.ts — no framework hook needed.
+  const paretoConfig = {
+    envPrefix: 'PARETO_',
     server: {
-      middlewareMode: true,
+      middlewareMode: true as const,
       hmr: { server: httpServer },
     },
     plugins: [
@@ -75,11 +77,18 @@ export async function dev() {
       }),
     ],
     resolve: { alias: aliases },
-    appType: 'custom',
+    appType: 'custom' as const,
     optimizeDeps: {
       include: ['react', 'react-dom', 'react-dom/server', 'react-dom/client'],
     },
-  })
+    ssr: {
+      noExternal: [/^@paretojs\//],
+    },
+  }
+
+  // Create Vite dev server — Vite auto-loads vite.config.ts from root
+  // and merges it with our inline config.
+  const vite = await createViteServer({ ...paretoConfig, root: cwd })
 
   // Security headers (applied after user middleware so user can override)
   if (!userApp) {

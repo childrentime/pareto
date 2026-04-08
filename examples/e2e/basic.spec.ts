@@ -12,7 +12,11 @@ test.describe('SSR rendering', () => {
   })
 
   test('stream page renders quick stats immediately', async ({ page }) => {
-    await page.goto('/stream')
+    // Use waitUntil:'commit' — the h1 and quick stats are in the initial
+    // shell, so we can assert as soon as the first bytes arrive without
+    // waiting for the full deferred stream to finish (which can take 2-3s
+    // and cause flaky timeouts under heavy parallelism).
+    await page.goto('/stream', { waitUntil: 'commit' })
     await expect(page.locator('h1')).toContainText('Streaming SSR')
     await expect(page.locator('text=12,847')).toBeVisible()
     await expect(page.locator('text=48,392')).toBeVisible()

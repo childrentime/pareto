@@ -3,7 +3,6 @@ import { createRequire } from 'module'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import type { InlineConfig, Plugin } from 'vite'
-import type { ParetoConfig } from '../types'
 
 /**
  * Load @vitejs/plugin-react via createRequire (works in both CJS and ESM contexts).
@@ -23,11 +22,10 @@ export function createClientConfig(options: {
   root: string
   outDir: string
   entry: string
-  config: Required<ParetoConfig>
   isDev?: boolean
   plugins?: Plugin[]
 }): InlineConfig {
-  const { root, outDir, entry, config, isDev = false, plugins = [] } = options
+  const { root, outDir, entry, isDev = false, plugins = [] } = options
 
   const baseConfig: InlineConfig = {
     root,
@@ -55,7 +53,7 @@ export function createClientConfig(options: {
     },
   }
 
-  return config.configureVite(baseConfig, { isServer: false })
+  return baseConfig
 }
 
 /**
@@ -65,10 +63,9 @@ export function createServerConfig(options: {
   root: string
   outDir: string
   entry: string
-  config: Required<ParetoConfig>
   plugins?: Plugin[]
 }): InlineConfig {
-  const { root, outDir, entry, config, plugins = [] } = options
+  const { root, outDir, entry, plugins = [] } = options
 
   const baseConfig: InlineConfig = {
     root,
@@ -95,7 +92,7 @@ export function createServerConfig(options: {
     },
   }
 
-  return config.configureVite(baseConfig, { isServer: true })
+  return baseConfig
 }
 
 /**

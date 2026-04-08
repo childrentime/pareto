@@ -1,6 +1,5 @@
 import type { Request, Response } from 'express'
 import type { ReactNode } from 'react'
-import type { UserConfig } from 'vite'
 
 // --- Route Types ---
 
@@ -120,10 +119,6 @@ export function notFound(): never {
 export interface ParetoConfig {
   appDir?: string
   outDir?: string
-  configureVite?: (
-    config: UserConfig,
-    context: { isServer: boolean },
-  ) => UserConfig
   /**
    * Inject a hidden element with 200+ zero-width characters into the HTML
    * shell to force iOS WKWebView to begin rendering before the stream

@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import fs from 'fs'
-import path from 'path'
 import os from 'os'
-import { loadConfig, resolveAppDir, resolveOutDir } from '../config/load'
+import path from 'path'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { defaultConfig } from '../config/defaults'
+import { loadConfig, resolveAppDir, resolveOutDir } from '../config/load'
 
 let tmpDir: string
 
@@ -19,12 +19,6 @@ describe('defaultConfig', () => {
   it('should have correct defaults', () => {
     expect(defaultConfig.appDir).toBe('app')
     expect(defaultConfig.outDir).toBe('.pareto')
-    expect(typeof defaultConfig.configureVite).toBe('function')
-  })
-
-  it('configureVite should pass through config by default', () => {
-    const config = { mode: 'development' } as any
-    expect(defaultConfig.configureVite(config, { isServer: false })).toBe(config)
   })
 })
 

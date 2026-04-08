@@ -46,7 +46,6 @@ export async function build() {
       root: cwd,
       outDir: clientOutputPath,
       entry: VIRTUAL_CLIENT_ENTRY,
-      config,
       plugins: [
         paretoVirtualEntry({
           appDir,
@@ -72,7 +71,6 @@ export async function build() {
       root: cwd,
       outDir: serverOutputPath,
       entry: VIRTUAL_SERVER_ENTRY,
-      config,
       plugins: [
         paretoVirtualEntry({
           appDir,

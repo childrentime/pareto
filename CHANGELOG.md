@@ -2,6 +2,55 @@
 
 All notable changes to Pareto will be documented in this file.
 
+## 5.0.0 (2026-04-08)
+
+### Breaking Changes
+
+- **`configureVite` config option removed** — The framework-specific `configureVite(config, { isServer })` hook has been removed. Users now customize Vite via a standard `vite.config.ts` in their project root, which Pareto loads and merges natively in both dev and build modes. This aligns Pareto with the Vite ecosystem convention (TanStack Start, Vike, etc.) where frameworks do not expose custom config hooks.
+
+  **Migration:** Move your `configureVite` logic into a `vite.config.ts` at the project root.
+
+  Before (`pareto.config.ts`):
+  ```ts
+  export default {
+    configureVite(config, { isServer }) {
+      config.plugins.push(tsconfigPaths())
+      if (isServer) {
+        config.ssr = { ...config.ssr, external: ['heavy-lib'] }
+      }
+      return config
+    },
+  }
+  ```
+
+  After (`vite.config.ts`):
+  ```ts
+  import { defineConfig } from 'vite'
+  import tsconfigPaths from 'vite-tsconfig-paths'
+
+  export default defineConfig({
+    plugins: [tsconfigPaths()],
+    ssr: {
+      external: ['heavy-lib'],
+    },
+  })
+  ```
+
+  For client/server-specific config, use Vite's native `isSsrBuild` flag:
+  ```ts
+  export default defineConfig(({ isSsrBuild }) => ({
+    plugins: [!isSsrBuild && clientOnlyPlugin()].filter(Boolean),
+  }))
+  ```
+
+- **`vite` moved to `peerDependencies`** — Users must install `vite` in their project (any version `^6.0.0 || ^7.0.0`) to write `vite.config.ts`. Most projects already have it transitively.
+
+### Bug Fixes
+
+- **`configureVite` was never called in dev mode** ([#13](https://github.com/childrentime/pareto/issues/13)) — The root cause is addressed by removing the hook entirely and routing customization through standard Vite config, which works identically in dev and build.
+- **Dev server SSR now respects `ssr` config** — The dev server now includes `ssr.noExternal: [/^@paretojs\//]` matching build mode, so `ssrLoadModule` behaves consistently between dev and build.
+- **Fixed flaky streaming SSR e2e test** — Use `waitUntil: 'commit'` for streaming pages so assertions run against the initial shell without waiting for the full deferred stream.
+
 ## 4.0.0 (2026-03-31)
 
 ### Breaking Changes

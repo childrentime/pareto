@@ -152,6 +152,6 @@ export default app
 
 ## 相关
 
-- [配置](/zh/api/config/) — `configureVite` 自定义构建。
+- [配置](/zh/api/config/) — `pareto.config.ts` 选项和通过 `vite.config.ts` 自定义 Vite。
 - [基于文件的路由](/zh/concepts/routing/) — `route.ts` 如何融入文件路由系统。
 - [重定向与 404](/zh/concepts/redirects/) — 在页面 loader 中使用 `redirect()` 和 `notFound()`。

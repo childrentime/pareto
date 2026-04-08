@@ -22,7 +22,6 @@ export default config
 interface ParetoConfig {
   appDir?: string
   outDir?: string
-  configureVite?: (config: UserConfig, context: { isServer: boolean }) => UserConfig
   wkWebViewFlushHint?: boolean
 }
 ```
@@ -41,37 +40,46 @@ The output directory for production builds. Defaults to `.pareto`.
 
 Inject a hidden element with 200+ zero-width characters into the HTML shell to force iOS WKWebView to begin rendering before the stream completes. WebKit delays first paint until visible text exceeds 200 characters, which can cause a white flash for minimal-text pages loaded inside native iOS apps. Has no visual effect and is ignored by screen readers. Only relevant for WKWebView — Safari and Chrome browsers are not affected. Defaults to `false`.
 
-### `configureVite`
+## Customizing Vite
 
-Extend the Vite configuration. This function receives the current Vite config and an `env` object indicating whether the build is for the server or client. Return the modified config:
+Pareto uses Vite natively. To customize Vite, create a standard `vite.config.ts` in your project root — Pareto loads and merges it automatically in both dev and build modes.
 
 ```tsx
-import react from '@vitejs/plugin-react'
+// vite.config.ts
+import { defineConfig } from 'vite'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
-const config: ParetoConfig = {
-  configureVite(config, { isServer }) {
-    config.plugins.push(myPlugin())
-
-    // Server-only config
-    if (isServer) {
-      config.ssr = {
-        ...config.ssr,
-        external: ['heavy-library'],
-      }
-    }
-
-    return config
+export default defineConfig({
+  plugins: [tsconfigPaths()],
+  resolve: {
+    alias: { '@': '/src' },
   },
-}
+  ssr: {
+    noExternal: ['some-esm-only-pkg'],
+    external: ['heavy-library'],
+  },
+})
 ```
 
-Use cases for `configureVite`:
+To apply config conditionally for client vs server builds, use Vite's native `isSsrBuild` flag:
 
-- Adding Vite plugins (Tailwind, SVG imports, etc.)
-- Customizing the build output directory
+```tsx
+export default defineConfig(({ isSsrBuild, command }) => ({
+  plugins: [
+    // Client-only plugin
+    !isSsrBuild && clientOnlyPlugin(),
+  ].filter(Boolean),
+}))
+```
+
+Use cases:
+
+- Adding Vite plugins (Tailwind, SVG imports, tsconfig-paths, etc.)
 - Configuring SSR externals for Node.js-only packages
 - Adding path aliases (`resolve.alias`)
 - Modifying the dev server proxy settings
+
+See the [Vite config reference](https://vite.dev/config/) for all available options.
 
 ## Environment variables
 

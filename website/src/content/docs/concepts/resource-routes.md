@@ -169,6 +169,6 @@ Your custom routes and middleware take priority. Unmatched requests fall through
 
 ## Related
 
-- [Configuration](/api/config/) — `configureVite` for customizing the build.
+- [Configuration](/api/config/) — `pareto.config.ts` options and customizing Vite via `vite.config.ts`.
 - [File-Based Routing](/concepts/routing/) — How `route.ts` fits into the file-based routing system.
 - [Redirect & 404](/concepts/redirects/) — Using `redirect()` and `notFound()` in page loaders.

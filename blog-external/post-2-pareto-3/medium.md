@@ -20,20 +20,16 @@ Pareto 3.0 uses **Vite 7**:
 - **Native ESM** — no bundling during dev
 - **React Fast Refresh** — HMR that preserves component state
 - **Your Vite plugins work** — PostCSS, Tailwind, MDX, etc. No framework wrappers
-- **One config** — `configureVite()` in `pareto.config.ts`
+- **One config** — drop a standard `vite.config.ts` in your project root; Pareto loads and merges it automatically
 
 ```ts
-// pareto.config.ts
-import type { ParetoConfig } from '@paretojs/core'
+// vite.config.ts
+import { defineConfig } from 'vite'
+import myVitePlugin from 'my-vite-plugin'
 
-const config: ParetoConfig = {
-  configureVite(config) {
-    config.plugins.push(myVitePlugin())
-    return config
-  },
-}
-
-export default config
+export default defineConfig({
+  plugins: [myVitePlugin()],
+})
 ```
 
 ### React 19
@@ -91,16 +87,17 @@ Direct destructuring works: `const { count, increment } = counterStore.useStore(
 
 ### Security headers
 
-OWASP-recommended headers out of the box:
+OWASP-recommended headers out of the box. Create a custom `app.ts` at your project root:
 
 ```ts
+// app.ts
+import express from 'express'
 import { securityHeaders } from '@paretojs/core/node'
 
-const config: ParetoConfig = {
-  configureServer(app) {
-    app.use(securityHeaders())
-  },
-}
+const app = express()
+app.use(securityHeaders())
+
+export default app
 ```
 
 ## Streaming SSR — the killer feature
@@ -139,7 +136,7 @@ Users see content fast. Slow data loads progressively. No full-page spinners.
 ## Migration from 2.x
 
 1. Install `@paretojs/core@3`, update to React 19
-2. Remove Rspack config, use `configureVite()` instead
+2. Remove Rspack config, create a standard `vite.config.ts` instead
 3. Replace `error.tsx` files with `ParetoErrorBoundary`
 4. Test loaders with Vite's dev server
 

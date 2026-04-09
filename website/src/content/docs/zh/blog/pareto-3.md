@@ -16,20 +16,16 @@ Pareto 3.0 使用 **Vite 7** 作为构建引擎：
 - **开发环境原生 ESM** — 开发时不打包，模块直接提供给浏览器。
 - **React Fast Refresh** — 保留组件状态的 HMR，由 `@vitejs/plugin-react` 驱动。
 - **你的 Vite 插件直接可用** — PostCSS、Tailwind、MDX 等，无需框架特定的封装。
-- **单一配置** — 通过 `pareto.config.ts` 中的 `configureVite()` 自定义构建。不再需要分别管理客户端和服务端的 Rspack 配置。
+- **单一配置** — 在项目根目录放一个标准的 `vite.config.ts`，Pareto 自动加载并合并。不再需要分别管理客户端和服务端的 Rspack 配置。
 
 ```ts
-// pareto.config.ts
-import type { ParetoConfig } from '@paretojs/core'
+// vite.config.ts
+import { defineConfig } from 'vite'
+import myVitePlugin from 'my-vite-plugin'
 
-const config: ParetoConfig = {
-  configureVite(config) {
-    config.plugins.push(myVitePlugin())
-    return config
-  },
-}
-
-export default config
+export default defineConfig({
+  plugins: [myVitePlugin()],
+})
 ```
 
 ## React 19
@@ -124,7 +120,7 @@ pareto start   # 启动生产服务器
 ## 从 2.x 迁移
 
 1. **更新依赖** — 安装 `@paretojs/core@3` 并更新到 React 19。
-2. **移除 Rspack 配置** — 删除自定义的 Rspack 配置文件，改用 `pareto.config.ts` 中的 `configureVite()`。
+2. **移除 Rspack 配置** — 删除自定义的 Rspack 配置文件，在项目根目录创建标准的 `vite.config.ts` 即可——Pareto 自动加载并合并。
 3. **更新错误处理** — `error.tsx` 现在是可选的，提供应用级错误页面。在布局/页面中使用 `ParetoErrorBoundary` 进行组件级错误隔离。
 4. **更新导入** — `@paretojs/core` 的 API 大体不变，但请对照 [API 参考](/zh/api/core/) 检查导入。
 5. **测试你的 loader** — Loader 行为未变，但需要验证数据获取在 Vite 开发服务器下正常工作。

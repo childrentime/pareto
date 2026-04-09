@@ -1,16 +1,14 @@
 ---
 title: "From Next.js to Pareto: What Changes and What Stays the Same"
-published: false
-description: "A practical migration guide for Next.js developers moving to Pareto — the lightweight, streaming-first React SSR framework on Vite."
-tags: react, nextjs, javascript, webdev
-series:
-canonical_url: https://paretojs.tech/blog/nextjs-migration/
-cover_image:
+description: A practical migration guide for Next.js developers moving to Pareto — the lightweight, streaming-first React SSR framework on Vite.
+template: splash
 ---
+
+<p class="blog-meta">By <a href="https://github.com/childrentime">childrentime</a> · April 3, 2026</p>
 
 You know Next.js. You know file-based routing, layouts, loaders, SSR. You probably also know the pain: server components vs client components, the `"use client"` dance, mysterious hydration errors, and a 233 KB client bundle before you write a single line of app code.
 
-[Pareto](https://github.com/childrentime/pareto) gives you the same SSR patterns — but without the complexity. Standard React components, Vite instead of Webpack/Turbopack, and a 62 KB client bundle. This post walks through exactly what changes when you move from Next.js to Pareto, and what stays familiar.
+Pareto gives you the same SSR patterns — but without the complexity. Standard React components, Vite instead of Webpack/Turbopack, and a 62 KB client bundle. This post walks through exactly what changes when you move from Next.js to Pareto, and what stays familiar.
 
 ## The mental model shift
 
@@ -210,7 +208,7 @@ We run automated benchmarks in CI comparing Pareto against Next.js on identical 
 - **Streaming SSR capacity:** Pareto 2,022 req/s vs Next.js 310 req/s (**6.5x**)
 - **Client JS bundle:** 62 KB vs 233 KB (**73% smaller**)
 
-In infrastructure terms: a page serving 2,000 req/s needs 1 Pareto server vs 6 Next.js instances. Full benchmark details: [paretojs.tech/blog/benchmarks](https://paretojs.tech/blog/benchmarks/)
+In infrastructure terms: a page serving 2,000 req/s needs 1 Pareto server vs 6 Next.js instances. Full benchmark details: [/blog/benchmarks/](/blog/benchmarks/)
 
 ## What you give up
 
@@ -242,6 +240,15 @@ npx create-pareto@latest my-app
 cd my-app && npm install && npm run dev
 ```
 
----
-
-*[Pareto](https://github.com/childrentime/pareto) is a lightweight, streaming-first React SSR framework built on Vite. [Documentation](https://paretojs.tech)*
+<style>
+{`
+  .blog-meta {
+    font-size: 0.875rem;
+    color: var(--sl-color-gray-3);
+    margin-bottom: 2rem;
+  }
+  .blog-meta a {
+    color: var(--sl-color-accent);
+  }
+`}
+</style>

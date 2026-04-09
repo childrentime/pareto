@@ -20,20 +20,16 @@ Pareto 3.0 使用 **Vite 7**：
 - **原生 ESM** — 开发时不打包
 - **React Fast Refresh** — 保留组件状态的 HMR
 - **你的 Vite 插件直接可用** — PostCSS、Tailwind、MDX 等，无需框架封装
-- **单一配置** — `pareto.config.ts` 中的 `configureVite()`
+- **单一配置** — 在项目根目录放一个标准的 `vite.config.ts`，Pareto 自动加载并合并
 
 ```ts
-// pareto.config.ts
-import type { ParetoConfig } from '@paretojs/core'
+// vite.config.ts
+import { defineConfig } from 'vite'
+import myVitePlugin from 'my-vite-plugin'
 
-const config: ParetoConfig = {
-  configureVite(config) {
-    config.plugins.push(myVitePlugin())
-    return config
-  },
-}
-
-export default config
+export default defineConfig({
+  plugins: [myVitePlugin()],
+})
 ```
 
 ### React 19
@@ -91,16 +87,17 @@ const { useStore, getState, setState } = defineStore((set) => ({
 
 ### 安全头
 
-OWASP 推荐的安全头，开箱即用：
+OWASP 推荐的安全头，开箱即用。在项目根目录创建自定义 `app.ts`：
 
 ```ts
+// app.ts
+import express from 'express'
 import { securityHeaders } from '@paretojs/core/node'
 
-const config: ParetoConfig = {
-  configureServer(app) {
-    app.use(securityHeaders())
-  },
-}
+const app = express()
+app.use(securityHeaders())
+
+export default app
 ```
 
 ## 流式 SSR — 核心特性
@@ -139,7 +136,7 @@ export default function Page() {
 ## 从 2.x 迁移
 
 1. 安装 `@paretojs/core@3`，更新到 React 19
-2. 移除 Rspack 配置，改用 `configureVite()`
+2. 移除 Rspack 配置，改用标准的 `vite.config.ts`
 3. 用 `ParetoErrorBoundary` 替换 `error.tsx` 文件
 4. 用 Vite 开发服务器测试 loader
 

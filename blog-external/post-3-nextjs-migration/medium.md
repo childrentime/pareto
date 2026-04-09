@@ -154,30 +154,41 @@ const { useStore, getState, setState } = defineStore((set) => ({
 
 SSR hydration is automatic. State defined on the server is serialized and restored on the client without any manual dehydrate / rehydrate boilerplate.
 
-## Configuration: one file
+## Configuration: use Vite directly
 
 **Next.js:** next.config.js for framework config + separate Webpack/Turbopack customization + potential middleware.ts + environment variable conventions.
 
-**Pareto:** One pareto.config.ts:
+**Pareto:** Pareto uses Vite natively, so there's no framework-specific config wrapper. Drop a standard vite.config.ts in your project root — Pareto loads and merges it automatically in both dev and build modes.
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite'
+import tsconfigPaths from 'vite-tsconfig-paths'
+
+export default defineConfig({
+  plugins: [tsconfigPaths()],
+  resolve: {
+    alias: { '@': '/src' },
+  },
+  ssr: {
+    noExternal: ['some-esm-only-pkg'],
+  },
+})
+```
+
+For Pareto-specific options (appDir, outDir, etc.) add a tiny pareto.config.ts:
 
 ```ts
 import type { ParetoConfig } from '@paretojs/core'
 
 const config: ParetoConfig = {
-  configureVite(config) {
-    // Standard Vite config — your plugins just work
-    return config
-  },
-  configureServer(app) {
-    // Standard Express app — add any middleware
-    app.use(cors())
-  },
+  appDir: 'app',
 }
 
 export default config
 ```
 
-No framework magic. It's Vite and Express under the hood, both fully accessible.
+No framework magic. It's Vite under the hood, fully accessible — every Vite plugin works out of the box.
 
 ## The performance difference
 
@@ -196,7 +207,7 @@ Transparency matters. Here's what Pareto doesn't have:
 - **Server components** — No RSC, no "use client". This is by design: the loader pattern is simpler and covers 95% of use cases.
 - **Image optimization** — No `<Image>` component. Use standard `<img>` with a CDN.
 - **ISR / Static generation** — Pareto is SSR-only. No build-time rendering.
-- **Middleware** — No edge middleware. Use Express middleware in configureServer() instead.
+- **Middleware** — No edge middleware concept. Create a custom app.ts at your project root and add Express middleware there instead.
 - **Vercel integration** — No one-click deploy. You deploy a standard Node.js server.
 - **Ecosystem size** — Smaller community, fewer examples. You're early.
 
@@ -211,7 +222,7 @@ If you're building a content-heavy marketing site with ISR, Next.js is still the
 5. Move generateMetadata to head.tsx components
 6. Replace loading.tsx with defer() + `<Await>` for streaming
 7. Replace next/link with Link from @paretojs/core
-8. Move Webpack config to configureVite() in pareto.config.ts
+8. Move Webpack/Turbopack config to a standard vite.config.ts
 9. Deploy as a standard Node.js server
 
 ```bash

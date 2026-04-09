@@ -1,8 +1,14 @@
-# 从 Next.js 迁移到 Pareto：哪些变了，哪些没变
+---
+title: "从 Next.js 迁移到 Pareto：哪些变了，哪些没变"
+description: Next.js 开发者迁移到 Pareto 的实战指南——轻量级、流式优先、基于 Vite 的 React SSR 框架。
+template: splash
+---
+
+<p class="blog-meta">作者：<a href="https://github.com/childrentime">childrentime</a> · 2026 年 4 月 3 日</p>
 
 你熟悉 Next.js，熟悉文件路由、布局、SSR。你大概也熟悉那些痛点：Server Components vs Client Components，满屏的 `"use client"`，莫名其妙的 hydration 错误，还有你一行业务代码没写就已经 233 KB 的客户端包。
 
-[Pareto](https://github.com/childrentime/pareto) 提供同样的 SSR 模式——但没有这些复杂性。标准 React 组件，Vite 替代 Webpack/Turbopack，客户端包只有 62 KB。这篇文章详细对比从 Next.js 切到 Pareto 时，什么变了，什么不变。
+Pareto 提供同样的 SSR 模式——但没有这些复杂性。标准 React 组件，Vite 替代 Webpack/Turbopack，客户端包只有 62 KB。这篇文章详细对比从 Next.js 切到 Pareto 时，什么变了，什么不变。
 
 ## 心智模型的转变
 
@@ -202,7 +208,7 @@ export default config
 - **流式 SSR 容量：** Pareto 2,022 req/s vs Next.js 310 req/s（**6.5 倍**）
 - **客户端 JS 包：** 62 KB vs 233 KB（**小 73%**）
 
-换算成基础设施：一个需要 2,000 req/s 的页面，Pareto 需要 1 台服务器，Next.js 需要 6 台。完整基准测试数据：[paretojs.tech/blog/benchmarks](https://paretojs.tech/blog/benchmarks/)
+换算成基础设施：一个需要 2,000 req/s 的页面，Pareto 需要 1 台服务器，Next.js 需要 6 台。完整基准测试数据：[/zh/blog/benchmarks/](/zh/blog/benchmarks/)
 
 ## 你会放弃什么
 
@@ -234,6 +240,15 @@ npx create-pareto@latest my-app
 cd my-app && npm install && npm run dev
 ```
 
----
-
-[Pareto](https://github.com/childrentime/pareto) — 轻量级流式 React SSR 框架 | [文档](https://paretojs.tech)
+<style>
+{`
+  .blog-meta {
+    font-size: 0.875rem;
+    color: var(--sl-color-gray-3);
+    margin-bottom: 2rem;
+  }
+  .blog-meta a {
+    color: var(--sl-color-accent);
+  }
+`}
+</style>

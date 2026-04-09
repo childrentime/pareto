@@ -5,11 +5,52 @@
 - For `create-pareto`, run `pnpm templates` before publishing to regenerate templates with resolved `workspace:*` and `catalog:` versions.
 - Full command: `pnpm publish --access public --no-git-checks --registry https://registry.npmjs.org`
 
-## External Blog Publishing
+## Blog Publishing
 
-### Directory structure
+### Critical: website post MUST exist before external copies
 
-External platform copies are stored in `blog-external/` with sequential numbering:
+Every blog post lives in two places:
+
+1. **Website canonical post** (required, must exist first):
+   - `website/src/content/docs/blog/{slug}.md` — English
+   - `website/src/content/docs/zh/blog/{slug}.md` — Simplified Chinese
+   - Also add entries to both `index.mdx` files
+
+2. **External platform copies** (optional, published later):
+   - `blog-external/post-N-{slug}/medium.md`
+   - `blog-external/post-N-{slug}/devto.md`
+   - `blog-external/post-N-{slug}/juejin.md`
+
+**Why this order matters:** External posts set `canonical_url` to `https://paretojs.tech/blog/{slug}/`. If the website page doesn't exist, the canonical URL 404s — which is worse than no canonical at all for SEO. Always create and verify the website page first, then write the external copies.
+
+### Website post format
+
+Match the existing blog posts (`pareto-4.md`, `benchmarks.md`):
+
+```markdown
+---
+title: "..."
+description: ...
+template: splash
+---
+
+<p class="blog-meta">By <a href="https://github.com/childrentime">childrentime</a> · Month D, YYYY</p>
+
+...body...
+
+<style>
+{`
+  .blog-meta { font-size: 0.875rem; color: var(--sl-color-gray-3); margin-bottom: 2rem; }
+  .blog-meta a { color: var(--sl-color-accent); }
+`}
+</style>
+```
+
+Chinese version uses `作者：... · YYYY 年 M 月 D 日`. Internal links should use site-relative paths (`/blog/benchmarks/`, `/zh/concepts/routing/`), never absolute `https://paretojs.tech/...`.
+
+### External copies
+
+Stored in `blog-external/` with sequential numbering:
 
 ```
 blog-external/
@@ -19,33 +60,31 @@ blog-external/
     juejin.md   # Chinese (simplified), no frontmatter (user copies manually)
 ```
 
-### File formats
-
-- **dev.to**: YAML frontmatter with `published: false`, `tags`, `canonical_url` pointing to paretojs.tech blog post to avoid SEO duplication.
+- **dev.to**: YAML frontmatter with `published: false`, `tags`, `canonical_url` pointing to the **already-existing** paretojs.tech blog post.
 - **Medium**: Plain markdown, no frontmatter. Starts with `# Title`.
 - **掘金 (Juejin)**: Plain markdown in Chinese, no frontmatter.
 
-### Publishing workflow
+### External publishing workflow
 
-After writing blog posts, always:
+After the website posts are in place, for each batch:
 
 1. Create `blog-external/post-N-{slug}/` with `medium.md`, `devto.md`, `juejin.md`
 2. **Only publish the first post** of each batch to all 3 platforms:
    - **Medium**: Use the `/medium-push` skill with the `medium.md` file
-   - **dev.to**: POST via API using `DEVTO_API_KEY` from `.env` (set `published: false` as draft)
+   - **dev.to**: POST via API using `DEV_TO_API_KEY` from `.env` (set `published: false` as draft)
    - **Juejin (掘金)**: Tell user to copy from `juejin.md` (no API available)
 3. The remaining posts are saved in `blog-external/` for future publishing
 
 ### dev.to API
 
+Note: `.env` uses the variable name `DEV_TO_API_KEY` (with underscores). The dev.to API rejects Python urllib's default User-Agent with 403 — use `curl` (or set a custom UA).
+
 ```bash
 curl -s -X POST https://dev.to/api/articles \
-  -H "api-key: $DEVTO_API_KEY" \
+  -H "api-key: $DEV_TO_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"article": {"title": "...", "body_markdown": "...", "published": false, "tags": ["react","javascript","ssr","webdev"]}}'
+  -d '{"article": {"title": "...", "body_markdown": "...", "published": false, "tags": ["react","javascript","ssr","webdev"], "canonical_url": "https://paretojs.tech/blog/{slug}/"}}'
 ```
-
-API key is in `.env` as `DEVTO_API_KEY`.
 
 ## Code Conventions
 

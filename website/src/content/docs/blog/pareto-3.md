@@ -18,20 +18,16 @@ Pareto 3.0 uses **Vite 7** as its build engine. This means:
 - **Native ESM in development** — No bundling during dev. Modules are served directly to the browser.
 - **React Fast Refresh** — HMR that preserves component state, powered by `@vitejs/plugin-react`.
 - **Your Vite plugins work** — Any Vite plugin you already use (PostCSS, Tailwind, MDX, etc.) works out of the box. No framework-specific wrappers needed.
-- **Single config surface** — Customize the build via `configureVite()` in `pareto.config.ts`. No more juggling separate Rspack configs for client and server.
+- **Single config surface** — Customize the build by dropping a standard `vite.config.ts` in your project root. Pareto loads and merges it automatically. No more juggling separate Rspack configs for client and server.
 
 ```ts
-// pareto.config.ts
-import type { ParetoConfig } from '@paretojs/core'
+// vite.config.ts
+import { defineConfig } from 'vite'
+import myVitePlugin from 'my-vite-plugin'
 
-const config: ParetoConfig = {
-  configureVite(config) {
-    config.plugins.push(myVitePlugin())
-    return config
-  },
-}
-
-export default config
+export default defineConfig({
+  plugins: [myVitePlugin()],
+})
 ```
 
 ## React 19
@@ -126,7 +122,7 @@ pareto start   # Start production server
 ## Migration from 2.x
 
 1. **Update dependencies** — Install `@paretojs/core@3` and update to React 19.
-2. **Remove Rspack config** — Delete any custom Rspack configuration files. Use `configureVite()` in `pareto.config.ts` instead.
+2. **Remove Rspack config** — Delete any custom Rspack configuration files. Create a standard `vite.config.ts` in your project root instead — Pareto loads and merges it automatically.
 3. **Update error handling** — `error.tsx` is now optional and provides app-level error pages. Use `ParetoErrorBoundary` in your layouts/pages for component-level error isolation.
 4. **Update imports** — The `@paretojs/core` API surface is largely the same, but check that your imports match the [API reference](/api/core/).
 5. **Test your loaders** — Loader behavior is unchanged, but verify that your data fetching works with Vite's dev server.

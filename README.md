@@ -6,6 +6,8 @@
 
 <p align="center">
   Lightweight, streaming-first React SSR framework built on Vite.
+  <br>
+  <em>A fast, minimal alternative to Next.js, Remix, and TanStack Start.</em>
 </p>
 
 <p align="center">
